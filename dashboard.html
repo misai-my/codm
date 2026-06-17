@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Dashboard · Tournament Results Portal</title>
+  <title>Dashboard · CODM Tournament OS</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
 <body>
 <header class="nav">
   <div class="container nav-inner">
     <a class="brand" href="dashboard.html">
-      <span class="brand-mark">TRP</span>
+      <span class="brand-mark logo-image"><img src="assets/img/codm-logo.png" alt="CODM Tournament OS logo"/></span>
       <span class="brand-title">Tournament Results Portal<small id="tournamentName">Dashboard</small></span>
     </a>
     <nav class="nav-links">
       <a class="nav-link" href="#results">Results</a>
-      <a class="nav-link" href="#rulebook">Rulebook</a>
+      <a class="nav-link" href="rulebook.html">Rulebook</a>
       <a class="nav-link" href="#announcements">Announcements</a>
       <button class="btn btn-danger btn-small" data-signout>Sign Out</button>
     </nav>
@@ -49,7 +49,7 @@
           <aside class="sidebar card">
             <a class="nav-link" href="#announcements">Announcements</a>
             <a class="nav-link" href="#results">Results</a>
-            <a class="nav-link" href="#rulebook">Rulebook</a>
+            <a class="nav-link" href="rulebook.html">Rulebook</a>
           </aside>
 
           <div class="panel-stack">
@@ -79,7 +79,7 @@
                   <div class="eyebrow">Official</div>
                   <h2>Rulebook</h2>
                 </div>
-                <div id="rulebookFallback"></div>
+                <div id="rulebookFallback"></div><a class="btn btn-primary btn-small" href="rulebook.html">Full Rulebook Viewer</a>
               </div>
               <iframe id="rulebookFrame" class="rulebook-frame hidden" title="Rulebook"></iframe>
             </section>

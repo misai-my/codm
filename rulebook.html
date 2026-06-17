@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Rulebook · CODM Tournament OS</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark logo-image"><img src="assets/img/codm-logo.png" alt="CODM Tournament OS logo"/></span>
+      <span class="brand-title">CODM Tournament OS<small>Elite Competition Platform</small></span>
+    </a>
+    <nav class="nav-links">
+      <a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="admin.html">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div class="rulebook-toolbar">
+        <div>
+          <div class="eyebrow">Official Rules</div>
+          <h1>Rulebook Viewer</h1>
+          <p id="rulebookStatus" class="lead">Loading rulebook...</p>
+        </div>
+        <div class="actions">
+          <a id="openRulebookBtn" class="btn btn-primary hidden" href="#" target="_blank" rel="noopener">Open in Google Docs</a>
+          <a class="btn" href="dashboard.html">Back to Dashboard</a>
+        </div>
+      </div>
+
+      <section class="card">
+        <iframe id="rulebookFrame" class="rulebook-page-frame hidden" title="CODM Tournament Rulebook"></iframe>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/rulebook.js"></script>
+</body>
+</html>

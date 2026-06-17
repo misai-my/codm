@@ -4,6 +4,16 @@ Supabase project URL:
 
 `https://mueolsjzwitvlgxwtfbi.supabase.co`
 
+## Included links
+
+Rulebook:
+
+`https://docs.google.com/document/d/1hpJPhy6sgMaQy_zUnnN32-BB2NjgAT9Soz7_4RZXt78`
+
+Google Form:
+
+`https://docs.google.com/forms/d/e/1FAIpQLScfhYYJk2NckttjyZHfSH4GRCMiBYT2jp4dw2z7VKuWB9KBWw/viewform?edit2=2_ABaOnueI47O1nQ0i9v7gQXXCgyARsdqv-CCfXSEtanddJZlCVbEIHBXNwN6SxzMlBQ`
+
 ## Setup
 
 1. In Supabase, open SQL Editor.
@@ -36,6 +46,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 TOURNAMENT_SLUG=main-event
 RESPONSE_SHEET_NAME=Form responses 1
 FORM_ID=your-google-form-editor-id
+REGISTRATION_FORM_URL=https://docs.google.com/forms/d/e/1FAIpQLScfhYYJk2NckttjyZHfSH4GRCMiBYT2jp4dw2z7VKuWB9KBWw/viewform?edit2=2_ABaOnueI47O1nQ0i9v7gQXXCgyARsdqv-CCfXSEtanddJZlCVbEIHBXNwN6SxzMlBQ
 ```
 
 Run:

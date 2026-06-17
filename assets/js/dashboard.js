@@ -151,7 +151,7 @@ function renderResults(items) {
 }
 
 function renderRulebook() {
-  const url = tournament?.rulebook_url || "";
+  const url = tournament?.rulebook_url || cfg.RULEBOOK_URL || "";
   const frame = portal.qs("#rulebookFrame");
   const fallback = portal.qs("#rulebookFallback");
 

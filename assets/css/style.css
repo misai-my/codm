@@ -528,202 +528,7 @@ th {
   }
 }
 
-@media (max-width: 640px) {
-  .container { width: min(100% - 22px, var(--max)); }
 
-  .nav-inner {
-    align-items: stretch;
-    flex-direction: column;
-    padding: 12px 0;
-  }
-
-  .nav-links {
-    justify-content: flex-start;
-  }
-
-  .nav-link, .btn {
-    width: 100%;
-  }
-
-  .hero {
-    padding-top: 38px;
-  }
-
-  .h1 {
-    font-size: 40px;
-  }
-
-  .hero-card,
-  .sidebar {
-    grid-template-columns: 1fr;
-  }
-
-  .section-head,
-  .announcement-top,
-  .result-top {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .rulebook-frame {
-    height: 68vh;
-    min-height: 520px;
-  }
-
-  .result-score {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .score {
-    font-size: 24px;
-  }
-}
-
-
-/* CODM Brand Logo */
-.brand-mark {
-  overflow: hidden;
-  padding: 0;
-}
-
-.brand-mark img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-.brand-mark.logo-image {
-  background: linear-gradient(135deg, #fff0a8, #f8d15c, #d9972f);
-}
-
-.rulebook-page-frame {
-  width: 100%;
-  height: clamp(660px, 82vh, 1040px);
-  border: 0;
-  border-radius: 18px;
-  background: #fff;
-}
-
-.rulebook-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-@media (max-width: 640px) {
-  .rulebook-page-frame {
-    height: 72vh;
-    min-height: 540px;
-  }
-}
-
-
-/* ============================================================
-   CODM Premium Compact Header
-   Matches the black-and-gold CODM Tournament OS reference style.
-   ============================================================ */
-.nav {
-  background:
-    linear-gradient(180deg, rgba(7,9,16,.98), rgba(4,6,12,.94)) !important;
-  border-bottom: 1px solid rgba(255,255,255,.075) !important;
-  box-shadow: 0 14px 42px rgba(0,0,0,.28) !important;
-}
-
-.nav-inner {
-  min-height: 64px !important;
-  padding-block: 10px !important;
-}
-
-.codm-premium-brand,
-.brand {
-  gap: 10px !important;
-}
-
-.codm-premium-brand .brand-mark,
-.brand .brand-mark.logo-image {
-  width: 48px !important;
-  height: 48px !important;
-  min-width: 48px !important;
-  border-radius: 16px !important;
-  display: grid !important;
-  place-items: center !important;
-  padding: 7px !important;
-  background:
-    radial-gradient(circle at 32% 22%, rgba(255,255,255,.42), transparent 22%),
-    linear-gradient(135deg, #ffe98a 0%, #f8d15c 46%, #d99a29 100%) !important;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.16) inset,
-    0 10px 28px rgba(248,209,92,.24) !important;
-  overflow: hidden !important;
-}
-
-.codm-premium-brand .brand-mark img,
-.brand .brand-mark.logo-image img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  display: block !important;
-  filter: drop-shadow(0 1px 0 rgba(255,255,255,.22)) !important;
-}
-
-.codm-premium-brand .brand-title,
-.brand .brand-title {
-  gap: 2px !important;
-  justify-content: center !important;
-  font-size: clamp(15px, 1.8vw, 19px) !important;
-  line-height: .95 !important;
-  color: #ffffff !important;
-  font-weight: 1000 !important;
-  letter-spacing: .012em !important;
-  text-transform: uppercase !important;
-  text-shadow: 0 1px 0 rgba(0,0,0,.55) !important;
-}
-
-.codm-premium-brand .brand-title small,
-.brand .brand-title small {
-  color: rgba(255,255,255,.64) !important;
-  font-size: clamp(9px, 1.15vw, 11px) !important;
-  line-height: 1 !important;
-  font-weight: 1000 !important;
-  letter-spacing: .22em !important;
-  text-transform: uppercase !important;
-}
-
-@media (max-width: 640px) {
-  .nav-inner {
-    min-height: 62px !important;
-    padding-block: 9px !important;
-  }
-
-  .codm-premium-brand .brand-mark,
-  .brand .brand-mark.logo-image {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    border-radius: 15px !important;
-    padding: 7px !important;
-  }
-
-  .codm-premium-brand .brand-title,
-  .brand .brand-title {
-    font-size: 14px !important;
-  }
-
-  .codm-premium-brand .brand-title small,
-  .brand .brand-title small {
-    font-size: 8px !important;
-    letter-spacing: .18em !important;
-  }
-
-  .nav-links {
-    width: 100% !important;
-  }
-}
 
 @media (max-width: 390px) {
   .codm-premium-brand .brand-title,
@@ -1222,5 +1027,187 @@ button:disabled {
   .hero-actions .btn {
     white-space: nowrap;
     flex: 0 0 auto;
+  }
+}
+
+
+
+
+/* ============================================================
+   COMPACT 2-ROW MOBILE TOP NAV
+   No sideways scroll. Buttons become smaller and wrap neatly.
+   ============================================================ */
+
+/* Desktop / large screens remain one clean row. */
+.nav .nav-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+.nav .nav-links {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  overflow: visible !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+.nav .nav-links .nav-link,
+.nav .nav-links .btn,
+.nav .nav-links button {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+/* Phone and small tablet: brand first row, buttons below in compact grid. */
+@media (max-width: 760px) {
+  .nav .nav-inner {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    min-height: auto !important;
+    padding-block: 8px !important;
+  }
+
+  .nav .brand,
+  .nav .codm-premium-brand {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    justify-content: center !important;
+    gap: 9px !important;
+  }
+
+  .nav .brand-mark.logo-image,
+  .nav .codm-premium-brand .brand-mark {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 13px !important;
+    padding: 6px !important;
+  }
+
+  .nav .brand-title {
+    font-size: 13px !important;
+    line-height: .95 !important;
+    text-align: left !important;
+    overflow: visible !important;
+  }
+
+  .nav .brand-title small {
+    font-size: 7.5px !important;
+    letter-spacing: .14em !important;
+  }
+
+  .nav .nav-links {
+    width: 100% !important;
+    max-width: 560px !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)) !important;
+    gap: 6px !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+
+  .nav .nav-links .nav-link,
+  .nav .nav-links .btn,
+  .nav .nav-links button {
+    width: 100% !important;
+    min-height: 30px !important;
+    padding: 7px 8px !important;
+    border-radius: 999px !important;
+    font-size: 9.5px !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* Small phones: force two columns, so four buttons become two rows. */
+@media (max-width: 520px) {
+  .nav .nav-inner {
+    padding-inline: 10px !important;
+  }
+
+  .nav .nav-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    max-width: 360px !important;
+    gap: 6px !important;
+  }
+
+  .nav .brand-title {
+    font-size: 12px !important;
+  }
+
+  .nav .brand-title small {
+    font-size: 6.8px !important;
+    letter-spacing: .11em !important;
+  }
+
+  .nav .nav-links .nav-link,
+  .nav .nav-links .btn,
+  .nav .nav-links button {
+    min-height: 29px !important;
+    padding: 6px 6px !important;
+    font-size: 9px !important;
+  }
+}
+
+/* Very narrow phones: keep the two-row system, just make text tighter. */
+@media (max-width: 370px) {
+  .nav .brand-mark.logo-image,
+  .nav .codm-premium-brand .brand-mark {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+
+  .nav .brand-title {
+    font-size: 10.5px !important;
+  }
+
+  .nav .brand-title small {
+    font-size: 6px !important;
+    letter-spacing: .08em !important;
+  }
+
+  .nav .nav-links {
+    gap: 5px !important;
+  }
+
+  .nav .nav-links .nav-link,
+  .nav .nav-links .btn,
+  .nav .nav-links button {
+    min-height: 28px !important;
+    font-size: 8.2px !important;
+    padding: 6px 4px !important;
+  }
+}
+
+/* Hero/action buttons can wrap neatly instead of scrolling sideways. */
+@media (max-width: 520px) {
+  .hero-actions,
+  .actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    gap: 8px !important;
+  }
+
+  .hero-actions .btn,
+  .actions .btn {
+    flex: 1 1 140px !important;
+    min-width: 0 !important;
+    text-align: center !important;
+    justify-content: center !important;
   }
 }

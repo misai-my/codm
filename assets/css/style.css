@@ -621,3 +621,119 @@ th {
     min-height: 540px;
   }
 }
+
+
+/* ============================================================
+   CODM Premium Compact Header
+   Matches the black-and-gold CODM Tournament OS reference style.
+   ============================================================ */
+.nav {
+  background:
+    linear-gradient(180deg, rgba(7,9,16,.98), rgba(4,6,12,.94)) !important;
+  border-bottom: 1px solid rgba(255,255,255,.075) !important;
+  box-shadow: 0 14px 42px rgba(0,0,0,.28) !important;
+}
+
+.nav-inner {
+  min-height: 64px !important;
+  padding-block: 10px !important;
+}
+
+.codm-premium-brand,
+.brand {
+  gap: 10px !important;
+}
+
+.codm-premium-brand .brand-mark,
+.brand .brand-mark.logo-image {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  border-radius: 16px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 7px !important;
+  background:
+    radial-gradient(circle at 32% 22%, rgba(255,255,255,.42), transparent 22%),
+    linear-gradient(135deg, #ffe98a 0%, #f8d15c 46%, #d99a29 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.16) inset,
+    0 10px 28px rgba(248,209,92,.24) !important;
+  overflow: hidden !important;
+}
+
+.codm-premium-brand .brand-mark img,
+.brand .brand-mark.logo-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.22)) !important;
+}
+
+.codm-premium-brand .brand-title,
+.brand .brand-title {
+  gap: 2px !important;
+  justify-content: center !important;
+  font-size: clamp(15px, 1.8vw, 19px) !important;
+  line-height: .95 !important;
+  color: #ffffff !important;
+  font-weight: 1000 !important;
+  letter-spacing: .012em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 1px 0 rgba(0,0,0,.55) !important;
+}
+
+.codm-premium-brand .brand-title small,
+.brand .brand-title small {
+  color: rgba(255,255,255,.64) !important;
+  font-size: clamp(9px, 1.15vw, 11px) !important;
+  line-height: 1 !important;
+  font-weight: 1000 !important;
+  letter-spacing: .22em !important;
+  text-transform: uppercase !important;
+}
+
+@media (max-width: 640px) {
+  .nav-inner {
+    min-height: 62px !important;
+    padding-block: 9px !important;
+  }
+
+  .codm-premium-brand .brand-mark,
+  .brand .brand-mark.logo-image {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    border-radius: 15px !important;
+    padding: 7px !important;
+  }
+
+  .codm-premium-brand .brand-title,
+  .brand .brand-title {
+    font-size: 14px !important;
+  }
+
+  .codm-premium-brand .brand-title small,
+  .brand .brand-title small {
+    font-size: 8px !important;
+    letter-spacing: .18em !important;
+  }
+
+  .nav-links {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .codm-premium-brand .brand-title,
+  .brand .brand-title {
+    font-size: 12px !important;
+  }
+
+  .codm-premium-brand .brand-title small,
+  .brand .brand-title small {
+    font-size: 7px !important;
+    letter-spacing: .14em !important;
+  }
+}

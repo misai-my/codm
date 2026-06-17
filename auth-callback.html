@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Completing Login · Tournament Results Portal</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">TRP</span>
+      <span class="brand-title">Tournament Results Portal<small>Secure Login</small></span>
+    </a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="card" style="max-width:680px;margin:0 auto;">
+        <div class="eyebrow">Authentication</div>
+        <h1 id="callbackStatus">Completing login</h1>
+        <p id="callbackDetail" class="lead">Please wait while we secure your session...</p>
+        <div id="callbackActions" class="actions hidden">
+          <a class="btn btn-primary" href="index.html">Request New Login Link</a>
+          <a class="btn" href="dashboard.html">Try Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/auth-callback.js"></script>
+</body>
+</html>

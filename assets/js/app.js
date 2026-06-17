@@ -1,5 +1,21 @@
 const cfg = window.PORTAL_CONFIG || {};
-const sb = window.supabase?.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+const sb = window.supabase?.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
+
+function appBaseUrl() {
+  const path = window.location.pathname;
+  const basePath = path.endsWith("/") ? path : path.replace(/\/[^/]*$/, "/");
+  return `${window.location.origin}${basePath}`;
+}
+
+function authCallbackUrl() {
+  return `${appBaseUrl()}auth-callback.html`;
+}
 
 function qs(sel, root = document) { return root.querySelector(sel); }
 function qsa(sel, root = document) { return [...root.querySelectorAll(sel)]; }
@@ -36,7 +52,7 @@ async function signOut() {
 }
 
 async function sendMagicLink(email) {
-  const redirectTo = `${location.origin}${location.pathname.replace(/\/[^/]*$/, "/")}dashboard.html`;
+  const redirectTo = authCallbackUrl();
   const { error } = await sb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: redirectTo }
@@ -73,4 +89,4 @@ function wireNavAuth() {
 }
 
 document.addEventListener("DOMContentLoaded", wireNavAuth);
-window.portal = { qs, qsa, text, esc, toast, getSession, signOut, sendMagicLink, currentUserAccess, requireConfig };
+window.portal = { appBaseUrl, authCallbackUrl, qs, qsa, text, esc, toast, getSession, signOut, sendMagicLink, currentUserAccess, requireConfig };

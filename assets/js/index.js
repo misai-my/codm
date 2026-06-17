@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       status.textContent = "Sending secure login link...";
       status.classList.remove("hidden");
       await portal.sendMagicLink(email);
-      status.textContent = "Login link sent. Check your email.";
+      status.textContent = "Login link sent. Open it on the same browser/device. It will complete login through auth-callback.html.";
     } catch (err) {
       console.error(err);
       status.textContent = err.message || "Could not send login link.";

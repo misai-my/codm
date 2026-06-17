@@ -742,9 +742,6 @@ th {
 /* ============================================================
    Public Event Hub: Schedule / Announcements / Results only
    ============================================================ */
-.public-hub-shell .sidebar {
-  top: 86px;
-}
 
 .schedule-list {
   display: grid;
@@ -1071,5 +1068,159 @@ button:disabled {
 
   .admin-table-wrap table {
     min-width: 600px;
+  }
+}
+
+
+/* ============================================================
+   Dashboard without redundant sidebar
+   ============================================================ */
+.public-hub-content {
+  max-width: 1120px;
+}
+
+.public-hub-content .panel-stack {
+  width: 100%;
+}
+
+.public-hub-content .card {
+  scroll-margin-top: 92px;
+}
+
+@media (max-width: 760px) {
+  .public-hub-content {
+    padding-inline: 14px;
+  }
+
+  .public-hub-content .section-head {
+    align-items: flex-start;
+  }
+
+  .public-hub-content .panel-stack {
+    gap: 16px;
+  }
+}
+
+
+/* ============================================================
+   Dashboard without sidebar + mobile top nav no-stack fix
+   ============================================================ */
+.public-hub-content {
+  max-width: 1120px;
+}
+
+.public-hub-content .panel-stack {
+  width: 100%;
+}
+
+.public-hub-content .card {
+  scroll-margin-top: 92px;
+}
+
+/* Keep header buttons in one row on phones instead of stacking vertically. */
+.nav-inner {
+  gap: 12px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.nav-links .nav-link,
+.nav-links .btn {
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 760px) {
+  .nav-inner {
+    display: flex;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 8px !important;
+  }
+
+  .brand.codm-premium-brand,
+  .brand {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .brand-title {
+    min-width: 0;
+  }
+
+  .nav-links {
+    width: auto !important;
+    max-width: 46vw;
+    margin-left: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links .nav-link,
+  .nav-links .btn {
+    min-height: 34px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .public-hub-content {
+    padding-inline: 14px;
+  }
+
+  .public-hub-content .section-head {
+    align-items: flex-start;
+  }
+
+  .public-hub-content .panel-stack {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 430px) {
+  .nav-links {
+    max-width: 42vw;
+    gap: 6px;
+  }
+
+  .nav-links .nav-link,
+  .nav-links .btn {
+    padding: 7px 9px;
+    font-size: 10px;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .hero-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero-actions .btn {
+    white-space: nowrap;
+    flex: 0 0 auto;
   }
 }

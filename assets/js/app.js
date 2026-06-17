@@ -60,6 +60,18 @@ async function sendMagicLink(email) {
   if (error) throw error;
 }
 
+async function getActiveTournament(slug = null) {
+  const targetSlug = slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+  const { data, error } = await sb
+    .from("tournaments")
+    .select("*")
+    .eq("slug", targetSlug)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 async function currentUserAccess() {
   const session = await getSession();
   const email = session?.user?.email;
@@ -89,4 +101,4 @@ function wireNavAuth() {
 }
 
 document.addEventListener("DOMContentLoaded", wireNavAuth);
-window.portal = { appBaseUrl, authCallbackUrl, qs, qsa, text, esc, toast, getSession, signOut, sendMagicLink, currentUserAccess, requireConfig };
+window.portal = { appBaseUrl, authCallbackUrl, qs, qsa, text, esc, toast, getSession, signOut, sendMagicLink, currentUserAccess, getActiveTournament, requireConfig };

@@ -14,8 +14,10 @@
       <span class="brand-title">CODM TOURNAMENT OS<small>ELITE COMPETITION PLATFORM</small></span>
     </a>
     <nav class="nav-links">
-      <a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLScfhYYJk2NckttjyZHfSH4GRCMiBYT2jp4dw2z7VKuWB9KBWw/viewform?edit2=2_ABaOnueI47O1nQ0i9v7gQXXCgyARsdqv-CCfXSEtanddJZlCVbEIHBXNwN6SxzMlBQ" target="_blank" rel="noopener">Register</a>
-      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="dashboard.html#announcements">Announcements</a>
+      <a class="nav-link" href="dashboard.html#schedule">Schedule</a>
+      <a class="nav-link" href="dashboard.html#results">Results</a>
+      <a class="nav-link" href="rulebook.html">Rulebook</a>
       <a class="nav-link" href="admin.html">Admin</a>
     </nav>
   </div>
@@ -25,45 +27,32 @@
   <section class="hero">
     <div class="container hero-grid">
       <div>
-        <div class="eyebrow">Registered Access Only</div>
-        <h1 class="h1"><span class="gradient-text">Results, rulebook,</span><br/>and announcements.</h1>
-        <p class="lead">A premium event portal for players and captains. Access is based on the email registered through the official Google Form.</p>
-        <div class="hero-actions" style="margin: 0 0 16px;">
-          <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLScfhYYJk2NckttjyZHfSH4GRCMiBYT2jp4dw2z7VKuWB9KBWw/viewform?edit2=2_ABaOnueI47O1nQ0i9v7gQXXCgyARsdqv-CCfXSEtanddJZlCVbEIHBXNwN6SxzMlBQ" target="_blank" rel="noopener">Open Registration Form</a>
+        <div class="eyebrow">Public Tournament Hub</div>
+        <h1 class="h1"><span class="gradient-text">CODM Tournament OS</span><br/>Elite Competition Platform.</h1>
+        <p class="lead">A premium public hub for official announcements, match schedule, rulebook, and match results.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="dashboard.html">Open Event Hub</a>
           <a class="btn" href="rulebook.html">View Rulebook</a>
         </div>
-
-        <div id="loggedInBox" class="notice hidden">
-          You are logged in as <strong id="loggedInEmail"></strong>. Open the dashboard to continue.
-        </div>
-
-        <form id="loginForm" class="card form" style="margin-top:18px;max-width:520px;">
-          <div class="field">
-            <label for="loginEmail">Registered Email</label>
-            <input id="loginEmail" type="email" placeholder="captain@email.com" required/>
-          </div>
-          <button class="btn btn-primary" type="submit">Send Secure Login Link</button>
-          <div id="loginStatus" class="notice hidden"></div>
-        </form>
       </div>
 
       <div class="hero-card">
-        <div class="stat-card"><strong>01</strong><span>Results display</span></div>
-        <div class="stat-card"><strong>02</strong><span>Rulebook viewer</span></div>
-        <div class="stat-card"><strong>03</strong><span>Announcements</span></div>
+        <div class="stat-card"><strong>01</strong><span>Announcements</span></div>
+        <div class="stat-card"><strong>02</strong><span>Match Schedule</span></div>
+        <div class="stat-card"><strong>03</strong><span>Match Results</span></div>
+        <div class="stat-card"><strong>04</strong><span>Rulebook Viewer</span></div>
       </div>
     </div>
   </section>
 </main>
 
 <footer class="footer">
-  <div class="container">Built for mobile, tablet, and desktop.</div>
+  <div class="container">CODM Tournament OS · Elite Competition Platform</div>
 </footer>
 
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js"></script>
 <script src="assets/js/app.js"></script>
-<script src="assets/js/index.js"></script>
 </body>
 </html>

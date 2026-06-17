@@ -1,38 +1,53 @@
-let accessRows = [];
-let selectedAccess = null;
 let tournament = null;
 
-function accessLabel(row) {
-  return [row.team_name, row.mode].filter(Boolean).join(" · ") || row.email;
-}
-
 async function loadTournament(slug) {
-  const { data, error } = await sb
-    .from("tournaments")
-    .select("*")
-    .eq("slug", slug || cfg.DEFAULT_TOURNAMENT_SLUG)
-    .maybeSingle();
+  const row = await portal.getActiveTournament(slug || cfg.DEFAULT_TOURNAMENT_SLUG);
+  if (row) return row;
 
-  if (error) throw error;
-  return data;
+  return {
+    id: null,
+    slug: cfg.DEFAULT_TOURNAMENT_SLUG || "main-event",
+    title: cfg.SITE_NAME || "CODM Tournament OS",
+    rulebook_url: cfg.RULEBOOK_URL || ""
+  };
 }
 
 async function loadAnnouncements() {
-  const { data, error } = await sb
+  let query = sb
     .from("announcements")
     .select("*")
     .eq("is_published", true)
-    .or(`tournament_id.is.null,tournament_id.eq.${tournament.id}`)
     .order("priority_order", { ascending: true })
     .order("published_at", { ascending: false });
+
+  if (tournament?.id) {
+    query = query.or(`tournament_id.is.null,tournament_id.eq.${tournament.id}`);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+async function loadSchedule() {
+  if (!tournament?.id) return [];
+
+  const { data, error } = await sb
+    .from("match_schedules")
+    .select("*")
+    .eq("tournament_id", tournament.id)
+    .eq("is_published", true)
+    .order("scheduled_at", { ascending: true, nullsFirst: false })
+    .order("schedule_order", { ascending: true });
 
   if (error) throw error;
   return data || [];
 }
 
 async function loadResults() {
-  const modes = selectedAccess?.mode ? [selectedAccess.mode] : [];
-  let query = sb
+  if (!tournament?.id) return [];
+
+  const { data, error } = await sb
     .from("event_results")
     .select("*")
     .eq("tournament_id", tournament.id)
@@ -40,32 +55,17 @@ async function loadResults() {
     .order("result_order", { ascending: true })
     .order("created_at", { ascending: false });
 
-  if (modes.length) query = query.in("mode", modes);
-
-  const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
 
-function renderAccessSelector() {
-  const wrap = portal.qs("#accessSelectorWrap");
-  const select = portal.qs("#accessSelector");
-
-  if (accessRows.length <= 1) {
-    wrap.classList.add("hidden");
-    return;
-  }
-
-  select.innerHTML = accessRows.map(row => `
-    <option value="${portal.esc(row.id)}">${portal.esc(accessLabel(row))}</option>
-  `).join("");
-
-  select.value = selectedAccess.id;
-  wrap.classList.remove("hidden");
-  select.addEventListener("change", async () => {
-    selectedAccess = accessRows.find(row => row.id === select.value) || accessRows[0];
-    await renderDashboardData();
-  });
+function modeLabel(value) {
+  return ({
+    multiplayer_1v1: "MP 1v1",
+    multiplayer_5v5: "MP 5v5",
+    battle_royale_solo: "BR Solo",
+    battle_royale_squads: "BR Squads"
+  })[value] || value || "Mode";
 }
 
 function renderAnnouncements(items) {
@@ -82,9 +82,40 @@ function renderAnnouncements(items) {
           <span class="pill ${String(item.priority).toLowerCase() === "urgent" ? "pill-red" : "pill-gold"}">${portal.esc(item.priority || "Info")}</span>
           <h3>${portal.esc(item.title)}</h3>
         </div>
-        <span class="pill">${item.published_at ? new Date(item.published_at).toLocaleDateString() : "Posted"}</span>
+        <span class="pill">${item.published_at ? new Date(item.published_at).toLocaleString() : "Posted"}</span>
       </div>
       <p>${portal.esc(item.body)}</p>
+    </article>
+  `).join("");
+}
+
+function renderSchedule(items) {
+  const wrap = portal.qs("#scheduleList");
+  if (!items.length) {
+    wrap.innerHTML = `<div class="notice">No published match schedule yet.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = items.map(item => `
+    <article class="schedule-card">
+      <div class="schedule-time">
+        <strong>${item.scheduled_at ? new Date(item.scheduled_at).toLocaleDateString() : "TBD"}</strong>
+        <span>${item.scheduled_at ? new Date(item.scheduled_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Time TBD"}</span>
+      </div>
+      <div class="schedule-main">
+        <div class="schedule-topline">
+          <span class="pill pill-gold">${portal.esc(modeLabel(item.mode))}</span>
+          <span class="pill">${portal.esc(item.stage || "Stage")}</span>
+          <span class="pill">${portal.esc(item.status || "Scheduled")}</span>
+        </div>
+        <h3>${portal.esc(item.title || "Match")}</h3>
+        <p>${portal.esc(item.description || "")}</p>
+        <div class="schedule-teams">
+          <strong>${portal.esc(item.team_a || "TBD")}</strong>
+          <span>vs</span>
+          <strong>${portal.esc(item.team_b || "TBD")}</strong>
+        </div>
+      </div>
     </article>
   `).join("");
 }
@@ -92,7 +123,7 @@ function renderAnnouncements(items) {
 function renderResults(items) {
   const wrap = portal.qs("#resultsList");
   if (!items.length) {
-    wrap.innerHTML = `<div class="notice">No published results for this registration yet.</div>`;
+    wrap.innerHTML = `<div class="notice">No published results yet.</div>`;
     return;
   }
 
@@ -105,7 +136,7 @@ function renderResults(items) {
         <article class="result-card">
           <div class="result-top">
             <div>
-              <span class="pill pill-gold">${portal.esc(item.mode || "Mode")}</span>
+              <span class="pill pill-gold">${portal.esc(modeLabel(item.mode))}</span>
               <h3>${portal.esc(item.title)}</h3>
             </div>
             <span class="pill pill-green">${portal.esc(item.status || "Final")}</span>
@@ -129,7 +160,7 @@ function renderResults(items) {
       <article class="result-card">
         <div class="result-top">
           <div>
-            <span class="pill pill-gold">${portal.esc(item.mode || "Mode")}</span>
+            <span class="pill pill-gold">${portal.esc(modeLabel(item.mode))}</span>
             <h3>${portal.esc(item.title)}</h3>
           </div>
           <span class="pill pill-green">${portal.esc(item.status || "Final")}</span>
@@ -165,19 +196,22 @@ function renderRulebook() {
   const preview = docMatch ? `https://docs.google.com/document/d/${docMatch[1]}/preview?usp=sharing` : url;
   frame.src = preview;
   frame.classList.remove("hidden");
-  fallback.innerHTML = `<a class="btn btn-primary btn-small" href="${portal.esc(url)}" target="_blank" rel="noopener">Open Rulebook</a>`;
+  fallback.innerHTML = `<a class="btn btn-primary btn-small" href="${portal.esc(url)}" target="_blank" rel="noopener">Open in Google Docs</a>`;
 }
 
 async function renderDashboardData() {
-  portal.qs("#portalMeta").textContent = `${selectedAccess.email} · ${accessLabel(selectedAccess)}`;
+  portal.qs("#portalMeta").textContent = `${tournament?.title || "CODM Tournament OS"} · Public event information hub`;
+
   renderRulebook();
 
-  const [announcements, results] = await Promise.all([
+  const [announcements, schedule, results] = await Promise.all([
     loadAnnouncements(),
+    loadSchedule(),
     loadResults()
   ]);
 
   renderAnnouncements(announcements);
+  renderSchedule(schedule);
   renderResults(results);
 }
 
@@ -185,33 +219,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!portal.requireConfig()) return;
 
   try {
-    const { session, email, access } = await portal.currentUserAccess();
-
-    if (!session?.user) {
-      location.href = "index.html";
-      return;
-    }
-
-    accessRows = access;
-
-    if (!accessRows.length) {
-      portal.qs("#accessDenied").classList.remove("hidden");
-      portal.qs("#dashboardMain").classList.add("hidden");
-      portal.qs("#deniedEmail").textContent = email;
-      return;
-    }
-
-    selectedAccess = accessRows[0];
-    tournament = await loadTournament(selectedAccess.tournament_slug || cfg.DEFAULT_TOURNAMENT_SLUG);
-
-    portal.qs("#dashboardMain").classList.remove("hidden");
-    portal.qs("#welcomeName").textContent = selectedAccess.full_name || selectedAccess.email;
-    portal.qs("#tournamentName").textContent = tournament?.title || cfg.SITE_NAME;
-
-    renderAccessSelector();
+    tournament = await loadTournament(cfg.DEFAULT_TOURNAMENT_SLUG);
     await renderDashboardData();
   } catch (err) {
     console.error(err);
-    portal.toast(err.message || "Failed to load dashboard.");
+    portal.toast(err.message || "Failed to load event hub.");
   }
 });

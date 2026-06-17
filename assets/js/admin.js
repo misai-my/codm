@@ -27,30 +27,26 @@ async function requireAdmin() {
 }
 
 async function loadTournament() {
-  const { data, error } = await sb
-    .from("tournaments")
-    .select("*")
-    .eq("slug", cfg.DEFAULT_TOURNAMENT_SLUG)
-    .maybeSingle();
-
-  if (error) throw error;
-  activeTournament = data;
+  activeTournament = await portal.getActiveTournament(cfg.DEFAULT_TOURNAMENT_SLUG);
+  if (!activeTournament) {
+    throw new Error(`Tournament not found: ${cfg.DEFAULT_TOURNAMENT_SLUG}`);
+  }
 }
 
 async function loadAdminData() {
-  const [annRes, resultRes, accessRes] = await Promise.all([
+  const [annRes, resultRes, scheduleRes] = await Promise.all([
     sb.from("announcements").select("*").order("created_at", { ascending: false }).limit(25),
     sb.from("event_results").select("*").order("created_at", { ascending: false }).limit(25),
-    sb.from("registered_access").select("*").order("created_at", { ascending: false }).limit(100)
+    sb.from("match_schedules").select("*").order("scheduled_at", { ascending: true, nullsFirst: false }).order("schedule_order", { ascending: true }).limit(50)
   ]);
 
   if (annRes.error) throw annRes.error;
   if (resultRes.error) throw resultRes.error;
-  if (accessRes.error) throw accessRes.error;
+  if (scheduleRes.error) throw scheduleRes.error;
 
   renderAnnouncementsTable(annRes.data || []);
   renderResultsTable(resultRes.data || []);
-  renderAccessTable(accessRes.data || []);
+  renderScheduleTable(scheduleRes.data || []);
 }
 
 function renderAnnouncementsTable(rows) {
@@ -67,22 +63,28 @@ function renderResultsTable(rows) {
   portal.qs("#resultsTable").innerHTML = rows.map(row => `
     <tr>
       <td>${portal.esc(row.mode || "")}</td>
-      <td><strong>${portal.esc(row.title)}</strong><div>${portal.esc(row.status || "")}</div></td>
+      <td><strong>${portal.esc(row.title)}</strong><div>${portal.esc(row.team_a || "")} ${row.team_a_score ?? ""} - ${row.team_b_score ?? ""} ${portal.esc(row.team_b || "")}</div></td>
       <td>${row.is_published ? "Published" : "Draft"}</td>
     </tr>
   `).join("") || `<tr><td colspan="3">No results.</td></tr>`;
 }
 
-function renderAccessTable(rows) {
-  portal.qs("#accessTable").innerHTML = rows.map(row => `
+function renderScheduleTable(rows) {
+  portal.qs("#scheduleTable").innerHTML = rows.map(row => `
     <tr>
-      <td>${portal.esc(row.email)}</td>
-      <td>${portal.esc(row.full_name || "")}</td>
-      <td>${portal.esc(row.team_name || "")}</td>
+      <td>${row.scheduled_at ? new Date(row.scheduled_at).toLocaleString() : "TBD"}</td>
+      <td><strong>${portal.esc(row.title || "Match")}</strong><div>${portal.esc(row.team_a || "TBD")} vs ${portal.esc(row.team_b || "TBD")}</div></td>
       <td>${portal.esc(row.mode || "")}</td>
-      <td>${portal.esc(row.status || "")}</td>
+      <td>${row.is_published ? portal.esc(row.status || "Published") : "Draft"}</td>
     </tr>
-  `).join("") || `<tr><td colspan="5">No registered access rows.</td></tr>`;
+  `).join("") || `<tr><td colspan="4">No schedule.</td></tr>`;
+}
+
+function localDateTimeToIso(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -103,7 +105,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         priority: portal.qs("#announcementPriority").value,
         priority_order: portal.qs("#announcementPriority").value === "Urgent" ? 1 : portal.qs("#announcementPriority").value === "Important" ? 2 : 3,
         is_published: true,
-        published_at: new Date().toISOString()
+        published_at: new Date().toISOString(),
+        created_by: currentProfile?.id || null
       };
 
       const { error } = await sb.from("announcements").insert(payload);
@@ -125,13 +128,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         team_b: portal.text(portal.qs("#teamB").value),
         team_a_score: Number(portal.qs("#teamAScore").value || 0),
         team_b_score: Number(portal.qs("#teamBScore").value || 0),
-        is_published: true
+        is_published: true,
+        created_by: currentProfile?.id || null
       };
 
       const { error } = await sb.from("event_results").insert(payload);
       if (error) throw error;
       event.target.reset();
       portal.toast("Result posted.");
+      await loadAdminData();
+    });
+
+    portal.qs("#scheduleForm")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        tournament_id: activeTournament?.id,
+        title: portal.text(portal.qs("#scheduleTitle").value),
+        mode: portal.qs("#scheduleMode").value,
+        stage: portal.text(portal.qs("#scheduleStage").value),
+        team_a: portal.text(portal.qs("#scheduleTeamA").value),
+        team_b: portal.text(portal.qs("#scheduleTeamB").value),
+        status: portal.text(portal.qs("#scheduleStatus").value) || "Scheduled",
+        description: portal.text(portal.qs("#scheduleDescription").value),
+        scheduled_at: localDateTimeToIso(portal.qs("#scheduleAt").value),
+        schedule_order: Number(portal.qs("#scheduleOrder").value || 100),
+        is_published: true,
+        created_by: currentProfile?.id || null
+      };
+
+      const { error } = await sb.from("match_schedules").insert(payload);
+      if (error) throw error;
+      event.target.reset();
+      portal.toast("Schedule posted.");
       await loadAdminData();
     });
   } catch (err) {

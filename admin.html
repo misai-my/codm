@@ -9,12 +9,13 @@
 <body>
 <header class="nav">
   <div class="container nav-inner">
-    <a class="brand codm-premium-brand" href="admin.html">
+    <a class="brand codm-premium-brand" href="index.html">
       <span class="brand-mark logo-image"><img src="assets/img/codm-logo.png" alt="CODM Tournament OS logo"/></span>
       <span class="brand-title">CODM TOURNAMENT OS<small>ELITE COMPETITION PLATFORM</small></span>
     </a>
     <nav class="nav-links">
-      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="dashboard.html">Event Hub</a>
+      <a class="nav-link" href="rulebook.html">Rulebook</a>
       <button class="btn btn-danger btn-small" data-signout>Sign Out</button>
     </nav>
   </div>
@@ -26,8 +27,8 @@
       <div id="adminDenied" class="card hidden">
         <div class="eyebrow">Admin Only</div>
         <h1>Admin access required.</h1>
-        <p class="lead">Login with an admin email to manage announcements and results.</p>
-        <a class="btn btn-primary" href="index.html">Login</a>
+        <p class="lead">Login with an admin email to manage announcements, schedule, and results.</p>
+        <a class="btn btn-primary" href="index.html">Back to Home</a>
       </div>
 
       <div id="adminMain" class="hidden">
@@ -35,7 +36,7 @@
           <div>
             <div class="eyebrow">Command Center</div>
             <h1>Admin Console</h1>
-            <p>Post announcements, publish results, and review registered access.</p>
+            <p>Post announcements, publish match schedules, and update match results.</p>
           </div>
         </div>
 
@@ -64,7 +65,7 @@
           </section>
 
           <section class="card">
-            <h2>Post Result</h2>
+            <h2>Post Match Result</h2>
             <form id="resultForm" class="form">
               <div class="field"><label>Title</label><input id="resultTitle" required placeholder="Match 1 · Finals"/></div>
               <div class="field">
@@ -89,18 +90,47 @@
         </div>
 
         <section class="card section">
+          <h2>Post Match Schedule</h2>
+          <form id="scheduleForm" class="form">
+            <div class="grid grid-two">
+              <div class="field"><label>Match Title</label><input id="scheduleTitle" required placeholder="Match 1 · Upper Bracket"/></div>
+              <div class="field"><label>Scheduled At</label><input id="scheduleAt" type="datetime-local"/></div>
+              <div class="field">
+                <label>Mode</label>
+                <select id="scheduleMode">
+                  <option value="multiplayer_1v1">Multiplayer 1v1</option>
+                  <option value="multiplayer_5v5">Multiplayer 5v5</option>
+                  <option value="battle_royale_solo">Battle Royale Solo</option>
+                  <option value="battle_royale_squads">Battle Royale Squads</option>
+                </select>
+              </div>
+              <div class="field"><label>Stage</label><input id="scheduleStage" placeholder="Group Stage / Finals"/></div>
+              <div class="field"><label>Team A</label><input id="scheduleTeamA" placeholder="Team A / Lobby A"/></div>
+              <div class="field"><label>Team B</label><input id="scheduleTeamB" placeholder="Team B / TBD"/></div>
+              <div class="field"><label>Status</label><input id="scheduleStatus" value="Scheduled"/></div>
+              <div class="field"><label>Order</label><input id="scheduleOrder" type="number" value="100"/></div>
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <textarea id="scheduleDescription" placeholder="Stream details, lobby note, map order, or admin note"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Publish Schedule</button>
+          </form>
+        </section>
+
+        <section class="card section">
           <h2>Announcements</h2>
           <div class="admin-table-wrap"><table><thead><tr><th>Priority</th><th>Post</th><th>Status</th></tr></thead><tbody id="announcementsTable"></tbody></table></div>
         </section>
 
         <section class="card section">
-          <h2>Results</h2>
-          <div class="admin-table-wrap"><table><thead><tr><th>Mode</th><th>Result</th><th>Status</th></tr></thead><tbody id="resultsTable"></tbody></table></div>
+          <h2>Match Schedule</h2>
+          <div class="admin-table-wrap"><table><thead><tr><th>Time</th><th>Match</th><th>Mode</th><th>Status</th></tr></thead><tbody id="scheduleTable"></tbody></table></div>
         </section>
 
         <section class="card section">
-          <h2>Registered Access</h2>
-          <div class="admin-table-wrap"><table><thead><tr><th>Email</th><th>Name</th><th>Team</th><th>Mode</th><th>Status</th></tr></thead><tbody id="accessTable"></tbody></table></div>
+          <h2>Match Results</h2>
+          <div class="admin-table-wrap"><table><thead><tr><th>Mode</th><th>Result</th><th>Status</th></tr></thead><tbody id="resultsTable"></tbody></table></div>
         </section>
       </div>
     </div>

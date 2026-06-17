@@ -51,12 +51,15 @@ async function signOut() {
   location.href = "index.html";
 }
 
-async function sendMagicLink(email) {
-  const redirectTo = authCallbackUrl();
+async function sendMagicLink(email, nextPath = "dashboard.html") {
+  const callback = new URL(authCallbackUrl());
+  callback.searchParams.set("next", nextPath || "dashboard.html");
+
   const { error } = await sb.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: redirectTo }
+    options: { emailRedirectTo: callback.toString() }
   });
+
   if (error) throw error;
 }
 

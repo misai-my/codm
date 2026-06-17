@@ -1,3 +1,10 @@
+function safeNextPath() {
+  const query = new URLSearchParams(window.location.search);
+  const next = query.get("next") || "dashboard.html";
+  if (/^[a-z0-9_-]+\.html(?:[?#].*)?$/i.test(next)) return next;
+  return "dashboard.html";
+}
+
 async function completeAuthCallback() {
   const status = portal.qs("#callbackStatus");
   const detail = portal.qs("#callbackDetail");
@@ -55,7 +62,7 @@ async function completeAuthCallback() {
 
     window.history.replaceState({}, document.title, window.location.pathname);
     setStatus("Login confirmed", "Redirecting to your dashboard...");
-    setTimeout(() => window.location.replace("dashboard.html"), 500);
+    setTimeout(() => window.location.replace(safeNextPath()), 500);
   } catch (err) {
     console.error(err);
     setStatus("Login could not be completed", err.message || "Please request a new login link.");

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin · Tournament Results Portal</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="admin.html">
+      <span class="brand-mark">TRP</span>
+      <span class="brand-title">Tournament Results Portal<small>Admin Console</small></span>
+    </a>
+    <nav class="nav-links">
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <button class="btn btn-danger btn-small" data-signout>Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div id="adminDenied" class="card hidden">
+        <div class="eyebrow">Admin Only</div>
+        <h1>Admin access required.</h1>
+        <p class="lead">Login with an admin email to manage announcements and results.</p>
+        <a class="btn btn-primary" href="index.html">Login</a>
+      </div>
+
+      <div id="adminMain" class="hidden">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Command Center</div>
+            <h1>Admin Console</h1>
+            <p>Post announcements, publish results, and review registered access.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-two">
+          <section class="card">
+            <h2>Post Announcement</h2>
+            <form id="announcementForm" class="form">
+              <div class="field">
+                <label>Title</label>
+                <input id="announcementTitle" maxlength="100" required/>
+              </div>
+              <div class="field">
+                <label>Priority</label>
+                <select id="announcementPriority">
+                  <option>Info</option>
+                  <option>Important</option>
+                  <option>Urgent</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Message</label>
+                <textarea id="announcementBody" required></textarea>
+              </div>
+              <button class="btn btn-primary" type="submit">Publish Announcement</button>
+            </form>
+          </section>
+
+          <section class="card">
+            <h2>Post Result</h2>
+            <form id="resultForm" class="form">
+              <div class="field"><label>Title</label><input id="resultTitle" required placeholder="Match 1 · Finals"/></div>
+              <div class="field">
+                <label>Mode</label>
+                <select id="resultMode">
+                  <option value="multiplayer_1v1">Multiplayer 1v1</option>
+                  <option value="multiplayer_5v5">Multiplayer 5v5</option>
+                  <option value="battle_royale_solo">Battle Royale Solo</option>
+                  <option value="battle_royale_squads">Battle Royale Squads</option>
+                </select>
+              </div>
+              <div class="grid grid-two">
+                <div class="field"><label>Team A</label><input id="teamA"/></div>
+                <div class="field"><label>Team B</label><input id="teamB"/></div>
+                <div class="field"><label>Team A Score</label><input id="teamAScore" type="number" value="0"/></div>
+                <div class="field"><label>Team B Score</label><input id="teamBScore" type="number" value="0"/></div>
+              </div>
+              <div class="field"><label>Status</label><input id="resultStatus" value="Final"/></div>
+              <button class="btn btn-primary" type="submit">Publish Result</button>
+            </form>
+          </section>
+        </div>
+
+        <section class="card section">
+          <h2>Announcements</h2>
+          <div class="admin-table-wrap"><table><thead><tr><th>Priority</th><th>Post</th><th>Status</th></tr></thead><tbody id="announcementsTable"></tbody></table></div>
+        </section>
+
+        <section class="card section">
+          <h2>Results</h2>
+          <div class="admin-table-wrap"><table><thead><tr><th>Mode</th><th>Result</th><th>Status</th></tr></thead><tbody id="resultsTable"></tbody></table></div>
+        </section>
+
+        <section class="card section">
+          <h2>Registered Access</h2>
+          <div class="admin-table-wrap"><table><thead><tr><th>Email</th><th>Name</th><th>Team</th><th>Mode</th><th>Status</th></tr></thead><tbody id="accessTable"></tbody></table></div>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>

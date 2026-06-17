@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Tournament Results Portal</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">TRP</span>
+      <span class="brand-title">Tournament Results Portal<small>Premium Access Hub</small></span>
+    </a>
+    <nav class="nav-links">
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="admin.html">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">Registered Access Only</div>
+        <h1 class="h1"><span class="gradient-text">Results, rulebook,</span><br/>and announcements.</h1>
+        <p class="lead">A premium event portal for players and captains. Access is based on the email registered through the official Google Form.</p>
+
+        <div id="loggedInBox" class="notice hidden">
+          You are logged in as <strong id="loggedInEmail"></strong>. Open the dashboard to continue.
+        </div>
+
+        <form id="loginForm" class="card form" style="margin-top:18px;max-width:520px;">
+          <div class="field">
+            <label for="loginEmail">Registered Email</label>
+            <input id="loginEmail" type="email" placeholder="captain@email.com" required/>
+          </div>
+          <button class="btn btn-primary" type="submit">Send Secure Login Link</button>
+          <div id="loginStatus" class="notice hidden"></div>
+        </form>
+      </div>
+
+      <div class="hero-card">
+        <div class="stat-card"><strong>01</strong><span>Results display</span></div>
+        <div class="stat-card"><strong>02</strong><span>Rulebook viewer</span></div>
+        <div class="stat-card"><strong>03</strong><span>Announcements</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">Built for mobile, tablet, and desktop.</div>
+</footer>
+
+<div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/index.js"></script>
+</body>
+</html>

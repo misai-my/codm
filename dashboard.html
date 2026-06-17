@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dashboard · Tournament Results Portal</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="dashboard.html">
+      <span class="brand-mark">TRP</span>
+      <span class="brand-title">Tournament Results Portal<small id="tournamentName">Dashboard</small></span>
+    </a>
+    <nav class="nav-links">
+      <a class="nav-link" href="#results">Results</a>
+      <a class="nav-link" href="#rulebook">Rulebook</a>
+      <a class="nav-link" href="#announcements">Announcements</a>
+      <button class="btn btn-danger btn-small" data-signout>Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div id="accessDenied" class="card hidden">
+        <div class="eyebrow">Access Denied</div>
+        <h1>Registration email not found.</h1>
+        <p class="lead">The logged-in email <strong id="deniedEmail"></strong> is not currently listed in the registration access table.</p>
+        <a class="btn btn-primary" href="index.html">Try Another Email</a>
+      </div>
+
+      <div id="dashboardMain" class="hidden">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Welcome</div>
+            <h1>Hi, <span id="welcomeName">Captain</span>.</h1>
+            <p id="portalMeta">Loading access...</p>
+          </div>
+          <div id="accessSelectorWrap" class="field hidden" style="min-width:min(100%,320px);">
+            <label for="accessSelector">Select Registration</label>
+            <select id="accessSelector"></select>
+          </div>
+        </div>
+
+        <div class="dashboard-shell">
+          <aside class="sidebar card">
+            <a class="nav-link" href="#announcements">Announcements</a>
+            <a class="nav-link" href="#results">Results</a>
+            <a class="nav-link" href="#rulebook">Rulebook</a>
+          </aside>
+
+          <div class="panel-stack">
+            <section class="card" id="announcements">
+              <div class="section-head">
+                <div>
+                  <div class="eyebrow">Official Updates</div>
+                  <h2>Announcements</h2>
+                </div>
+              </div>
+              <div id="announcementList" class="announcement-list"></div>
+            </section>
+
+            <section class="card" id="results">
+              <div class="section-head">
+                <div>
+                  <div class="eyebrow">Published</div>
+                  <h2>Results</h2>
+                </div>
+              </div>
+              <div id="resultsList" class="results-list"></div>
+            </section>
+
+            <section class="card" id="rulebook">
+              <div class="section-head">
+                <div>
+                  <div class="eyebrow">Official</div>
+                  <h2>Rulebook</h2>
+                </div>
+                <div id="rulebookFallback"></div>
+              </div>
+              <iframe id="rulebookFrame" class="rulebook-frame hidden" title="Rulebook"></iframe>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/dashboard.js"></script>
+</body>
+</html>

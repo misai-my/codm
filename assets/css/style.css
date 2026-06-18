@@ -2754,6 +2754,7 @@ header.dashboard-sticky-nav,
 #schedule,
 #results,
 #support,
+#registration,
 #rulebook {
   scroll-margin-top: 160px;
 }
@@ -2772,8 +2773,71 @@ header.dashboard-sticky-nav,
   #schedule,
   #results,
   #support,
+  #registration,
   #rulebook {
     scroll-margin-top: 190px;
+  }
+}
+
+
+/* ============================================================
+   FINAL DASHBOARD REGISTRATION CTA
+   ============================================================ */
+.registration-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  border-color: rgba(248, 209, 92, .28);
+  background:
+    radial-gradient(circle at 88% 22%, rgba(248, 209, 92, .14), transparent 30%),
+    linear-gradient(145deg, rgba(248, 209, 92, .07), rgba(255, 255, 255, .025));
+}
+
+.registration-cta-copy {
+  min-width: 0;
+}
+
+.registration-cta-copy h2 {
+  margin: 6px 0 8px;
+}
+
+.registration-cta-copy p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.registration-cta-actions {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  text-align: right;
+}
+
+.registration-cta-button {
+  min-width: 178px;
+}
+
+.registration-cta-note {
+  color: var(--muted2);
+  font-size: 11px;
+}
+
+@media (max-width: 760px) {
+  .registration-cta {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .registration-cta-actions {
+    justify-items: stretch;
+    text-align: left;
+  }
+
+  .registration-cta-button {
+    width: 100%;
   }
 }
 

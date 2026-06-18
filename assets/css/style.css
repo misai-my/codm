@@ -2729,3 +2729,51 @@ iframe#rulebookFrame,
   }
 }
 
+
+/* ============================================================
+   FINAL DASHBOARD STICKY HEADER
+   Keeps public dashboard navigation visible while scrolling.
+   ============================================================ */
+.dashboard-sticky-nav,
+header.dashboard-sticky-nav,
+.nav.dashboard-sticky-nav {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 5000 !important;
+  width: 100% !important;
+  isolation: isolate;
+  background: rgba(7, 10, 18, .92) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .10);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .24);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Prevent hash-link sections from hiding behind the sticky menu. */
+#announcements,
+#schedule,
+#results,
+#support,
+#rulebook {
+  scroll-margin-top: 160px;
+}
+
+@media (max-width: 760px) {
+  .dashboard-sticky-nav,
+  header.dashboard-sticky-nav,
+  .nav.dashboard-sticky-nav {
+    top: 0 !important;
+    max-height: min(46vh, 260px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  #announcements,
+  #schedule,
+  #results,
+  #support,
+  #rulebook {
+    scroll-margin-top: 190px;
+  }
+}
+

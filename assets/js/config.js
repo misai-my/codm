@@ -12,11 +12,13 @@ window.PORTAL_CONFIG = {
   TOURNAMENT_FALLBACKS: {
     "community-gladiators-2026-season-2": {
       title: "Community Gladiators 2026 Season 2",
+      show_in_public_selector: true,
       registration_form_url: "https://docs.google.com/forms/d/e/1FAIpQLScfhYYJk2NckttjyZHfSH4GRCMiBYT2jp4dw2z7VKuWB9KBWw/viewform",
       rulebook_url: "https://docs.google.com/document/d/1hpJPhy6sgMaQy_zUnnN32-BB2NjgAT9Soz7_4RZXt78"
     },
     "garena-masters-xi": {
       title: "Garena Masters XI",
+      show_in_public_selector: false,
       registration_form_url: "",
       rulebook_url: ""
     }

@@ -37,18 +37,38 @@ function tournamentUrl(path, slug = getSelectedTournamentSlug()) {
   return `${url.pathname.split("/").pop()}${url.search}${url.hash}`;
 }
 
-async function listTournaments() {
+async function listTournaments(options = {}) {
+  const publicOnly = Boolean(options.publicOnly);
+
   const { data, error } = await sb
     .from("tournaments")
     .select("*");
 
-  if (error) throw error;
+  if (error) {
+    console.warn("Tournament list unavailable; using local fallbacks.", error);
 
-  return [...(data || [])].sort((a, b) => {
-    const titleA = String(a.title || a.slug || "");
-    const titleB = String(b.title || b.slug || "");
-    return titleA.localeCompare(titleB);
-  });
+    return Object.entries(cfg.TOURNAMENT_FALLBACKS || {})
+      .map(([slug, row]) => ({
+        id: null,
+        slug,
+        title: row.title || slug,
+        registration_open: Boolean(row.registration_form_url),
+        registration_form_url: row.registration_form_url || "",
+        rulebook_doc_url: row.rulebook_url || "",
+        event_hub_enabled: true,
+        show_in_public_selector: row.show_in_public_selector !== false
+      }))
+      .filter(row => !publicOnly || row.show_in_public_selector !== false);
+  }
+
+  return [...(data || [])]
+    .filter(row => row.event_hub_enabled !== false)
+    .filter(row => !publicOnly || row.show_in_public_selector !== false)
+    .sort((a, b) => {
+      const titleA = String(a.title || a.slug || "");
+      const titleB = String(b.title || b.slug || "");
+      return titleA.localeCompare(titleB);
+    });
 }
 
 async function getTournamentBySlug(slug = getSelectedTournamentSlug()) {
@@ -59,7 +79,11 @@ async function getTournamentBySlug(slug = getSelectedTournamentSlug()) {
     .eq("slug", targetSlug)
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.warn("Tournament lookup unavailable; using local fallback.", error);
+    return null;
+  }
+
   return data;
 }
 

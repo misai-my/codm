@@ -426,7 +426,7 @@ function renderResultsTable(rows) {
 }
 
 async function bootAdminConsole() {
-  adminTournaments = await portal.listTournaments();
+  adminTournaments = await portal.listTournaments({ publicOnly: false });
   await loadTournament();
   renderAdminTournamentSelector();
   wireAdminTournamentSelector();

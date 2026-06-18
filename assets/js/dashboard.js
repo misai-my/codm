@@ -1007,8 +1007,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!portal.requireConfig()) return;
 
   try {
-    dashboardTournaments = await portal.listTournaments();
-    const selectedSlug = portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+    dashboardTournaments = await portal.listTournaments({ publicOnly: true });
+    const requestedSlug = portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+    const selectedSlug = dashboardTournaments.some(row => row.slug === requestedSlug)
+      ? requestedSlug
+      : (dashboardTournaments[0]?.slug || cfg.DEFAULT_TOURNAMENT_SLUG);
+
+    if (selectedSlug !== requestedSlug) {
+      portal.setSelectedTournamentSlug(selectedSlug, true);
+    }
+
     tournament = dashboardTournaments.find(row => row.slug === selectedSlug) || await loadTournament(selectedSlug);
 
     renderDashboardTournamentSelector();

@@ -58,8 +58,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const select = portal.qs("#rulebookTournamentSelect");
 
   try {
-    rulebookTournaments = await portal.listTournaments();
-    await loadRulebookTournament(portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG));
+    rulebookTournaments = await portal.listTournaments({ publicOnly: true });
+    const requestedSlug = portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+    const selectedSlug = rulebookTournaments.some(row => row.slug === requestedSlug)
+      ? requestedSlug
+      : (rulebookTournaments[0]?.slug || cfg.DEFAULT_TOURNAMENT_SLUG);
+
+    if (selectedSlug !== requestedSlug) {
+      portal.setSelectedTournamentSlug(selectedSlug, true);
+    }
+
+    await loadRulebookTournament(selectedSlug);
     await renderRulebookTournament();
 
     select?.addEventListener("change", async () => {

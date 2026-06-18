@@ -47,6 +47,7 @@ async function switchAdminTournament(slug) {
   inquiryRows = [];
 
   renderAdminTournamentSelector();
+  renderAdminMatchPreviews();
   await loadAdminData();
   await loadFaqAndSupportAdmin();
 }
@@ -188,6 +189,9 @@ async function loadTournament(slug = null) {
 async function loadMatchDetails() {
   const slug = adminTournamentSlug();
 
+  // Important: do not fall back to all published records.
+  // A tournament with no synced rows must show an empty preview,
+  // never another tournament's match data.
   const { data, error } = await sb
     .from("match_details")
     .select("*")
@@ -202,28 +206,19 @@ async function loadMatchDetails() {
 
   if (error) {
     if (error.code === "42P01") {
-      portal.qs("#matchTableWarning").innerHTML = `<div class="notice notice-warning">match_details table missing. Run supabase_match_details_schema.sql.</div>`;
+      portal.qs("#matchTableWarning").innerHTML = `<div class="notice notice-warning">match_details table missing. Run the Sheet Mirror SQL first.</div>`;
       return [];
     }
+
     if (error.code === "42501") {
-      portal.qs("#matchTableWarning").innerHTML = `<div class="notice notice-warning">match_details RLS/public policy issue. Run supabase_match_details_public_read_fix.sql.</div>`;
+      portal.qs("#matchTableWarning").innerHTML = `<div class="notice notice-warning">match_details RLS issue. Confirm the published-read policy is enabled.</div>`;
       return [];
     }
+
     throw error;
   }
 
-  if (data && data.length) return data;
-
-  const fallback = await sb
-    .from("match_details")
-    .select("*")
-    .eq("is_published", true)
-    .order("mode", { ascending: true })
-    .order("scheduled_at", { ascending: true, nullsFirst: false })
-    .limit(250);
-
-  if (fallback.error) throw fallback.error;
-  return fallback.data || [];
+  return data || [];
 }
 
 
@@ -312,7 +307,32 @@ function applyAdminFilter(rows, prefix) {
   });
 }
 
+
+function updateAdminMatchPreviewContext() {
+  const title = activeTournament?.title || adminTournamentSlug();
+  const label = portal.qs("#matchPreviewTournament");
+  const warning = portal.qs("#matchTableWarning");
+
+  if (label) {
+    label.textContent = `Showing published data for: ${title}`;
+  }
+
+  if (!warning) return;
+
+  if (adminMatchRows.length) {
+    warning.innerHTML = "";
+    return;
+  }
+
+  warning.innerHTML = `
+    <div class="notice notice-info">
+      No published match data is available for <strong>${portal.esc(title)}</strong> yet.
+    </div>
+  `;
+}
+
 function renderAdminMatchPreviews() {
+  updateAdminMatchPreviewContext();
   renderScheduleTable(applyAdminFilter(adminMatchRows, "adminSchedule"));
   renderResultsTable(applyAdminFilter(adminMatchRows, "adminResults"));
 }

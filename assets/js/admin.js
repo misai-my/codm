@@ -61,10 +61,13 @@ async function loadTournament() {
 }
 
 async function loadMatchDetails() {
+  const slug = cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+
   const { data, error } = await sb
     .from("match_details")
     .select("*")
-    .eq("tournament_slug", cfg.DEFAULT_TOURNAMENT_SLUG || "main-event")
+    .eq("tournament_slug", slug)
+    .eq("is_published", true)
     .order("scheduled_at", { ascending: true, nullsFirst: false })
     .order("day_no", { ascending: true, nullsFirst: false })
     .order("series_no", { ascending: true, nullsFirst: false })
@@ -77,10 +80,25 @@ async function loadMatchDetails() {
       portal.qs("#matchTableWarning").innerHTML = `<div class="notice notice-warning">match_details table missing. Run supabase_match_details_schema.sql.</div>`;
       return [];
     }
+    if (error.code === "42501") {
+      portal.qs("#matchTableWarning").innerHTML = `<div class="notice notice-warning">match_details RLS/public policy issue. Run supabase_match_details_public_read_fix.sql.</div>`;
+      return [];
+    }
     throw error;
   }
 
-  return data || [];
+  if (data && data.length) return data;
+
+  const fallback = await sb
+    .from("match_details")
+    .select("*")
+    .eq("is_published", true)
+    .order("mode", { ascending: true })
+    .order("scheduled_at", { ascending: true, nullsFirst: false })
+    .limit(250);
+
+  if (fallback.error) throw fallback.error;
+  return fallback.data || [];
 }
 
 async function loadAdminData() {

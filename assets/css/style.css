@@ -1214,8 +1214,31 @@ button:disabled {
 
 
 /* ============================================================
-   Match Details public results from Google Sheet / Supabase
+   Match Details Display Polish
    ============================================================ */
+.match-mode-group {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.match-mode-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 6px 0 2px;
+}
+
+.match-mode-title h3 {
+  margin: 0;
+}
+
+.result-card p,
+.schedule-card p {
+  color: var(--muted);
+}
+
 .br-leaderboard {
   display: grid;
   gap: 8px;
@@ -1224,13 +1247,13 @@ button:disabled {
 
 .br-row {
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) 80px 72px;
-  gap: 10px;
+  grid-template-columns: 52px minmax(0, 1fr) 78px 68px;
   align-items: center;
-  padding: 9px 10px;
-  border-radius: 12px;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.09);
   background: rgba(255,255,255,.045);
-  border: 1px solid rgba(255,255,255,.08);
 }
 
 .br-row .rank {
@@ -1242,45 +1265,14 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
-.admin-grid {
-  display: grid;
-  grid-template-columns: 230px minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
-}
-
-.admin-side-menu {
-  position: sticky;
-  top: 92px;
+.match-empty-debug {
   display: grid;
   gap: 8px;
 }
 
-.admin-side-menu a {
-  padding: 11px 12px;
-  border-radius: 12px;
-  color: rgba(244,248,255,.90);
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
-  font-weight: 800;
-}
-
-.admin-stack {
-  display: grid;
-  gap: 18px;
-}
-
-@media (max-width: 820px) {
-  .admin-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-side-menu {
-    display: none;
-  }
-
+@media (max-width: 640px) {
   .br-row {
-    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-columns: 42px minmax(0, 1fr);
   }
 
   .br-row span:nth-child(3),
@@ -1290,9 +1282,10 @@ button:disabled {
 }
 
 
+
 /* ============================================================
-   FINAL CODM LOGO SIZE FIX
-   Prevents the uploaded logo from covering the full page.
+   FINAL HARD LOGO CONTAINMENT FIX
+   The logo asset is also physically resized to 96x96.
    ============================================================ */
 .nav .brand-mark.logo-image,
 .nav .codm-premium-brand .brand-mark.logo-image,
@@ -1311,28 +1304,35 @@ button:disabled {
   padding: 6px !important;
   border-radius: 14px !important;
   box-sizing: border-box !important;
+  line-height: 0 !important;
 }
 
 .nav .brand-mark.logo-image img,
 .nav .codm-premium-brand .brand-mark.logo-image img,
 .brand .brand-mark.logo-image img,
-.brand-mark.logo-image img {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
+.brand-mark.logo-image img,
+img[src$="codm-logo.png"] {
+  width: 32px !important;
+  height: 32px !important;
   min-width: 0 !important;
   min-height: 0 !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
   object-fit: contain !important;
   display: block !important;
   position: static !important;
   inset: auto !important;
   transform: none !important;
+  margin: 0 !important;
 }
 
-/* Safety guard: no image should exceed its container unless explicitly designed. */
-img {
-  max-width: 100%;
+/* Extra safety for any image escaping layout */
+body > img[src$="codm-logo.png"],
+main img[src$="codm-logo.png"] {
+  width: 32px !important;
+  height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
 }
 
 @media (max-width: 760px) {
@@ -1348,23 +1348,17 @@ img {
     max-height: 38px !important;
     flex-basis: 38px !important;
     padding: 5px !important;
-    border-radius: 13px !important;
   }
-}
 
-@media (max-width: 370px) {
-  .nav .brand-mark.logo-image,
-  .nav .codm-premium-brand .brand-mark.logo-image,
-  .brand .brand-mark.logo-image,
-  .brand-mark.logo-image {
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
-    min-height: 34px !important;
-    max-height: 34px !important;
-    flex-basis: 34px !important;
-    padding: 4px !important;
+  .nav .brand-mark.logo-image img,
+  .nav .codm-premium-brand .brand-mark.logo-image img,
+  .brand .brand-mark.logo-image img,
+  .brand-mark.logo-image img,
+  img[src$="codm-logo.png"] {
+    width: 28px !important;
+    height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
   }
 }
 

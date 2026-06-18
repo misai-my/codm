@@ -1,6 +1,5 @@
 let currentProfile = null;
 let activeTournament = null;
-let scheduleTableAvailable = true;
 
 async function loadProfile() {
   const session = await portal.getSession();
@@ -61,46 +60,49 @@ async function loadTournament() {
   if (!activeTournament) throw new Error(`Tournament not found: ${cfg.DEFAULT_TOURNAMENT_SLUG}`);
 }
 
-function tableMissing(error) {
-  const msg = String(error?.message || error?.details || error || "").toLowerCase();
-  return msg.includes("match_schedules") || msg.includes("schema cache") || msg.includes("could not find the table");
-}
-
-async function loadScheduleRows() {
-  const scheduleRes = await sb
-    .from("match_schedules")
+async function loadMatchDetails() {
+  const { data, error } = await sb
+    .from("match_details")
     .select("*")
+    .eq("tournament_slug", cfg.DEFAULT_TOURNAMENT_SLUG || "main-event")
     .order("scheduled_at", { ascending: true, nullsFirst: false })
-    .order("schedule_order", { ascending: true })
-    .limit(50);
+    .order("day_no", { ascending: true, nullsFirst: false })
+    .order("series_no", { ascending: true, nullsFirst: false })
+    .order("round_no", { ascending: true, nullsFirst: false })
+    .order("map_order", { ascending: true, nullsFirst: false })
+    .limit(250);
 
-  if (scheduleRes.error) {
-    if (tableMissing(scheduleRes.error)) {
-      scheduleTableAvailable = false;
-      showScheduleSetupWarning();
+  if (error) {
+    if (error.code === "42P01") {
+      portal.qs("#matchTableWarning").innerHTML = `<div class="notice notice-warning">match_details table missing. Run supabase_match_details_schema.sql.</div>`;
       return [];
     }
-    throw scheduleRes.error;
+    throw error;
   }
 
-  scheduleTableAvailable = true;
-  hideScheduleSetupWarning();
-  return scheduleRes.data || [];
+  return data || [];
 }
 
 async function loadAdminData() {
-  const [annRes, resultRes, scheduleRows] = await Promise.all([
+  const [annRes, matchRows] = await Promise.all([
     sb.from("announcements").select("*").order("created_at", { ascending: false }).limit(25),
-    sb.from("event_results").select("*").order("created_at", { ascending: false }).limit(25),
-    loadScheduleRows()
+    loadMatchDetails()
   ]);
 
   if (annRes.error) throw annRes.error;
-  if (resultRes.error) throw resultRes.error;
 
   renderAnnouncementsTable(annRes.data || []);
-  renderResultsTable(resultRes.data || []);
-  renderScheduleTable(scheduleRows || []);
+  renderScheduleTable(matchRows);
+  renderResultsTable(matchRows);
+}
+
+function modeLabel(value) {
+  return ({
+    MP_1V1: "MP 1v1",
+    MP_TEAM_5V5: "MP Team",
+    BR_SOLO: "BR Solo",
+    BR_SQUAD: "BR Squad"
+  })[value] || value || "Mode";
 }
 
 function renderAnnouncementsTable(rows) {
@@ -113,71 +115,57 @@ function renderAnnouncementsTable(rows) {
   `).join("") || `<tr><td colspan="3">No announcements.</td></tr>`;
 }
 
-function renderResultsTable(rows) {
-  portal.qs("#resultsTable").innerHTML = rows.map(row => `
-    <tr>
-      <td>${portal.esc(row.mode || "")}</td>
-      <td><strong>${portal.esc(row.title)}</strong><div>${portal.esc(row.team_a || "")} ${row.team_a_score ?? ""} - ${row.team_b_score ?? ""} ${portal.esc(row.team_b || "")}</div></td>
-      <td>${row.is_published ? "Published" : "Draft"}</td>
-    </tr>
-  `).join("") || `<tr><td colspan="3">No results.</td></tr>`;
-}
-
 function renderScheduleTable(rows) {
-  if (!scheduleTableAvailable) {
-    portal.qs("#scheduleTable").innerHTML = `<tr><td colspan="4">Run <strong>supabase_public_event_hub_migration.sql</strong> to enable match schedules.</td></tr>`;
-    return;
-  }
+  const scheduleRows = rows.filter(row => row.is_published).slice(0, 40);
 
-  portal.qs("#scheduleTable").innerHTML = rows.map(row => `
+  portal.qs("#scheduleTable").innerHTML = scheduleRows.map(row => `
     <tr>
+      <td>${portal.esc(modeLabel(row.mode))}</td>
+      <td><strong>${portal.esc(row.match_title || row.stage || "Match")}</strong><div>${portal.esc(row.map_name || "")}</div></td>
       <td>${row.scheduled_at ? new Date(row.scheduled_at).toLocaleString() : "TBD"}</td>
-      <td><strong>${portal.esc(row.title || "Match")}</strong><div>${portal.esc(row.team_a || "TBD")} vs ${portal.esc(row.team_b || "TBD")}</div></td>
-      <td>${portal.esc(row.mode || "")}</td>
-      <td>${row.is_published ? portal.esc(row.status || "Published") : "Draft"}</td>
+      <td>${portal.esc(row.status || "Scheduled")}</td>
     </tr>
-  `).join("") || `<tr><td colspan="4">No schedule.</td></tr>`;
+  `).join("") || `<tr><td colspan="4">No synced schedule rows.</td></tr>`;
 }
 
-function showScheduleSetupWarning() {
-  const warning = portal.qs("#scheduleWarning");
-  if (!warning) return;
-  warning.innerHTML = "The <strong>match_schedules</strong> table is missing. Run <strong>supabase_public_event_hub_migration.sql</strong> in Supabase, then refresh this page.";
-  warning.classList.remove("hidden");
+function renderResultsTable(rows) {
+  const resultRows = rows.filter(row =>
+    row.is_published &&
+    (row.score !== null || row.opponent_score !== null || row.placement !== null || row.total_points !== null)
+  ).slice(0, 60);
 
-  portal.qsa("#scheduleForm input, #scheduleForm select, #scheduleForm textarea, #scheduleForm button").forEach(el => {
-    el.disabled = true;
-  });
-}
+  portal.qs("#resultsTable").innerHTML = resultRows.map(row => {
+    const isBr = String(row.mode).startsWith("BR_");
+    const resultText = isBr
+      ? `#${row.placement ?? "-"} · ${row.eliminations ?? 0} elims · ${row.total_points ?? 0} pts`
+      : `${row.score ?? "-"} - ${row.opponent_score ?? "-"} · ${row.result || ""}`;
 
-function hideScheduleSetupWarning() {
-  const warning = portal.qs("#scheduleWarning");
-  if (warning) warning.classList.add("hidden");
-
-  portal.qsa("#scheduleForm input, #scheduleForm select, #scheduleForm textarea, #scheduleForm button").forEach(el => {
-    el.disabled = false;
-  });
-}
-
-function localDateTimeToIso(value) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toISOString();
+    return `
+      <tr>
+        <td>${portal.esc(modeLabel(row.mode))}</td>
+        <td><strong>${portal.esc(row.match_title || row.participant_name || "Entry")}</strong><div>${portal.esc(row.participant_name || row.map_name || "")}</div></td>
+        <td>${portal.esc(resultText)}</td>
+        <td>${portal.esc(row.status || "Final")}</td>
+      </tr>
+    `;
+  }).join("") || `<tr><td colspan="4">No synced result rows.</td></tr>`;
 }
 
 function wireAdminLoginForm() {
-  portal.qs("#adminLoginForm")?.addEventListener("submit", async event => {
+  portal.qs("#adminLoginForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const email = portal.text(portal.qs("#adminLoginEmail")?.value).toLowerCase();
     const status = portal.qs("#adminLoginStatus");
+
     if (!email) return;
 
     try {
       status.textContent = "Sending admin login link...";
       status.classList.remove("hidden");
+
       await portal.sendMagicLink(email, "admin.html");
+
       status.textContent = "Admin login link sent. Open it on this browser/device.";
     } catch (err) {
       console.error(err);
@@ -186,8 +174,8 @@ function wireAdminLoginForm() {
   });
 }
 
-function wireAdminForms() {
-  portal.qs("#announcementForm")?.addEventListener("submit", async event => {
+function wireAnnouncementForm() {
+  portal.qs("#announcementForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const payload = {
@@ -207,59 +195,6 @@ function wireAdminForms() {
     portal.toast("Announcement posted.");
     await loadAdminData();
   });
-
-  portal.qs("#resultForm")?.addEventListener("submit", async event => {
-    event.preventDefault();
-
-    const payload = {
-      tournament_id: activeTournament?.id,
-      title: portal.text(portal.qs("#resultTitle").value),
-      mode: portal.qs("#resultMode").value,
-      status: portal.qs("#resultStatus").value,
-      team_a: portal.text(portal.qs("#teamA").value),
-      team_b: portal.text(portal.qs("#teamB").value),
-      team_a_score: Number(portal.qs("#teamAScore").value || 0),
-      team_b_score: Number(portal.qs("#teamBScore").value || 0),
-      is_published: true,
-      created_by: currentProfile?.id || null
-    };
-
-    const { error } = await sb.from("event_results").insert(payload);
-    if (error) throw error;
-    event.target.reset();
-    portal.toast("Result posted.");
-    await loadAdminData();
-  });
-
-  portal.qs("#scheduleForm")?.addEventListener("submit", async event => {
-    event.preventDefault();
-
-    if (!scheduleTableAvailable) {
-      portal.toast("Run the match_schedules SQL migration first.");
-      return;
-    }
-
-    const payload = {
-      tournament_id: activeTournament?.id,
-      title: portal.text(portal.qs("#scheduleTitle").value),
-      mode: portal.qs("#scheduleMode").value,
-      stage: portal.text(portal.qs("#scheduleStage").value),
-      team_a: portal.text(portal.qs("#scheduleTeamA").value),
-      team_b: portal.text(portal.qs("#scheduleTeamB").value),
-      status: portal.text(portal.qs("#scheduleStatus").value) || "Scheduled",
-      description: portal.text(portal.qs("#scheduleDescription").value),
-      scheduled_at: localDateTimeToIso(portal.qs("#scheduleAt").value),
-      schedule_order: Number(portal.qs("#scheduleOrder").value || 100),
-      is_published: true,
-      created_by: currentProfile?.id || null
-    };
-
-    const { error } = await sb.from("match_schedules").insert(payload);
-    if (error) throw error;
-    event.target.reset();
-    portal.toast("Schedule posted.");
-    await loadAdminData();
-  });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -269,9 +204,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     if (!(await requireAdmin())) return;
+
     await loadTournament();
     await loadAdminData();
-    wireAdminForms();
+    wireAnnouncementForm();
   } catch (err) {
     console.error(err);
     portal.toast(err.message || "Admin page failed to load.");

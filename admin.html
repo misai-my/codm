@@ -6,14 +6,14 @@
   <title>Admin · CODM Tournament OS</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
-<body class="admin-page">
+<body>
 <header class="nav admin-nav">
-  <div class="container nav-inner admin-nav-inner">
+  <div class="container nav-inner">
     <a class="brand codm-premium-brand" href="admin.html">
       <span class="brand-mark logo-image"><img src="assets/img/codm-logo.png" alt="CODM Tournament OS logo"/></span>
       <span class="brand-title">CODM TOURNAMENT OS<small>ADMIN CONTROL CENTER</small></span>
     </a>
-    <nav class="nav-links admin-top-actions">
+    <nav class="nav-links admin-only-nav">
       <a class="nav-link" href="dashboard.html" target="_blank" rel="noopener">View Public Site</a>
       <button class="btn btn-danger btn-small hidden" id="adminSignOutBtn" data-signout>Sign Out</button>
     </nav>
@@ -21,14 +21,13 @@
 </header>
 
 <main>
-  <section class="section admin-section">
+  <section class="section">
     <div class="container">
       <section id="adminLoginCard" class="card admin-login-card hidden">
         <div class="eyebrow">Admin Login</div>
         <h1>Organizer access only.</h1>
         <p class="lead">Public viewers do not need a login. Only approved admins can enter this control center.</p>
-
-        <form id="adminLoginForm" class="form admin-login-form">
+        <form id="adminLoginForm" class="form" style="max-width:520px;">
           <div class="field">
             <label for="adminLoginEmail">Admin Email</label>
             <input id="adminLoginEmail" type="email" placeholder="admin@email.com" required/>
@@ -36,62 +35,60 @@
           <button class="btn btn-primary" type="submit">Send Admin Login Link</button>
           <div id="adminLoginStatus" class="notice hidden"></div>
         </form>
-
-        <div class="actions admin-login-actions">
+        <div class="actions" style="margin-top:14px;">
           <a class="btn" href="dashboard.html">Back to Public Event Hub</a>
         </div>
       </section>
 
-      <section id="adminDenied" class="card admin-login-card hidden">
+      <section id="adminDenied" class="card hidden">
         <div class="eyebrow">Admin Only</div>
         <h1>Admin role required.</h1>
         <p class="lead">You are logged in, but this account is not marked as an admin in Supabase profiles.</p>
         <div class="notice notice-warning">
-          Ask the project owner to run:<br/>
+          Run:
+          <br/>
           <code>update public.profiles set role = 'admin' where lower(email) = lower('YOUR_EMAIL');</code>
         </div>
-        <div class="actions admin-login-actions">
+        <div class="actions" style="margin-top:14px;">
           <button class="btn btn-danger" data-signout>Sign Out</button>
           <a class="btn" href="dashboard.html">View Public Site</a>
         </div>
       </section>
 
       <div id="adminMain" class="hidden">
-        <section class="admin-hero card">
+        <div class="admin-hero card">
           <div>
             <div class="eyebrow">Command Center</div>
             <h1>Admin Console</h1>
-            <p>Manage the public event hub: announcements, match schedule, rulebook visibility, and match results.</p>
+            <p>Post announcements and monitor match data synced from Google Sheets.</p>
           </div>
-          <div class="admin-hero-badges">
-            <span class="pill pill-gold">Admin Only</span>
-            <span class="pill pill-green">Live Public Hub</span>
-          </div>
-        </section>
+        </div>
 
-        <div class="admin-workspace">
-          <aside class="card admin-side">
-            <div class="eyebrow">Admin Tabs</div>
-            <nav class="admin-menu">
-              <a class="admin-tab" href="#announcementsAdmin"><span>01</span><strong>Announcements</strong></a>
-              <a class="admin-tab" href="#scheduleAdmin"><span>02</span><strong>Match Schedule</strong></a>
-              <a class="admin-tab" href="#resultsAdmin"><span>03</span><strong>Match Results</strong></a>
-            </nav>
-            <div class="notice admin-note">These controls are hidden from public viewers. Public pages only show published content.</div>
+        <div class="admin-tabs">
+          <a class="admin-tab" href="#announcementsAdmin">Announcements</a>
+          <a class="admin-tab" href="#sheetSyncAdmin">Sheet Sync</a>
+          <a class="admin-tab" href="#matchPreviewAdmin">Match Preview</a>
+        </div>
+
+        <section class="admin-grid">
+          <aside class="admin-side-menu card">
+            <a href="#announcementsAdmin">Announcements</a>
+            <a href="#sheetSyncAdmin">Sheet Sync</a>
+            <a href="#schedulePreview">Schedule Preview</a>
+            <a href="#resultsPreview">Results Preview</a>
           </aside>
 
-          <div class="admin-content">
-            <section class="card admin-panel" id="announcementsAdmin">
-              <div class="section-head admin-panel-head">
+          <div class="admin-stack">
+            <section class="card" id="announcementsAdmin">
+              <div class="section-head">
                 <div>
                   <div class="eyebrow">Official Updates</div>
                   <h2>Post Announcement</h2>
-                  <p>Create urgent notices, stream updates, and tournament reminders.</p>
                 </div>
               </div>
 
-              <form id="announcementForm" class="form admin-form">
-                <div class="grid admin-form-grid two">
+              <form id="announcementForm" class="form">
+                <div class="grid grid-two">
                   <div class="field">
                     <label>Title</label>
                     <input id="announcementTitle" maxlength="100" required/>
@@ -109,9 +106,7 @@
                   <label>Message</label>
                   <textarea id="announcementBody" required></textarea>
                 </div>
-                <div class="form-actions">
-                  <button class="btn btn-primary" type="submit">Publish Announcement</button>
-                </div>
+                <button class="btn btn-primary" type="submit">Publish Announcement</button>
               </form>
 
               <div class="admin-table-wrap section-tight">
@@ -122,94 +117,56 @@
               </div>
             </section>
 
-            <section class="card admin-panel" id="scheduleAdmin">
-              <div class="section-head admin-panel-head">
+            <section class="card" id="sheetSyncAdmin">
+              <div class="section-head">
                 <div>
-                  <div class="eyebrow">Match Flow</div>
-                  <h2>Post Match Schedule</h2>
-                  <p>Publish match windows, stages, lobbies, and team assignments.</p>
+                  <div class="eyebrow">Google Sheet Source</div>
+                  <h2>Match Data Sync</h2>
+                  <p>Use the match data template and run Apps Script to push schedule/results into Supabase.</p>
                 </div>
               </div>
-
-              <div id="scheduleWarning" class="notice notice-warning hidden"></div>
-
-              <form id="scheduleForm" class="form admin-form">
-                <div class="grid admin-form-grid two">
-                  <div class="field"><label>Match Title</label><input id="scheduleTitle" required placeholder="Match 1 · Upper Bracket"/></div>
-                  <div class="field"><label>Scheduled At</label><input id="scheduleAt" type="datetime-local"/></div>
-                  <div class="field">
-                    <label>Mode</label>
-                    <select id="scheduleMode">
-                      <option value="multiplayer_1v1">Multiplayer 1v1</option>
-                      <option value="multiplayer_5v5">Multiplayer 5v5</option>
-                      <option value="battle_royale_solo">Battle Royale Solo</option>
-                      <option value="battle_royale_squads">Battle Royale Squads</option>
-                    </select>
-                  </div>
-                  <div class="field"><label>Stage</label><input id="scheduleStage" placeholder="Group Stage / Finals"/></div>
-                  <div class="field"><label>Team A</label><input id="scheduleTeamA" placeholder="Team A / Lobby A"/></div>
-                  <div class="field"><label>Team B</label><input id="scheduleTeamB" placeholder="Team B / TBD"/></div>
-                  <div class="field"><label>Status</label><input id="scheduleStatus" value="Scheduled"/></div>
-                  <div class="field"><label>Order</label><input id="scheduleOrder" type="number" value="100"/></div>
-                </div>
-                <div class="field">
-                  <label>Description</label>
-                  <textarea id="scheduleDescription" placeholder="Stream details, lobby note, map order, or admin note"></textarea>
-                </div>
-                <div class="form-actions">
-                  <button class="btn btn-primary" type="submit">Publish Schedule</button>
-                </div>
-              </form>
-
-              <div class="admin-table-wrap section-tight">
-                <table>
-                  <thead><tr><th>Time</th><th>Match</th><th>Mode</th><th>Status</th></tr></thead>
-                  <tbody id="scheduleTable"></tbody>
-                </table>
+              <div class="notice">
+                Source tabs:
+                <strong>MP_1V1</strong>, <strong>MP_TEAM_5V5</strong>, <strong>BR_SOLO</strong>, <strong>BR_SQUAD</strong>
+                <br/>
+                Database table:
+                <strong>public.match_details</strong>
+              </div>
+              <div class="actions">
+                <a class="btn btn-primary" href="dashboard.html#schedule" target="_blank" rel="noopener">View Public Schedule</a>
+                <a class="btn" href="dashboard.html#results" target="_blank" rel="noopener">View Public Results</a>
               </div>
             </section>
 
-            <section class="card admin-panel" id="resultsAdmin">
-              <div class="section-head admin-panel-head">
+            <section class="card" id="matchPreviewAdmin">
+              <div class="section-head">
                 <div>
-                  <div class="eyebrow">Published Scores</div>
-                  <h2>Post Match Result</h2>
-                  <p>Publish final scores for multiplayer and battle royale matches.</p>
+                  <div class="eyebrow">Supabase Preview</div>
+                  <h2>Published Match Data</h2>
+                  <p>This preview reads from public.match_details, the same source used by the public page.</p>
                 </div>
               </div>
 
-              <form id="resultForm" class="form admin-form">
-                <div class="grid admin-form-grid two">
-                  <div class="field"><label>Title</label><input id="resultTitle" required placeholder="Match 1 · Finals"/></div>
-                  <div class="field">
-                    <label>Mode</label>
-                    <select id="resultMode">
-                      <option value="multiplayer_1v1">Multiplayer 1v1</option>
-                      <option value="multiplayer_5v5">Multiplayer 5v5</option>
-                      <option value="battle_royale_solo">Battle Royale Solo</option>
-                      <option value="battle_royale_squads">Battle Royale Squads</option>
-                    </select>
-                  </div>
-                  <div class="field"><label>Team A</label><input id="teamA"/></div>
-                  <div class="field"><label>Team B</label><input id="teamB"/></div>
-                  <div class="field"><label>Team A Score</label><input id="teamAScore" type="number" value="0"/></div>
-                  <div class="field"><label>Team B Score</label><input id="teamBScore" type="number" value="0"/></div>
-                  <div class="field"><label>Status</label><input id="resultStatus" value="Final"/></div>
-                </div>
-                <div class="form-actions">
-                  <button class="btn btn-primary" type="submit">Publish Result</button>
-                </div>
-              </form>
+              <div id="matchTableWarning"></div>
 
+              <h3 id="schedulePreview">Schedule Preview</h3>
               <div class="admin-table-wrap section-tight">
                 <table>
-                  <thead><tr><th>Mode</th><th>Result</th><th>Status</th></tr></thead>
+                  <thead><tr><th>Mode</th><th>Match</th><th>Schedule</th><th>Status</th></tr></thead>
+                  <tbody id="scheduleTable"></tbody>
+                </table>
+              </div>
+
+              <h3 id="resultsPreview" class="section-tight">Results Preview</h3>
+              <div class="admin-table-wrap section-tight">
+                <table>
+                  <thead><tr><th>Mode</th><th>Match / Entry</th><th>Result</th><th>Status</th></tr></thead>
                   <tbody id="resultsTable"></tbody>
                 </table>
               </div>
             </section>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   </section>

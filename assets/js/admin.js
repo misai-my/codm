@@ -3,6 +3,10 @@ let activeTournament = null;
 let announcementFormWired = false;
 let adminMatchRows = [];
 let adminFiltersWired = false;
+let faqAdminRows = [];
+let inquiryRows = [];
+let inquiryFiltersWired = false;
+let faqFormWired = false;
 
 async function loadProfile() {
   const session = await portal.getSession();
@@ -355,6 +359,7 @@ function renderResultsTable(rows) {
 async function bootAdminConsole() {
   await loadTournament();
   await loadAdminData();
+  await loadFaqAndSupportAdmin();
   wireAnnouncementForm();
 }
 
@@ -397,6 +402,281 @@ function wireAdminLoginForm() {
       status.textContent = err.message || "Could not login. Check email and password.";
     }
   });
+}
+
+
+async function loadFaqAdminRows() {
+  const slug = cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+  const { data, error } = await sb
+    .from("faq_items")
+    .select("*")
+    .eq("tournament_slug", slug)
+    .order("priority_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    if (error.code === "42P01") {
+      portal.toast("faq_items table missing. Run supabase_faq_support_schema.sql.");
+      return [];
+    }
+    throw error;
+  }
+  return data || [];
+}
+
+async function loadInquiryRows() {
+  const slug = cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+  const { data, error } = await sb
+    .from("support_inquiries")
+    .select("*")
+    .eq("tournament_slug", slug)
+    .order("created_at", { ascending: false })
+    .limit(300);
+
+  if (error) {
+    if (error.code === "42P01") {
+      portal.toast("support_inquiries table missing. Run supabase_faq_support_schema.sql.");
+      return [];
+    }
+    throw error;
+  }
+  return data || [];
+}
+
+function renderFaqAdminTable() {
+  const table = portal.qs("#faqAdminTable");
+  if (!table) return;
+
+  table.innerHTML = faqAdminRows.map(row => `
+    <tr>
+      <td>${portal.esc(row.category || "General")}</td>
+      <td><strong>${portal.esc(row.question)}</strong><div>${portal.esc(row.answer || "")}</div></td>
+      <td>${row.is_published ? "Published" : "Unpublished"}</td>
+      <td>
+        <div class="table-actions">
+          <button class="btn btn-small" data-faq-toggle="${row.id}">${row.is_published ? "Unpublish" : "Publish"}</button>
+          <button class="btn btn-danger btn-small" data-faq-delete="${row.id}">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join("") || `<tr><td colspan="4">No FAQ items.</td></tr>`;
+
+  table.querySelectorAll("[data-faq-toggle]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const row = faqAdminRows.find(item => item.id === btn.dataset.faqToggle);
+      if (!row) return;
+      const { error } = await sb.from("faq_items").update({
+        is_published: !row.is_published,
+        updated_at: new Date().toISOString()
+      }).eq("id", row.id);
+      if (error) throw error;
+      faqAdminRows = await loadFaqAdminRows();
+      renderFaqAdminTable();
+      portal.toast(row.is_published ? "FAQ unpublished." : "FAQ published.");
+    });
+  });
+
+  table.querySelectorAll("[data-faq-delete]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Delete this FAQ item?")) return;
+      const { error } = await sb.from("faq_items").delete().eq("id", btn.dataset.faqDelete);
+      if (error) throw error;
+      faqAdminRows = await loadFaqAdminRows();
+      renderFaqAdminTable();
+      portal.toast("FAQ deleted.");
+    });
+  });
+}
+
+function inquirySearchText(row) {
+  return [row.name, row.email, row.discord, row.category, row.subject, row.message, row.status, row.published_answer, row.admin_note]
+    .filter(Boolean).join(" ").toLowerCase();
+}
+
+function populateInquiryFilters() {
+  const statuses = uniqueSorted(inquiryRows, "status");
+  const categories = uniqueSorted(inquiryRows, "category");
+  setSelectOptions("inquiryStatusFilter", statuses, "All Status");
+  setSelectOptions("inquiryCategoryFilter", categories, "All Categories");
+}
+
+function filteredInquiries() {
+  const status = portal.qs("#inquiryStatusFilter")?.value || "";
+  const category = portal.qs("#inquiryCategoryFilter")?.value || "";
+  const published = portal.qs("#inquiryPublishedFilter")?.value || "";
+  const search = (portal.qs("#inquirySearchFilter")?.value || "").trim().toLowerCase();
+
+  return inquiryRows.filter(row => {
+    if (status && String(row.status || "") !== status) return false;
+    if (category && String(row.category || "") !== category) return false;
+    if (published && String(Boolean(row.is_published)) !== published) return false;
+    if (search && !inquirySearchText(row).includes(search)) return false;
+    return true;
+  });
+}
+
+function renderInquiryTable() {
+  const table = portal.qs("#inquiriesAdminTable");
+  if (!table) return;
+
+  const rows = filteredInquiries();
+
+  table.innerHTML = rows.map(row => `
+    <tr>
+      <td>
+        <strong>${portal.esc(row.subject)}</strong>
+        <div>${portal.esc(row.message)}</div>
+        <div><span class="pill">${portal.esc(row.category || "General")}</span></div>
+      </td>
+      <td>
+        <strong>${portal.esc(row.name || "")}</strong>
+        <div>${portal.esc(row.email || "")}</div>
+        <div>${portal.esc(row.discord || "")}</div>
+        <small>${row.created_at ? new Date(row.created_at).toLocaleString() : ""}</small>
+      </td>
+      <td>
+        <select class="inline-select" data-inquiry-status="${row.id}">
+          ${["New", "Reviewing", "Answered", "Closed", "Spam"].map(status => `<option value="${status}" ${row.status === status ? "selected" : ""}>${status}</option>`).join("")}
+        </select>
+        <div>${row.is_published ? "Published" : "Unpublished"}</div>
+      </td>
+      <td>
+        <textarea class="inline-answer" data-inquiry-answer="${row.id}" placeholder="Public answer shown when published">${portal.esc(row.published_answer || "")}</textarea>
+      </td>
+      <td>
+        <div class="table-actions">
+          <button class="btn btn-small" data-inquiry-save="${row.id}">Save</button>
+          <button class="btn btn-small" data-inquiry-toggle="${row.id}">${row.is_published ? "Unpublish" : "Publish"}</button>
+          <button class="btn btn-danger btn-small" data-inquiry-delete="${row.id}">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join("") || `<tr><td colspan="5">No inquiries found.</td></tr>`;
+
+  table.querySelectorAll("[data-inquiry-save]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.inquirySave;
+      const status = table.querySelector(`[data-inquiry-status="${id}"]`)?.value || "New";
+      const answer = table.querySelector(`[data-inquiry-answer="${id}"]`)?.value || "";
+
+      const { error } = await sb.from("support_inquiries").update({
+        status,
+        published_answer: answer,
+        admin_note: answer,
+        updated_at: new Date().toISOString()
+      }).eq("id", id);
+
+      if (error) throw error;
+      inquiryRows = await loadInquiryRows();
+      populateInquiryFilters();
+      renderInquiryTable();
+      portal.toast("Inquiry saved.");
+    });
+  });
+
+  table.querySelectorAll("[data-inquiry-toggle]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const row = inquiryRows.find(item => item.id === btn.dataset.inquiryToggle);
+      if (!row) return;
+
+      const answer = table.querySelector(`[data-inquiry-answer="${row.id}"]`)?.value || row.published_answer || "";
+      if (!row.is_published && !answer.trim()) {
+        alert("Add a public answer before publishing this inquiry.");
+        return;
+      }
+
+      const { error } = await sb.from("support_inquiries").update({
+        is_published: !row.is_published,
+        status: !row.is_published ? "Answered" : row.status,
+        published_answer: answer,
+        admin_note: answer,
+        updated_at: new Date().toISOString()
+      }).eq("id", row.id);
+
+      if (error) throw error;
+      inquiryRows = await loadInquiryRows();
+      populateInquiryFilters();
+      renderInquiryTable();
+      portal.toast(row.is_published ? "Inquiry unpublished." : "Inquiry published.");
+    });
+  });
+
+  table.querySelectorAll("[data-inquiry-delete]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Delete this inquiry? This cannot be undone.")) return;
+      const { error } = await sb.from("support_inquiries").delete().eq("id", btn.dataset.inquiryDelete);
+      if (error) throw error;
+      inquiryRows = await loadInquiryRows();
+      populateInquiryFilters();
+      renderInquiryTable();
+      portal.toast("Inquiry deleted.");
+    });
+  });
+}
+
+function wireInquiryFilters() {
+  if (inquiryFiltersWired) return;
+  inquiryFiltersWired = true;
+
+  ["inquiryStatusFilter", "inquiryCategoryFilter", "inquiryPublishedFilter", "inquirySearchFilter"].forEach(id => {
+    const el = portal.qs(`#${id}`);
+    if (!el) return;
+    el.addEventListener(el.tagName === "INPUT" ? "input" : "change", renderInquiryTable);
+  });
+
+  portal.qs("#inquiryFilterReset")?.addEventListener("click", () => {
+    ["inquiryStatusFilter", "inquiryCategoryFilter", "inquiryPublishedFilter"].forEach(id => {
+      const el = portal.qs(`#${id}`);
+      if (el) el.value = "";
+    });
+    const search = portal.qs("#inquirySearchFilter");
+    if (search) search.value = "";
+    renderInquiryTable();
+  });
+}
+
+function wireFaqForm() {
+  if (faqFormWired) return;
+  faqFormWired = true;
+
+  portal.qs("#faqForm")?.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const payload = {
+      tournament_id: activeTournament?.id || null,
+      tournament_slug: cfg.DEFAULT_TOURNAMENT_SLUG || "main-event",
+      question: portal.text(portal.qs("#faqQuestion")?.value),
+      answer: portal.text(portal.qs("#faqAnswer")?.value),
+      category: portal.text(portal.qs("#faqCategory")?.value) || "General",
+      priority_order: Number(portal.qs("#faqPriority")?.value || 100),
+      is_published: portal.qs("#faqPublished")?.value === "true",
+      created_by: currentProfile?.id || null,
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await sb.from("faq_items").insert(payload);
+    if (error) throw error;
+
+    event.target.reset();
+    portal.qs("#faqCategory").value = "General";
+    portal.qs("#faqPriority").value = "100";
+    faqAdminRows = await loadFaqAdminRows();
+    renderFaqAdminTable();
+    portal.toast("FAQ saved.");
+  });
+}
+
+async function loadFaqAndSupportAdmin() {
+  [faqAdminRows, inquiryRows] = await Promise.all([
+    loadFaqAdminRows(),
+    loadInquiryRows()
+  ]);
+
+  renderFaqAdminTable();
+  populateInquiryFilters();
+  wireInquiryFilters();
+  renderInquiryTable();
+  wireFaqForm();
 }
 
 function wireAnnouncementForm() {

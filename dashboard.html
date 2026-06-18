@@ -19,6 +19,7 @@
       <a class="nav-link" href="#announcements">Announcements</a>
       <a class="nav-link" href="#schedule">Schedule</a>
       <a class="nav-link" href="#results">Results</a>
+      <a class="nav-link" href="#support">FAQ & Support</a>
       <a class="nav-link" href="rulebook.html">Rulebook</a>
     </nav>
   </div>
@@ -118,6 +119,100 @@
           </div>
           <div id="resultsList" class="results-list"></div>
         </section>
+
+        <section class="card" id="support">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Help Desk</div>
+              <h2>FAQ & Support</h2>
+              <p>Check common questions first. If you still need help, submit an inquiry for the admin team.</p>
+            </div>
+          </div>
+
+          <div class="support-layout">
+            <div>
+              <div class="filter-panel support-filter-panel">
+                <div class="field">
+                  <label for="faqCategoryFilter">FAQ Category</label>
+                  <select id="faqCategoryFilter"><option value="">All Categories</option></select>
+                </div>
+                <div class="field filter-search">
+                  <label for="faqSearchFilter">Search FAQ</label>
+                  <input id="faqSearchFilter" type="search" placeholder="Search question or answer..."/>
+                </div>
+                <button class="btn btn-small filter-reset" id="faqFilterReset" type="button">Reset</button>
+              </div>
+
+              <div id="faqList" class="faq-list"></div>
+
+              <div class="section-tight">
+                <div class="eyebrow">Published Answers</div>
+                <div id="publicInquiryList" class="faq-list"></div>
+              </div>
+            </div>
+
+            <form id="supportForm" class="support-form form">
+              <div>
+                <div class="eyebrow">Submit Inquiry</div>
+                <h3>Ask the admin team</h3>
+                <p class="muted">To avoid spam, type <strong>CODM</strong> in the gatekeeper field before submitting.</p>
+              </div>
+
+              <div class="grid grid-two">
+                <div class="field">
+                  <label for="supportName">Name / Team</label>
+                  <input id="supportName" maxlength="120" placeholder="Team or player name" required/>
+                </div>
+                <div class="field">
+                  <label for="supportEmail">Email optional</label>
+                  <input id="supportEmail" type="email" maxlength="160" placeholder="you@email.com"/>
+                </div>
+              </div>
+
+              <div class="grid grid-two">
+                <div class="field">
+                  <label for="supportDiscord">Discord optional</label>
+                  <input id="supportDiscord" maxlength="120" placeholder="Discord username"/>
+                </div>
+                <div class="field">
+                  <label for="supportCategory">Category</label>
+                  <select id="supportCategory">
+                    <option>General</option>
+                    <option>Schedule</option>
+                    <option>Match Result</option>
+                    <option>Rulebook</option>
+                    <option>Technical Issue</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="supportSubject">Subject</label>
+                <input id="supportSubject" maxlength="160" placeholder="Brief summary" required/>
+              </div>
+
+              <div class="field">
+                <label for="supportMessage">Message</label>
+                <textarea id="supportMessage" maxlength="2000" minlength="20" placeholder="Include mode, match, team/player, and issue details." required></textarea>
+              </div>
+
+              <div class="support-honeypot" aria-hidden="true">
+                <label for="supportWebsite">Website</label>
+                <input id="supportWebsite" tabindex="-1" autocomplete="off"/>
+              </div>
+
+              <div class="field">
+                <label for="supportGatekeeper">Gatekeeper: type CODM</label>
+                <input id="supportGatekeeper" maxlength="12" placeholder="CODM" required/>
+              </div>
+
+              <button class="btn btn-primary" type="submit">Submit Inquiry</button>
+              <div id="supportFormStatus" class="notice hidden"></div>
+            </form>
+          </div>
+        </section>
+
+
 
         <section class="card" id="rulebook">
           <div class="section-head">

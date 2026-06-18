@@ -2125,3 +2125,122 @@ iframe#rulebookFrame,
   }
 }
 
+
+/* ============================================================
+   FINAL FAQ SUPPORT UI
+   FAQ + Support form + Admin inquiries
+   ============================================================ */
+.support-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+  gap: 18px;
+  align-items: start;
+}
+
+.faq-list {
+  display: grid;
+  gap: 10px;
+}
+
+.faq-item {
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.045);
+  overflow: hidden;
+}
+
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-weight: 900;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item p {
+  margin: 0;
+  padding: 0 15px 15px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.support-form {
+  position: sticky;
+  top: 90px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(248, 209, 92, .18);
+  background: linear-gradient(145deg, rgba(248, 209, 92, .09), rgba(255,255,255,.035));
+}
+
+.support-form h3 {
+  margin-bottom: 4px;
+}
+
+.support-honeypot {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
+
+.inline-select,
+.inline-answer {
+  width: 100%;
+  min-width: 160px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(5, 9, 18, .82);
+  color: var(--text);
+  padding: 8px;
+}
+
+.inline-answer {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.table-actions .btn {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 980px) {
+  .support-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .support-form {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .faq-item summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .support-form {
+    padding: 14px;
+  }
+
+  .table-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+

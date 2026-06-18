@@ -1,6 +1,9 @@
 let tournament = null;
 let dashboardMatchDetails = null;
 let dashboardFiltersWired = false;
+let faqRows = [];
+let publicInquiryRows = [];
+let supportWired = false;
 
 async function loadTournament(slug) {
   const row = await portal.getActiveTournament(slug || cfg.DEFAULT_TOURNAMENT_SLUG);
@@ -207,12 +210,7 @@ function renderSchedule(matchResult) {
     .sort((a, b) => modeOrder(a.mode) - modeOrder(b.mode));
 
   if (!rows.length) {
-    wrap.innerHTML = `
-      <div class="notice match-empty-debug">
-        <strong>No published match schedule yet.</strong>
-        <span>Checklist: rows must have tournament_slug = ${portal.esc(matchResult.slug || "main-event")} and is_published = TRUE.</span>
-      </div>
-    `;
+    wrap.innerHTML = `<div class="notice">No matches found for the selected filters.</div>`;
     return;
   }
 
@@ -531,6 +529,201 @@ function renderRulebook() {
   fallback.innerHTML = `<a class="btn btn-primary btn-small" href="${portal.esc(url)}" target="_blank" rel="noopener">Open in Google Docs</a>`;
 }
 
+
+async function loadFaqItems() {
+  const slug = tournament?.slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+
+  const { data, error } = await sb
+    .from("faq_items")
+    .select("*")
+    .eq("tournament_slug", slug)
+    .eq("is_published", true)
+    .order("priority_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    if (error.code === "42P01") return { rows: [], missingTable: true };
+    throw error;
+  }
+
+  return { rows: data || [], missingTable: false };
+}
+
+async function loadPublicInquiries() {
+  const slug = tournament?.slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+
+  const { data, error } = await sb
+    .from("support_inquiries")
+    .select("*")
+    .eq("tournament_slug", slug)
+    .eq("is_published", true)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error) {
+    if (error.code === "42P01") return { rows: [], missingTable: true };
+    throw error;
+  }
+
+  return { rows: data || [], missingTable: false };
+}
+
+function populateFaqFilters() {
+  const categories = uniqueSorted(faqRows, "category");
+  setSelectOptions("faqCategoryFilter", categories, "All Categories");
+}
+
+function faqSearchText(row) {
+  return [row.question, row.answer, row.category].filter(Boolean).join(" ").toLowerCase();
+}
+
+function renderFaqList() {
+  const wrap = portal.qs("#faqList");
+  if (!wrap) return;
+
+  const category = portal.qs("#faqCategoryFilter")?.value || "";
+  const search = (portal.qs("#faqSearchFilter")?.value || "").trim().toLowerCase();
+
+  const rows = faqRows.filter(row => {
+    if (category && String(row.category || "") !== category) return false;
+    if (search && !faqSearchText(row).includes(search)) return false;
+    return true;
+  });
+
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="notice">No FAQ items found.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = rows.map(row => `
+    <details class="faq-item">
+      <summary>
+        <span>${portal.esc(row.question)}</span>
+        <span class="pill">${portal.esc(row.category || "General")}</span>
+      </summary>
+      <p>${portal.esc(row.answer)}</p>
+    </details>
+  `).join("");
+}
+
+function renderPublicInquiries() {
+  const wrap = portal.qs("#publicInquiryList");
+  if (!wrap) return;
+
+  if (!publicInquiryRows.length) {
+    wrap.innerHTML = `<div class="notice">No public support answers yet.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = publicInquiryRows.map(row => `
+    <details class="faq-item inquiry-public-item">
+      <summary>
+        <span>${portal.esc(row.subject)}</span>
+        <span class="pill">${portal.esc(row.category || "Support")}</span>
+      </summary>
+      <p><strong>Question:</strong> ${portal.esc(row.message)}</p>
+      <p><strong>Answer:</strong> ${portal.esc(row.published_answer || row.admin_note || "Answered by admin.")}</p>
+    </details>
+  `).join("");
+}
+
+function resetFaqFilters() {
+  const cat = portal.qs("#faqCategoryFilter");
+  const search = portal.qs("#faqSearchFilter");
+  if (cat) cat.value = "";
+  if (search) search.value = "";
+  renderFaqList();
+}
+
+function wireSupportSection() {
+  if (supportWired) return;
+  supportWired = true;
+
+  portal.qs("#faqCategoryFilter")?.addEventListener("change", renderFaqList);
+  portal.qs("#faqSearchFilter")?.addEventListener("input", renderFaqList);
+  portal.qs("#faqFilterReset")?.addEventListener("click", resetFaqFilters);
+
+  portal.qs("#supportForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const status = portal.qs("#supportFormStatus");
+    const lastSubmit = Number(localStorage.getItem("codm_support_last_submit") || 0);
+    const now = Date.now();
+
+    if (now - lastSubmit < 60000) {
+      status.textContent = "Please wait at least 60 seconds before submitting another inquiry.";
+      status.classList.remove("hidden");
+      return;
+    }
+
+    const gate = portal.text(portal.qs("#supportGatekeeper")?.value).toUpperCase();
+    const hp = portal.text(portal.qs("#supportWebsite")?.value);
+
+    if (hp) return;
+
+    if (gate !== "CODM") {
+      status.textContent = "Gatekeeper failed. Type CODM exactly.";
+      status.classList.remove("hidden");
+      return;
+    }
+
+    const payload = {
+      tournament_slug: tournament?.slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event",
+      tournament_id: tournament?.id || null,
+      name: portal.text(portal.qs("#supportName")?.value),
+      email: portal.text(portal.qs("#supportEmail")?.value),
+      discord: portal.text(portal.qs("#supportDiscord")?.value),
+      category: portal.text(portal.qs("#supportCategory")?.value) || "General",
+      subject: portal.text(portal.qs("#supportSubject")?.value),
+      message: portal.text(portal.qs("#supportMessage")?.value),
+      gatekeeper_code: gate,
+      honeypot: hp,
+      status: "New",
+      is_published: false
+    };
+
+    if (payload.message.length < 20) {
+      status.textContent = "Please include more details. Minimum 20 characters.";
+      status.classList.remove("hidden");
+      return;
+    }
+
+    try {
+      status.textContent = "Submitting inquiry...";
+      status.classList.remove("hidden");
+
+      const { error } = await sb.from("support_inquiries").insert(payload);
+      if (error) throw error;
+
+      localStorage.setItem("codm_support_last_submit", String(now));
+      event.target.reset();
+      status.textContent = "Inquiry submitted. The admin team will review it.";
+    } catch (err) {
+      console.error(err);
+      status.textContent = err.message || "Could not submit inquiry.";
+    }
+  });
+}
+
+async function renderSupportSection() {
+  const faqResult = await loadFaqItems();
+  const inquiryResult = await loadPublicInquiries();
+
+  faqRows = faqResult.rows || [];
+  publicInquiryRows = inquiryResult.rows || [];
+
+  if (faqResult.missingTable || inquiryResult.missingTable) {
+    const wrap = portal.qs("#faqList");
+    if (wrap) wrap.innerHTML = `<div class="notice notice-warning">FAQ/support tables are not created yet. Run supabase_faq_support_schema.sql.</div>`;
+    return;
+  }
+
+  populateFaqFilters();
+  wireSupportSection();
+  renderFaqList();
+  renderPublicInquiries();
+}
+
 async function renderDashboardData() {
   portal.qs("#portalMeta").textContent = `${tournament?.title || "CODM Tournament OS"} · Public event information hub`;
 
@@ -547,6 +740,7 @@ async function renderDashboardData() {
   populateDashboardFilters(matchDetails.rows || []);
   wireDashboardFilters();
   renderDashboardMatchViews();
+  await renderSupportSection();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

@@ -74,6 +74,8 @@
           <a class="admin-tab" href="#announcementsAdmin" title="Announcements">Announcements</a>
           <a class="admin-tab" href="#sheetSyncAdmin" title="Sheet Sync">Sheet Sync</a>
           <a class="admin-tab" href="#matchPreviewAdmin" title="Match Preview">Match Preview</a>
+          <a class="admin-tab" href="#faqAdmin" title="FAQ">FAQ</a>
+          <a class="admin-tab" href="#inquiriesAdmin" title="Inquiries">Inquiries</a>
         </div>
 
         <section class="admin-grid">
@@ -219,6 +221,96 @@
                 </table>
               </div>
             </section>
+          
+            <section class="card" id="faqAdmin">
+              <div class="section-head">
+                <div>
+                  <div class="eyebrow">Public Help</div>
+                  <h2>FAQ Management</h2>
+                  <p>Create FAQ items that appear on the public dashboard.</p>
+                </div>
+              </div>
+
+              <form id="faqForm" class="form">
+                <div class="grid grid-two">
+                  <div class="field">
+                    <label for="faqQuestion">Question</label>
+                    <input id="faqQuestion" maxlength="220" required/>
+                  </div>
+                  <div class="field">
+                    <label for="faqCategory">Category</label>
+                    <input id="faqCategory" maxlength="80" value="General"/>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="faqAnswer">Answer</label>
+                  <textarea id="faqAnswer" maxlength="2000" required></textarea>
+                </div>
+                <div class="grid grid-two">
+                  <div class="field">
+                    <label for="faqPriority">Priority Order</label>
+                    <input id="faqPriority" type="number" value="100"/>
+                  </div>
+                  <div class="field">
+                    <label for="faqPublished">Published</label>
+                    <select id="faqPublished">
+                      <option value="true">Published</option>
+                      <option value="false">Unpublished</option>
+                    </select>
+                  </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Save FAQ</button>
+              </form>
+
+              <div class="admin-table-wrap section-tight">
+                <table>
+                  <thead><tr><th>Category</th><th>Question</th><th>Status</th><th>Actions</th></tr></thead>
+                  <tbody id="faqAdminTable"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="card" id="inquiriesAdmin">
+              <div class="section-head">
+                <div>
+                  <div class="eyebrow">Support Queue</div>
+                  <h2>Support Inquiries</h2>
+                  <p>Review inquiries. Publish answered items to public FAQ/support, unpublish, or delete spam.</p>
+                </div>
+              </div>
+
+              <div class="filter-panel admin-filter-panel" id="inquiryFilters">
+                <div class="field">
+                  <label for="inquiryStatusFilter">Status</label>
+                  <select id="inquiryStatusFilter"><option value="">All Status</option></select>
+                </div>
+                <div class="field">
+                  <label for="inquiryCategoryFilter">Category</label>
+                  <select id="inquiryCategoryFilter"><option value="">All Categories</option></select>
+                </div>
+                <div class="field">
+                  <label for="inquiryPublishedFilter">Published</label>
+                  <select id="inquiryPublishedFilter">
+                    <option value="">All</option>
+                    <option value="true">Published</option>
+                    <option value="false">Unpublished</option>
+                  </select>
+                </div>
+                <div class="field filter-search">
+                  <label for="inquirySearchFilter">Search</label>
+                  <input id="inquirySearchFilter" type="search" placeholder="Name, subject, message..."/>
+                </div>
+                <button class="btn btn-small filter-reset" id="inquiryFilterReset" type="button">Reset</button>
+              </div>
+
+              <div class="admin-table-wrap section-tight">
+                <table>
+                  <thead><tr><th>Inquiry</th><th>Contact</th><th>Status</th><th>Public Answer</th><th>Actions</th></tr></thead>
+                  <tbody id="inquiriesAdminTable"></tbody>
+                </table>
+              </div>
+            </section>
+
           </div>
         </section>
       </div>

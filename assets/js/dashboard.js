@@ -6,17 +6,90 @@ let publicInquiryRows = [];
 let supportWired = false;
 let pendingSupportPayload = null;
 let pendingSupportForm = null;
+let dashboardTournaments = [];
+
+
+function tournamentRulebookUrl(row) {
+  return row?.rulebook_url || row?.rulebook_doc_url || cfg.TOURNAMENT_FALLBACKS?.[row?.slug]?.rulebook_url || cfg.RULEBOOK_URL || "";
+}
+
+function tournamentRegistrationUrl(row) {
+  return row?.registration_form_url || cfg.TOURNAMENT_FALLBACKS?.[row?.slug]?.registration_form_url || "";
+}
+
+function formatTournamentOption(row) {
+  return row?.title || row?.slug || "Tournament";
+}
+
+function renderDashboardTournamentSelector() {
+  const select = portal.qs("#dashboardTournamentSelect");
+  if (!select) return;
+
+  const selectedSlug = tournament?.slug || portal.getSelectedTournamentSlug();
+  select.innerHTML = dashboardTournaments.length
+    ? dashboardTournaments.map(row => `<option value="${portal.esc(row.slug)}">${portal.esc(formatTournamentOption(row))}</option>`).join("")
+    : `<option value="${portal.esc(selectedSlug)}">${portal.esc(tournament?.title || selectedSlug)}</option>`;
+
+  select.value = selectedSlug;
+}
+
+function syncDashboardTournamentUi() {
+  const selectedSlug = tournament?.slug || portal.getSelectedTournamentSlug();
+  portal.updateTournamentLinks(document, selectedSlug);
+  renderDashboardTournamentSelector();
+
+  document.title = `${tournament?.title || "Event Hub"} · CODM Tournament OS`;
+
+  const regSection = portal.qs("#registration");
+  const regLink = portal.qs("#registrationLink");
+  const regNote = portal.qs("#registrationCtaNote");
+  const registrationUrl = tournamentRegistrationUrl(tournament);
+
+  if (regLink) {
+    if (registrationUrl && tournament?.registration_open !== false) {
+      regLink.href = registrationUrl;
+      regLink.target = "_blank";
+      regLink.rel = "noopener noreferrer";
+      regLink.classList.remove("hidden");
+      if (regNote) regNote.textContent = "Opens the official Google Form in a new tab.";
+      regSection?.classList.remove("registration-closed");
+    } else {
+      regLink.removeAttribute("href");
+      regLink.removeAttribute("target");
+      regLink.classList.add("hidden");
+      if (regNote) regNote.textContent = "Registration information will be announced soon.";
+      regSection?.classList.add("registration-closed");
+    }
+  }
+}
+
+async function selectDashboardTournament(slug) {
+  const selected = dashboardTournaments.find(row => row.slug === slug);
+  portal.setSelectedTournamentSlug(slug, true);
+  tournament = selected || await loadTournament(slug);
+  await renderDashboardData();
+}
+
+function wireDashboardTournamentSelector() {
+  const select = portal.qs("#dashboardTournamentSelect");
+  if (!select || select.dataset.bound === "true") return;
+
+  select.dataset.bound = "true";
+  select.addEventListener("change", async () => {
+    try {
+      await selectDashboardTournament(select.value);
+    } catch (err) {
+      console.error(err);
+      portal.toast(err.message || "Could not change tournament.");
+    }
+  });
+}
 
 async function loadTournament(slug) {
-  const row = await portal.getActiveTournament(slug || cfg.DEFAULT_TOURNAMENT_SLUG);
+  const targetSlug = slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+  const row = await portal.getTournamentBySlug(targetSlug);
   if (row) return row;
-
-  return {
-    id: null,
-    slug: cfg.DEFAULT_TOURNAMENT_SLUG || "main-event",
-    title: cfg.SITE_NAME || "CODM Tournament OS",
-    rulebook_url: cfg.RULEBOOK_URL || ""
-  };
+  return portal.tournamentFallback(targetSlug);
 }
 
 async function safeLoadAnnouncements() {
@@ -42,10 +115,10 @@ async function safeLoadAnnouncements() {
 }
 
 async function loadMatchDetails() {
-  const slug = tournament?.slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+  const slug = tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
 
   try {
-    let query = sb
+    const { data, error } = await sb
       .from("match_details")
       .select("*")
       .eq("tournament_slug", slug)
@@ -58,36 +131,7 @@ async function loadMatchDetails() {
       .order("map_order", { ascending: true, nullsFirst: false })
       .order("placement", { ascending: true, nullsFirst: false });
 
-    const { data, error } = await query;
-
-    if (error) {
-      return { rows: [], error, slug };
-    }
-
-    if (data && data.length) {
-      return { rows: data, error: null, slug };
-    }
-
-    // Fallback: if tournament_slug in the rows is different, still show published rows.
-    const fallback = await sb
-      .from("match_details")
-      .select("*")
-      .eq("is_published", true)
-      .order("scheduled_at", { ascending: true, nullsFirst: false })
-      .order("mode", { ascending: true })
-      .order("day_no", { ascending: true, nullsFirst: false })
-      .order("round_no", { ascending: true, nullsFirst: false })
-      .order("series_no", { ascending: true, nullsFirst: false })
-      .order("map_order", { ascending: true, nullsFirst: false })
-      .order("placement", { ascending: true, nullsFirst: false })
-      .limit(1000);
-
-    return {
-      rows: fallback.data || [],
-      error: fallback.error || null,
-      slug,
-      usedFallback: true
-    };
+    return { rows: data || [], error: error || null, slug };
   } catch (err) {
     console.error("Match details load failed:", err);
     return { rows: [], error: err, slug };
@@ -669,7 +713,7 @@ function wireDashboardFilters() {
 }
 
 function renderRulebook() {
-  const url = tournament?.rulebook_url || cfg.RULEBOOK_URL || "";
+  const url = tournamentRulebookUrl(tournament);
   const frame = portal.qs("#rulebookFrame");
   const fallback = portal.qs("#rulebookFallback");
 
@@ -688,7 +732,7 @@ function renderRulebook() {
 
 
 async function loadFaqItems() {
-  const slug = tournament?.slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+  const slug = tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
 
   const { data, error } = await sb
     .from("faq_items")
@@ -707,7 +751,7 @@ async function loadFaqItems() {
 }
 
 async function loadPublicInquiries() {
-  const slug = tournament?.slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+  const slug = tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
 
   const { data, error } = await sb
     .from("support_inquiries")
@@ -881,7 +925,7 @@ function wireSupportSection() {
     if (hp) return;
 
     const payload = {
-      tournament_slug: tournament?.slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event",
+      tournament_slug: tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG),
       tournament_id: tournament?.id || null,
       name: portal.text(portal.qs("#supportName")?.value),
       email: portal.text(portal.qs("#supportEmail")?.value),
@@ -941,6 +985,7 @@ async function renderSupportSection() {
 
 async function renderDashboardData() {
   portal.qs("#portalMeta").textContent = `${tournament?.title || "CODM Tournament OS"} · Public event information hub`;
+  syncDashboardTournamentUi();
 
   renderRulebook();
 
@@ -962,7 +1007,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!portal.requireConfig()) return;
 
   try {
-    tournament = await loadTournament(cfg.DEFAULT_TOURNAMENT_SLUG);
+    dashboardTournaments = await portal.listTournaments();
+    const selectedSlug = portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+    tournament = dashboardTournaments.find(row => row.slug === selectedSlug) || await loadTournament(selectedSlug);
+
+    renderDashboardTournamentSelector();
+    wireDashboardTournamentSelector();
     await renderDashboardData();
   } catch (err) {
     console.error(err);

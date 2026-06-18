@@ -16,7 +16,7 @@
       <span class="brand-title">CODM TOURNAMENT OS<small>ADMIN CONTROL CENTER</small></span>
     </a>
     <nav class="nav-links admin-only-nav">
-      <a class="nav-link" href="dashboard.html" target="_blank" rel="noopener">View Public Site</a>
+      <a class="nav-link" href="dashboard.html" data-tournament-link="dashboard.html" data-tournament-link="dashboard.html" target="_blank" rel="noopener">View Public Site</a>
       <button class="btn btn-danger btn-small hidden" id="adminSignOutBtn" data-signout>Sign Out</button>
     </nav>
   </div>
@@ -42,7 +42,7 @@
           <div id="adminLoginStatus" class="notice hidden"></div>
         </form>
         <div class="actions" style="margin-top:14px;">
-          <a class="btn" href="dashboard.html">Back to Public Event Hub</a>
+          <a class="btn" href="dashboard.html" data-tournament-link="dashboard.html">Back to Public Event Hub</a>
         </div>
       </section>
 
@@ -57,7 +57,7 @@
         </div>
         <div class="actions" style="margin-top:14px;">
           <button class="btn btn-danger" data-signout>Sign Out</button>
-          <a class="btn" href="dashboard.html">View Public Site</a>
+          <a class="btn" href="dashboard.html" data-tournament-link="dashboard.html">View Public Site</a>
         </div>
       </section>
 
@@ -67,6 +67,11 @@
             <div class="eyebrow">Command Center</div>
             <h1>Admin Console</h1>
             <p>Post announcements and monitor match data synced from Google Sheets.</p>
+          </div>
+          <div class="admin-tournament-control">
+            <label for="adminTournamentSelect">Managing Tournament</label>
+            <select id="adminTournamentSelect" aria-label="Select tournament"></select>
+            <span id="adminTournamentStatus">Loading tournament...</span>
           </div>
         </div>
 
@@ -141,8 +146,8 @@
                 <strong>public.match_details</strong>
               </div>
               <div class="actions">
-                <a class="btn btn-primary" href="dashboard.html#schedule" target="_blank" rel="noopener">View Public Schedule</a>
-                <a class="btn" href="dashboard.html#results" target="_blank" rel="noopener">View Public Results</a>
+                <a class="btn btn-primary" href="dashboard.html#schedule" data-tournament-link="dashboard.html#schedule" data-tournament-link="dashboard.html#schedule" target="_blank" rel="noopener">View Public Schedule</a>
+                <a class="btn" href="dashboard.html#results" data-tournament-link="dashboard.html#results" data-tournament-link="dashboard.html#results" target="_blank" rel="noopener">View Public Results</a>
               </div>
             </section>
 

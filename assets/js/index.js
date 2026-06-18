@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  portal.updateTournamentLinks(document, portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG));
   const loginForm = portal.qs("#loginForm");
   const emailInput = portal.qs("#loginEmail");
   const status = portal.qs("#loginStatus");

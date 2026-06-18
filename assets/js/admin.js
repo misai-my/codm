@@ -7,6 +7,65 @@ let faqAdminRows = [];
 let inquiryRows = [];
 let inquiryFiltersWired = false;
 let faqFormWired = false;
+let adminTournaments = [];
+
+
+function adminTournamentSlug() {
+  return activeTournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+}
+
+function adminTournamentRulebookUrl() {
+  return activeTournament?.rulebook_url || activeTournament?.rulebook_doc_url || cfg.TOURNAMENT_FALLBACKS?.[adminTournamentSlug()]?.rulebook_url || cfg.RULEBOOK_URL || "";
+}
+
+function renderAdminTournamentSelector() {
+  const select = portal.qs("#adminTournamentSelect");
+  if (!select) return;
+
+  const selectedSlug = adminTournamentSlug();
+  select.innerHTML = adminTournaments.length
+    ? adminTournaments.map(row => `<option value="${portal.esc(row.slug)}">${portal.esc(row.title || row.slug)}</option>`).join("")
+    : `<option value="${portal.esc(selectedSlug)}">${portal.esc(activeTournament?.title || selectedSlug)}</option>`;
+
+  select.value = selectedSlug;
+
+  const status = portal.qs("#adminTournamentStatus");
+  if (status) {
+    const state = activeTournament?.status ? ` · ${activeTournament.status}` : "";
+    status.textContent = `${activeTournament?.title || selectedSlug}${state}`;
+  }
+
+  portal.updateTournamentLinks(document, selectedSlug);
+}
+
+async function switchAdminTournament(slug) {
+  portal.setSelectedTournamentSlug(slug, true);
+  activeTournament = adminTournaments.find(row => row.slug === slug) || await loadTournament(slug);
+
+  adminMatchRows = [];
+  faqAdminRows = [];
+  inquiryRows = [];
+
+  renderAdminTournamentSelector();
+  await loadAdminData();
+  await loadFaqAndSupportAdmin();
+}
+
+function wireAdminTournamentSelector() {
+  const select = portal.qs("#adminTournamentSelect");
+  if (!select || select.dataset.bound === "true") return;
+
+  select.dataset.bound = "true";
+  select.addEventListener("change", async () => {
+    try {
+      await switchAdminTournament(select.value);
+      portal.toast("Tournament changed.");
+    } catch (err) {
+      console.error(err);
+      portal.toast(err.message || "Could not change tournament.");
+    }
+  });
+}
 
 async function loadProfile() {
   const session = await portal.getSession();
@@ -115,19 +174,19 @@ async function requireAdmin() {
   return true;
 }
 
-async function loadTournament() {
-  activeTournament = await portal.getActiveTournament(cfg.DEFAULT_TOURNAMENT_SLUG);
+async function loadTournament(slug = null) {
+  const targetSlug = slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+  activeTournament = await portal.getTournamentBySlug(targetSlug);
+
   if (!activeTournament) {
-    activeTournament = {
-      id: null,
-      slug: cfg.DEFAULT_TOURNAMENT_SLUG || "main-event",
-      title: cfg.SITE_NAME || "CODM Tournament OS"
-    };
+    activeTournament = portal.tournamentFallback(targetSlug);
   }
+
+  return activeTournament;
 }
 
 async function loadMatchDetails() {
-  const slug = cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+  const slug = adminTournamentSlug();
 
   const { data, error } = await sb
     .from("match_details")
@@ -286,8 +345,18 @@ function wireAdminFilters() {
 }
 
 async function loadAdminData() {
+  let announcementQuery = sb
+    .from("announcements")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(25);
+
+  if (activeTournament?.id) {
+    announcementQuery = announcementQuery.or(`tournament_id.is.null,tournament_id.eq.${activeTournament.id}`);
+  }
+
   const [annRes, matchRows] = await Promise.all([
-    sb.from("announcements").select("*").order("created_at", { ascending: false }).limit(25),
+    announcementQuery,
     loadMatchDetails()
   ]);
 
@@ -357,7 +426,10 @@ function renderResultsTable(rows) {
 }
 
 async function bootAdminConsole() {
+  adminTournaments = await portal.listTournaments();
   await loadTournament();
+  renderAdminTournamentSelector();
+  wireAdminTournamentSelector();
   await loadAdminData();
   await loadFaqAndSupportAdmin();
   wireAnnouncementForm();
@@ -406,7 +478,7 @@ function wireAdminLoginForm() {
 
 
 async function loadFaqAdminRows() {
-  const slug = cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+  const slug = adminTournamentSlug();
   const { data, error } = await sb
     .from("faq_items")
     .select("*")
@@ -425,7 +497,7 @@ async function loadFaqAdminRows() {
 }
 
 async function loadInquiryRows() {
-  const slug = cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
+  const slug = adminTournamentSlug();
   const { data, error } = await sb
     .from("support_inquiries")
     .select("*")
@@ -644,7 +716,7 @@ function wireFaqForm() {
 
     const payload = {
       tournament_id: activeTournament?.id || null,
-      tournament_slug: cfg.DEFAULT_TOURNAMENT_SLUG || "main-event",
+      tournament_slug: adminTournamentSlug(),
       question: portal.text(portal.qs("#faqQuestion")?.value),
       answer: portal.text(portal.qs("#faqAnswer")?.value),
       category: portal.text(portal.qs("#faqCategory")?.value) || "General",

@@ -4,45 +4,72 @@ function googleDocPreviewUrl(url) {
   return match ? `https://docs.google.com/document/d/${match[1]}/preview?usp=sharing` : text;
 }
 
-async function getActiveTournament() {
-  const { data, error } = await sb
-    .from("tournaments")
-    .select("*")
-    .eq("slug", cfg.DEFAULT_TOURNAMENT_SLUG)
-    .maybeSingle();
+let rulebookTournaments = [];
+let selectedRulebookTournament = null;
 
-  if (error) {
-    console.warn("Could not load tournament rulebook row:", error);
-    return null;
+function tournamentRulebookUrl(row) {
+  return row?.rulebook_url || row?.rulebook_doc_url || cfg.TOURNAMENT_FALLBACKS?.[row?.slug]?.rulebook_url || cfg.RULEBOOK_URL || "";
+}
+
+function renderRulebookTournamentSelector() {
+  const select = portal.qs("#rulebookTournamentSelect");
+  if (!select) return;
+
+  const slug = selectedRulebookTournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+  select.innerHTML = rulebookTournaments.length
+    ? rulebookTournaments.map(row => `<option value="${portal.esc(row.slug)}">${portal.esc(row.title || row.slug)}</option>`).join("")
+    : `<option value="${portal.esc(slug)}">${portal.esc(selectedRulebookTournament?.title || slug)}</option>`;
+  select.value = slug;
+}
+
+async function loadRulebookTournament(slug) {
+  selectedRulebookTournament = rulebookTournaments.find(row => row.slug === slug) || await portal.getTournamentBySlug(slug);
+  if (!selectedRulebookTournament) selectedRulebookTournament = portal.tournamentFallback(slug);
+  return selectedRulebookTournament;
+}
+
+async function renderRulebookTournament() {
+  const frame = portal.qs("#rulebookFrame");
+  const openBtn = portal.qs("#openRulebookBtn");
+  const status = portal.qs("#rulebookStatus");
+  const rulebookUrl = tournamentRulebookUrl(selectedRulebookTournament);
+
+  renderRulebookTournamentSelector();
+  portal.updateTournamentLinks(document, selectedRulebookTournament.slug);
+  document.title = `${selectedRulebookTournament.title || "Rulebook"} · CODM Tournament OS`;
+
+  if (!rulebookUrl) {
+    frame?.classList.add("hidden");
+    if (openBtn) openBtn.classList.add("hidden");
+    if (status) status.textContent = `The ${selectedRulebookTournament.title || "selected"} rulebook will be published soon.`;
+    return;
   }
 
-  return data || null;
+  frame.src = googleDocPreviewUrl(rulebookUrl);
+  frame.classList.remove("hidden");
+  openBtn.href = rulebookUrl;
+  openBtn.classList.remove("hidden");
+  status.textContent = selectedRulebookTournament.title || "Official Rulebook";
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (!portal.requireConfig()) return;
 
-  const frame = portal.qs("#rulebookFrame");
-  const openBtn = portal.qs("#openRulebookBtn");
-  const status = portal.qs("#rulebookStatus");
+  const select = portal.qs("#rulebookTournamentSelect");
 
   try {
-    const tournament = await getActiveTournament();
-    const rulebookUrl = tournament?.rulebook_url || cfg.RULEBOOK_URL;
+    rulebookTournaments = await portal.listTournaments();
+    await loadRulebookTournament(portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG));
+    await renderRulebookTournament();
 
-    if (!rulebookUrl) {
-      status.textContent = "No rulebook link has been configured yet.";
-      return;
-    }
-
-    const previewUrl = googleDocPreviewUrl(rulebookUrl);
-    frame.src = previewUrl;
-    frame.classList.remove("hidden");
-    openBtn.href = rulebookUrl;
-    openBtn.classList.remove("hidden");
-    status.textContent = tournament?.title || "Official Rulebook";
+    select?.addEventListener("change", async () => {
+      portal.setSelectedTournamentSlug(select.value, true);
+      await loadRulebookTournament(select.value);
+      await renderRulebookTournament();
+    });
   } catch (err) {
     console.error(err);
-    status.textContent = err.message || "Could not load rulebook.";
+    const status = portal.qs("#rulebookStatus");
+    if (status) status.textContent = err.message || "Could not load rulebook.";
   }
 });

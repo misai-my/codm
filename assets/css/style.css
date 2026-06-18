@@ -2841,3 +2841,117 @@ header.dashboard-sticky-nav,
   }
 }
 
+
+/* ============================================================
+   FINAL MULTI TOURNAMENT SELECTOR
+   Dashboard / Admin / Rulebook
+   ============================================================ */
+.tournament-switcher {
+  display: grid;
+  gap: 4px;
+  min-width: 236px;
+}
+
+.tournament-switcher label,
+.admin-tournament-control label {
+  color: var(--muted2);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.tournament-switcher select,
+.admin-tournament-control select {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 34px 8px 10px;
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  background: rgba(5, 9, 18, .84);
+  border: 1px solid rgba(248, 209, 92, .30);
+}
+
+.dashboard-tournament-switcher {
+  margin-left: auto;
+}
+
+.admin-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 330px);
+  align-items: center;
+  gap: 20px;
+}
+
+.admin-tournament-control {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, .18);
+  border: 1px solid rgba(248, 209, 92, .18);
+}
+
+.admin-tournament-control span {
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.rulebook-tournament-switcher {
+  width: min(100%, 420px);
+  margin: 0 0 16px;
+}
+
+.registration-closed .registration-cta-actions {
+  justify-items: start;
+  text-align: left;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-tournament-switcher {
+    margin-left: 0;
+  }
+
+  .admin-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-tournament-control {
+    width: min(100%, 520px);
+  }
+}
+
+@media (max-width: 760px) {
+  .dashboard-tournament-switcher {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .dashboard-tournament-switcher label {
+    text-align: center;
+  }
+
+  .dashboard-tournament-switcher select {
+    min-height: 33px;
+    font-size: 11px;
+  }
+
+  .admin-tournament-control {
+    width: 100%;
+  }
+}
+
+
+/* Multi-tournament selector placement refinement */
+.rulebook-tournament-switcher {
+  margin: 0 0 18px;
+}
+
+.dashboard-tournament-switcher {
+  align-self: center;
+}
+

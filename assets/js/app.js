@@ -7,6 +7,79 @@ const sb = window.supabase?.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY
   }
 });
 
+
+const TOURNAMENT_STORAGE_KEY = "codm_selected_tournament_slug";
+
+function getTournamentSlugFromUrl() {
+  return new URLSearchParams(window.location.search).get("tournament") || "";
+}
+
+function getSelectedTournamentSlug(fallback = cfg.DEFAULT_TOURNAMENT_SLUG || "community-gladiators-2026-season-2") {
+  return getTournamentSlugFromUrl() || localStorage.getItem(TOURNAMENT_STORAGE_KEY) || fallback;
+}
+
+function setSelectedTournamentSlug(slug, updateUrl = true) {
+  const cleanSlug = text(slug);
+  if (!cleanSlug) return;
+
+  localStorage.setItem(TOURNAMENT_STORAGE_KEY, cleanSlug);
+
+  if (updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("tournament", cleanSlug);
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }
+}
+
+function tournamentUrl(path, slug = getSelectedTournamentSlug()) {
+  const url = new URL(path, window.location.href);
+  url.searchParams.set("tournament", slug);
+  return `${url.pathname.split("/").pop()}${url.search}${url.hash}`;
+}
+
+async function listTournaments() {
+  const { data, error } = await sb
+    .from("tournaments")
+    .select("*")
+    .order("start_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+async function getTournamentBySlug(slug = getSelectedTournamentSlug()) {
+  const targetSlug = slug || cfg.DEFAULT_TOURNAMENT_SLUG || "community-gladiators-2026-season-2";
+  const { data, error } = await sb
+    .from("tournaments")
+    .select("*")
+    .eq("slug", targetSlug)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+function tournamentFallback(slug = getSelectedTournamentSlug()) {
+  const fallback = cfg.TOURNAMENT_FALLBACKS?.[slug] || {};
+  return {
+    id: null,
+    slug,
+    title: fallback.title || cfg.SITE_NAME || "CODM Tournament OS",
+    registration_form_url: fallback.registration_form_url || "",
+    rulebook_url: fallback.rulebook_url || cfg.RULEBOOK_URL || "",
+    rulebook_doc_url: fallback.rulebook_url || cfg.RULEBOOK_URL || ""
+  };
+}
+
+function updateTournamentLinks(root = document, slug = getSelectedTournamentSlug()) {
+  qsa("[data-tournament-link]", root).forEach(link => {
+    const target = link.getAttribute("data-tournament-link");
+    if (!target) return;
+    link.href = tournamentUrl(target, slug);
+  });
+}
+
 function appBaseUrl() {
   const path = window.location.pathname;
   const basePath = path.endsWith("/") ? path : path.replace(/\/[^/]*$/, "/");
@@ -84,15 +157,7 @@ async function signInWithPassword(email, password) {
 }
 
 async function getActiveTournament(slug = null) {
-  const targetSlug = slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
-  const { data, error } = await sb
-    .from("tournaments")
-    .select("*")
-    .eq("slug", targetSlug)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data;
+  return getTournamentBySlug(slug || getSelectedTournamentSlug());
 }
 
 async function currentUserAccess() {
@@ -124,4 +189,4 @@ function wireNavAuth() {
 }
 
 document.addEventListener("DOMContentLoaded", wireNavAuth);
-window.portal = { appBaseUrl, authCallbackUrl, qs, qsa, text, esc, toast, getSession, waitForSession, signOut, sendMagicLink, signInWithPassword, currentUserAccess, getActiveTournament, requireConfig };
+window.portal = { getTournamentSlugFromUrl, getSelectedTournamentSlug, setSelectedTournamentSlug, tournamentUrl, listTournaments, getTournamentBySlug, tournamentFallback, updateTournamentLinks, appBaseUrl, authCallbackUrl, qs, qsa, text, esc, toast, getSession, waitForSession, signOut, sendMagicLink, signInWithPassword, currentUserAccess, getActiveTournament, requireConfig };

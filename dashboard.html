@@ -9,7 +9,7 @@
 <body>
 <header class="nav dashboard-sticky-nav">
   <div class="container nav-inner">
-    <a class="brand codm-premium-brand" href="index.html">
+    <a class="brand codm-premium-brand" href="index.html" data-tournament-link="index.html">
       <span class="brand-mark logo-image" style="width:44px;height:44px;min-width:44px;max-width:44px;min-height:44px;max-height:44px;flex:0 0 44px;overflow:hidden;display:grid;place-items:center;padding:6px;border-radius:14px;box-sizing:border-box;">
         <img src="assets/img/codm-logo.png" width="32" height="32" alt="CODM Tournament OS logo" style="width:32px;height:32px;max-width:32px;max-height:32px;object-fit:contain;display:block;position:static;"/>
       </span>
@@ -21,8 +21,12 @@
       <a class="nav-link" href="#results">Results</a>
       <a class="nav-link" href="#support">FAQ & Support</a>
       <a class="nav-link nav-link-registration" href="#registration">Registration</a>
-      <a class="nav-link" href="rulebook.html">Rulebook</a>
+      <a class="nav-link" href="rulebook.html" data-tournament-link="rulebook.html">Rulebook</a>
     </nav>
+    <div class="tournament-switcher dashboard-tournament-switcher">
+      <label for="dashboardTournamentSelect">Tournament</label>
+      <select id="dashboardTournamentSelect" aria-label="Select tournament"></select>
+    </div>
   </div>
 </header>
 
@@ -34,7 +38,7 @@
       <p id="portalMeta" class="lead">Loading tournament hub...</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="#schedule">View Match Schedule</a>
-        <a class="btn" href="rulebook.html">Open Rulebook</a>
+        <a class="btn" href="rulebook.html" data-tournament-link="rulebook.html">Open Rulebook</a>
       </div>
     </div>
   </section>
@@ -60,10 +64,10 @@
             <p>Ready to compete? Open the official registration form and complete your team or player submission.</p>
           </div>
           <div class="registration-cta-actions">
-            <a class="btn btn-primary registration-cta-button" href="https://docs.google.com/forms/d/e/1FAIpQLScfhYYJk2NckttjyZHfSH4GRCMiBYT2jp4dw2z7VKuWB9KBWw/viewform" target="_blank" rel="noopener noreferrer">
+            <a class="btn btn-primary registration-cta-button" href="#" id="registrationLink" target="_blank" rel="noopener noreferrer">
               Register Now
             </a>
-            <span class="registration-cta-note">Opens the official Google Form in a new tab.</span>
+            <span class="registration-cta-note" id="registrationCtaNote">Opens the official Google Form in a new tab.</span>
           </div>
         </section>
 
@@ -233,7 +237,7 @@
               <h2>Rulebook</h2>
               <p>Review the official tournament rules before match day.</p>
             </div>
-            <a class="btn btn-primary btn-small" href="rulebook.html">Full Rulebook Viewer</a>
+            <a class="btn btn-primary btn-small" href="rulebook.html" data-tournament-link="rulebook.html">Full Rulebook Viewer</a>
           </div>
           <iframe id="rulebookFrame" class="rulebook-frame hidden" title="Rulebook"></iframe>
           <div id="rulebookFallback"></div>

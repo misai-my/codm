@@ -28,7 +28,7 @@
       <section id="adminLoginCard" class="card admin-login-card hidden">
         <div class="eyebrow">Admin Login</div>
         <h1>Organizer access only.</h1>
-        <p class="lead">Public viewers do not need a login. Approved admins can sign in with email and password.</p>
+        <p class="lead">Public viewers do not need a login. Approved admins can sign in with email and password. The page now stays on the admin console after login.</p>
         <form id="adminLoginForm" class="form" style="max-width:520px;">
           <div class="field">
             <label for="adminLoginEmail">Admin Email</label>
@@ -51,9 +51,9 @@
         <h1>Admin role required.</h1>
         <p class="lead">You are logged in, but this account is not marked as an admin in Supabase profiles.</p>
         <div class="notice notice-warning">
-          Run:
+          This account is logged in but is not marked as admin yet.
           <br/>
-          <code>update public.profiles set role = 'admin' where lower(email) = lower('YOUR_EMAIL');</code>
+          The exact SQL will appear here after login.
         </div>
         <div class="actions" style="margin-top:14px;">
           <button class="btn btn-danger" data-signout>Sign Out</button>

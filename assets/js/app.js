@@ -46,9 +46,19 @@ async function getSession() {
   return data.session;
 }
 
-async function signOut() {
+async function waitForSession(retries = 8, delayMs = 180) {
+  for (let i = 0; i < retries; i += 1) {
+    const session = await getSession();
+    if (session?.user) return session;
+    await new Promise(resolve => setTimeout(resolve, delayMs));
+  }
+  return null;
+}
+
+async function signOut(redirectTo = "index.html") {
   await sb.auth.signOut();
-  location.href = "index.html";
+  const next = typeof redirectTo === "string" ? redirectTo : "index.html";
+  location.href = next;
 }
 
 async function sendMagicLink(email, nextPath = "dashboard.html") {
@@ -114,4 +124,4 @@ function wireNavAuth() {
 }
 
 document.addEventListener("DOMContentLoaded", wireNavAuth);
-window.portal = { appBaseUrl, authCallbackUrl, qs, qsa, text, esc, toast, getSession, signOut, sendMagicLink, signInWithPassword, currentUserAccess, getActiveTournament, requireConfig };
+window.portal = { appBaseUrl, authCallbackUrl, qs, qsa, text, esc, toast, getSession, waitForSession, signOut, sendMagicLink, signInWithPassword, currentUserAccess, getActiveTournament, requireConfig };

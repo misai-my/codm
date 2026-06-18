@@ -1,32 +1,86 @@
 let currentProfile = null;
 let activeTournament = null;
+let announcementFormWired = false;
 
 async function loadProfile() {
   const session = await portal.getSession();
-  if (!session?.user) return null;
+  const user = session?.user;
+  if (!user) return null;
 
-  const { data, error } = await sb
+  // First try the normal profile lookup by Auth user id.
+  let result = await sb
     .from("profiles")
     .select("*")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .maybeSingle();
 
-  if (error) throw error;
-  return data;
+  if (result.error) throw result.error;
+  if (result.data) return result.data;
+
+  // Fallback: some older rows may have email but not the current id.
+  const email = String(user.email || "").toLowerCase();
+  if (email) {
+    result = await sb
+      .from("profiles")
+      .select("*")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (result.error) throw result.error;
+    if (result.data) return result.data;
+  }
+
+  // Return a lightweight profile so the page can show a useful denied message
+  // instead of signing out and sending the user to index.html.
+  return {
+    id: user.id,
+    email,
+    role: "missing_profile"
+  };
 }
 
-function showAdminLogin() {
+function isAdminProfile(profile) {
+  return String(profile?.role || "").toLowerCase() === "admin";
+}
+
+function showAdminLogin(message = "") {
   portal.qs("#adminLoginCard")?.classList.remove("hidden");
   portal.qs("#adminDenied")?.classList.add("hidden");
   portal.qs("#adminMain")?.classList.add("hidden");
   portal.qs("#adminSignOutBtn")?.classList.add("hidden");
+
+  const status = portal.qs("#adminLoginStatus");
+  if (status && message) {
+    status.textContent = message;
+    status.classList.remove("hidden");
+  }
 }
 
-function showAdminDenied() {
+function showAdminDenied(profile = currentProfile) {
   portal.qs("#adminLoginCard")?.classList.add("hidden");
   portal.qs("#adminDenied")?.classList.remove("hidden");
   portal.qs("#adminMain")?.classList.add("hidden");
   portal.qs("#adminSignOutBtn")?.classList.remove("hidden");
+
+  const denied = portal.qs("#adminDenied");
+  if (denied && profile?.email) {
+    const sql = `insert into public.profiles (id, email, role)
+select id, email, 'admin'
+from auth.users
+where lower(email) = lower('${profile.email.replaceAll("'", "''")}')
+on conflict (id) do update set role = 'admin', email = excluded.email;`;
+
+    const notice = denied.querySelector(".notice");
+    if (notice) {
+      notice.innerHTML = `
+        This account is logged in but is not marked as admin yet.
+        <br/><br/>
+        Run this in Supabase SQL Editor:
+        <br/>
+        <code>${portal.esc(sql)}</code>
+      `;
+    }
+  }
 }
 
 function showAdminMain() {
@@ -37,7 +91,7 @@ function showAdminMain() {
 }
 
 async function requireAdmin() {
-  const session = await portal.getSession();
+  const session = await portal.waitForSession?.() || await portal.getSession();
 
   if (!session?.user) {
     showAdminLogin();
@@ -46,8 +100,8 @@ async function requireAdmin() {
 
   currentProfile = await loadProfile();
 
-  if (!currentProfile || String(currentProfile.role).toLowerCase() !== "admin") {
-    showAdminDenied();
+  if (!isAdminProfile(currentProfile)) {
+    showAdminDenied(currentProfile);
     return false;
   }
 
@@ -57,7 +111,13 @@ async function requireAdmin() {
 
 async function loadTournament() {
   activeTournament = await portal.getActiveTournament(cfg.DEFAULT_TOURNAMENT_SLUG);
-  if (!activeTournament) throw new Error(`Tournament not found: ${cfg.DEFAULT_TOURNAMENT_SLUG}`);
+  if (!activeTournament) {
+    activeTournament = {
+      id: null,
+      slug: cfg.DEFAULT_TOURNAMENT_SLUG || "main-event",
+      title: cfg.SITE_NAME || "CODM Tournament OS"
+    };
+  }
 }
 
 async function loadMatchDetails() {
@@ -134,7 +194,7 @@ function renderAnnouncementsTable(rows) {
 }
 
 function renderScheduleTable(rows) {
-  const scheduleRows = rows.filter(row => row.is_published).slice(0, 40);
+  const scheduleRows = rows.filter(row => row.is_published !== false).slice(0, 40);
 
   portal.qs("#scheduleTable").innerHTML = scheduleRows.map(row => `
     <tr>
@@ -148,7 +208,7 @@ function renderScheduleTable(rows) {
 
 function renderResultsTable(rows) {
   const resultRows = rows.filter(row =>
-    row.is_published &&
+    row.is_published !== false &&
     (row.score !== null || row.opponent_score !== null || row.placement !== null || row.total_points !== null)
   ).slice(0, 60);
 
@@ -169,6 +229,12 @@ function renderResultsTable(rows) {
   }).join("") || `<tr><td colspan="4">No synced result rows.</td></tr>`;
 }
 
+async function bootAdminConsole() {
+  await loadTournament();
+  await loadAdminData();
+  wireAnnouncementForm();
+}
+
 function wireAdminLoginForm() {
   portal.qs("#adminLoginForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -184,17 +250,25 @@ function wireAdminLoginForm() {
       status.classList.remove("hidden");
 
       await portal.signInWithPassword(email, password);
+      await portal.waitForSession?.();
 
-      const profile = await loadProfile();
+      currentProfile = await loadProfile();
 
-      if (!profile || String(profile.role).toLowerCase() !== "admin") {
-        status.textContent = "Login worked, but this account is not marked as admin.";
-        await portal.signOut();
+      if (!isAdminProfile(currentProfile)) {
+        status.textContent = "Login worked, but this account is not marked as admin yet.";
+        showAdminDenied(currentProfile);
         return;
       }
 
       status.textContent = "Login successful. Loading admin console...";
-      window.location.replace("admin.html");
+      showAdminMain();
+      await bootAdminConsole();
+      status.classList.add("hidden");
+
+      // Keep the URL as admin.html without causing a reload/session race.
+      if (!/admin\.html$/i.test(location.pathname)) {
+        history.replaceState(null, "", "admin.html");
+      }
     } catch (err) {
       console.error(err);
       status.textContent = err.message || "Could not login. Check email and password.";
@@ -203,6 +277,9 @@ function wireAdminLoginForm() {
 }
 
 function wireAnnouncementForm() {
+  if (announcementFormWired) return;
+  announcementFormWired = true;
+
   portal.qs("#announcementForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -232,10 +309,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     if (!(await requireAdmin())) return;
-
-    await loadTournament();
-    await loadAdminData();
-    wireAnnouncementForm();
+    await bootAdminConsole();
   } catch (err) {
     console.error(err);
     portal.toast(err.message || "Admin page failed to load.");

@@ -28,13 +28,17 @@
       <section id="adminLoginCard" class="card admin-login-card hidden">
         <div class="eyebrow">Admin Login</div>
         <h1>Organizer access only.</h1>
-        <p class="lead">Public viewers do not need a login. Only approved admins can enter this control center.</p>
+        <p class="lead">Public viewers do not need a login. Approved admins can sign in with email and password.</p>
         <form id="adminLoginForm" class="form" style="max-width:520px;">
           <div class="field">
             <label for="adminLoginEmail">Admin Email</label>
-            <input id="adminLoginEmail" type="email" placeholder="admin@email.com" required/>
+            <input id="adminLoginEmail" type="email" placeholder="admin@email.com" autocomplete="username" required/>
           </div>
-          <button class="btn btn-primary" type="submit">Send Admin Login Link</button>
+          <div class="field">
+            <label for="adminLoginPassword">Password</label>
+            <input id="adminLoginPassword" type="password" placeholder="Enter password" autocomplete="current-password" required/>
+          </div>
+          <button class="btn btn-primary" type="submit">Login to Admin</button>
           <div id="adminLoginStatus" class="notice hidden"></div>
         </form>
         <div class="actions" style="margin-top:14px;">

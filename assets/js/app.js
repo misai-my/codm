@@ -63,6 +63,16 @@ async function sendMagicLink(email, nextPath = "dashboard.html") {
   if (error) throw error;
 }
 
+async function signInWithPassword(email, password) {
+  const { data, error } = await sb.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) throw error;
+  return data;
+}
+
 async function getActiveTournament(slug = null) {
   const targetSlug = slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event";
   const { data, error } = await sb
@@ -104,4 +114,4 @@ function wireNavAuth() {
 }
 
 document.addEventListener("DOMContentLoaded", wireNavAuth);
-window.portal = { appBaseUrl, authCallbackUrl, qs, qsa, text, esc, toast, getSession, signOut, sendMagicLink, currentUserAccess, getActiveTournament, requireConfig };
+window.portal = { appBaseUrl, authCallbackUrl, qs, qsa, text, esc, toast, getSession, signOut, sendMagicLink, signInWithPassword, currentUserAccess, getActiveTournament, requireConfig };

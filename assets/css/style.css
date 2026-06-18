@@ -1362,3 +1362,15 @@ main img[src$="codm-logo.png"] {
   }
 }
 
+
+
+/* ============================================================
+   Admin Email + Password Login
+   ============================================================ */
+.admin-login-card input[type="password"] {
+  letter-spacing: .04em;
+}
+
+.admin-login-card .notice {
+  margin-top: 10px;
+}

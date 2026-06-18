@@ -174,20 +174,30 @@ function wireAdminLoginForm() {
     event.preventDefault();
 
     const email = portal.text(portal.qs("#adminLoginEmail")?.value).toLowerCase();
+    const password = portal.qs("#adminLoginPassword")?.value || "";
     const status = portal.qs("#adminLoginStatus");
 
-    if (!email) return;
+    if (!email || !password) return;
 
     try {
-      status.textContent = "Sending admin login link...";
+      status.textContent = "Checking admin login...";
       status.classList.remove("hidden");
 
-      await portal.sendMagicLink(email, "admin.html");
+      await portal.signInWithPassword(email, password);
 
-      status.textContent = "Admin login link sent. Open it on this browser/device.";
+      const profile = await loadProfile();
+
+      if (!profile || String(profile.role).toLowerCase() !== "admin") {
+        status.textContent = "Login worked, but this account is not marked as admin.";
+        await portal.signOut();
+        return;
+      }
+
+      status.textContent = "Login successful. Loading admin console...";
+      window.location.replace("admin.html");
     } catch (err) {
       console.error(err);
-      status.textContent = err.message || "Could not send admin login link.";
+      status.textContent = err.message || "Could not login. Check email and password.";
     }
   });
 }

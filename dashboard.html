@@ -155,7 +155,7 @@
               <div>
                 <div class="eyebrow">Submit Inquiry</div>
                 <h3>Ask the admin team</h3>
-                <p class="muted">To avoid spam, type <strong>CODM</strong> in the gatekeeper field before submitting.</p>
+                <p class="muted">A quick verification appears after you click Submit Inquiry.</p>
               </div>
 
               <div class="grid grid-two">
@@ -201,11 +201,6 @@
                 <input id="supportWebsite" tabindex="-1" autocomplete="off"/>
               </div>
 
-              <div class="field">
-                <label for="supportGatekeeper">Gatekeeper: type CODM</label>
-                <input id="supportGatekeeper" maxlength="12" placeholder="CODM" required/>
-              </div>
-
               <button class="btn btn-primary" type="submit">Submit Inquiry</button>
               <div id="supportFormStatus" class="notice hidden"></div>
             </form>
@@ -236,5 +231,24 @@
 <script src="assets/js/config.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/dashboard.js"></script>
+
+<div id="supportGateModal" class="support-gate-modal hidden" role="dialog" aria-modal="true" aria-labelledby="supportGateTitle">
+  <div class="support-gate-backdrop" data-support-gate-close></div>
+  <div class="support-gate-dialog">
+    <button class="support-gate-close" type="button" aria-label="Close verification" data-support-gate-close>×</button>
+    <div class="eyebrow">Quick Verification</div>
+    <h3 id="supportGateTitle">Before we submit your inquiry</h3>
+    <p>To protect the support queue from spam, type <strong>CODM</strong> below.</p>
+    <form id="supportGateForm" class="form">
+      <div class="field">
+        <label for="supportGateInput">Verification Code</label>
+        <input id="supportGateInput" maxlength="12" autocomplete="off" placeholder="CODM" required/>
+      </div>
+      <button class="btn btn-primary" type="submit">Confirm & Submit</button>
+      <div id="supportGateStatus" class="notice hidden"></div>
+    </form>
+  </div>
+</div>
+
 </body>
 </html>

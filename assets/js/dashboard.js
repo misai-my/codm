@@ -4,6 +4,8 @@ let dashboardFiltersWired = false;
 let faqRows = [];
 let publicInquiryRows = [];
 let supportWired = false;
+let pendingSupportPayload = null;
+let pendingSupportForm = null;
 
 async function loadTournament(slug) {
   const row = await portal.getActiveTournament(slug || cfg.DEFAULT_TOURNAMENT_SLUG);
@@ -317,44 +319,182 @@ function mpResultCards(rows) {
   });
 }
 
+function numericValue(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function brRoundKey(row) {
+  return [
+    row.day_no ?? "",
+    row.bracket ?? "",
+    row.round_no ?? "",
+    row.match_title ?? "",
+    row.map_name ?? "",
+    row.scheduled_at ?? ""
+  ].join("|");
+}
+
+function brRoundOrder(row) {
+  const parsedDate = row.scheduled_at ? Date.parse(row.scheduled_at) : NaN;
+  if (Number.isFinite(parsedDate)) return parsedDate;
+
+  return (
+    numericValue(row.day_no) * 1000000 +
+    numericValue(row.round_no) * 1000 +
+    numericValue(row.slot)
+  );
+}
+
+function lastMutualSurvivalDifference(a, b) {
+  const commonRounds = [...a.rounds.keys()]
+    .filter(key => b.rounds.has(key))
+    .map(key => ({
+      key,
+      order: Math.max(a.rounds.get(key).order, b.rounds.get(key).order)
+    }))
+    .sort((x, y) => y.order - x.order);
+
+  if (!commonRounds.length) return 0;
+
+  const latest = commonRounds[0].key;
+  const aPlacement = numericValue(a.rounds.get(latest).placement) || 9999;
+  const bPlacement = numericValue(b.rounds.get(latest).placement) || 9999;
+
+  // Lower placement is the better survival rank.
+  return aPlacement - bPlacement;
+}
+
+function compareBrStandings(a, b) {
+  // Official tie-break order:
+  // 1. Total Points
+  // 2. Total Victory
+  // 3. Total Elimination Points
+  // 4. Last Round Survival Rank in the latest common round
+  if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+  if (b.victories !== a.victories) return b.victories - a.victories;
+  if (b.eliminationPoints !== a.eliminationPoints) return b.eliminationPoints - a.eliminationPoints;
+
+  const survivalDifference = lastMutualSurvivalDifference(a, b);
+  if (survivalDifference !== 0) return survivalDifference;
+
+  return a.name.localeCompare(b.name);
+}
+
+function buildBrStandings(rows) {
+  const entries = new Map();
+
+  rows.forEach(row => {
+    const key = String(row.participant_tag || row.participant_name || row.slot || row.id || "").trim();
+    if (!key) return;
+
+    if (!entries.has(key)) {
+      entries.set(key, {
+        key,
+        name: row.participant_name || "Entry",
+        tag: row.participant_tag || "",
+        victories: 0,
+        placementPoints: 0,
+        eliminationPoints: 0,
+        totalPoints: 0,
+        rounds: new Map()
+      });
+    }
+
+    const entry = entries.get(key);
+    entry.victories += numericValue(row.victory);
+    entry.placementPoints += numericValue(row.placement_points);
+    entry.eliminationPoints += numericValue(row.elimination_points);
+
+    const rowTotal = row.total_points === null || row.total_points === undefined || row.total_points === ""
+      ? numericValue(row.placement_points) + numericValue(row.elimination_points)
+      : numericValue(row.total_points);
+
+    entry.totalPoints += rowTotal;
+
+    const roundKey = brRoundKey(row);
+    const currentRound = entry.rounds.get(roundKey);
+
+    // Keep the best available placement for duplicate source rows in the same round.
+    const placement = row.placement === null || row.placement === undefined || row.placement === ""
+      ? 9999
+      : numericValue(row.placement);
+
+    if (!currentRound || placement < currentRound.placement) {
+      entry.rounds.set(roundKey, {
+        placement,
+        order: brRoundOrder(row)
+      });
+    }
+  });
+
+  return [...entries.values()].sort(compareBrStandings);
+}
+
 function brResultCards(rows) {
   const brRows = rows.filter(row => String(row.mode).startsWith("BR_") && hasFinalData(row));
 
+  // Aggregate each mode/stage/bracket into standings.
+  // When a Day filter is used, the filtered rows naturally become that matchday's standings.
   const brGroups = groupRows(brRows, row =>
-    [row.mode, row.stage, row.day_no, row.bracket, row.round_no, row.match_title, row.map_name].join("|")
+    [row.mode, row.stage || "Stage", row.bracket || ""].join("|")
   );
 
   return brGroups.map(group => {
     const row = group[0];
-    const sorted = [...group].sort((a, b) => {
-      const ap = a.placement ?? 9999;
-      const bp = b.placement ?? 9999;
-      if (ap !== bp) return ap - bp;
-      return (b.total_points ?? 0) - (a.total_points ?? 0);
-    }).slice(0, 12);
+    const standings = buildBrStandings(group);
+    const stage = row.stage || "Stage";
+    const bracket = row.bracket ? ` · ${row.bracket}` : "";
+    const days = [...new Set(group.map(item => item.day_no).filter(value => value !== null && value !== undefined && value !== ""))];
+    const dayLabel = days.length === 1 ? ` · Day ${days[0]}` : "";
+    const maps = [...new Set(group.map(item => item.map_name).filter(Boolean))];
+    const rounds = [...new Set(group.map(item => item.round_no).filter(value => value !== null && value !== undefined && value !== ""))];
 
-    const title = row.match_title || `${modeLabel(row.mode)} Round ${row.round_no || ""}`;
+    const title = `${modeLabel(row.mode)} · ${stage}${bracket}${dayLabel}`;
+    const subLabel = [
+      rounds.length ? `${rounds.length} round${rounds.length === 1 ? "" : "s"}` : "",
+      maps.length ? maps.join(", ") : ""
+    ].filter(Boolean).join(" · ");
 
     return `
-      <article class="result-card">
+      <article class="result-card br-standings-card">
         <div class="result-top">
           <div>
             <span class="pill pill-gold">${portal.esc(modeLabel(row.mode))}</span>
-            <span class="pill">${portal.esc(row.map_name || "Map")}</span>
+            <span class="pill">${portal.esc(stage)}</span>
             <h3>${portal.esc(title)}</h3>
+            <p>${portal.esc(subLabel)}</p>
           </div>
-          <span class="pill pill-green">${portal.esc(row.status || "Final")}</span>
+          <span class="pill pill-green">Standings</span>
         </div>
+
+        <div class="br-standings-header" aria-hidden="true">
+          <span>Rank</span>
+          <span>Team / Player</span>
+          <span>Victory</span>
+          <span>Placement Pts</span>
+          <span>Elimination Pts</span>
+          <span>Total Pts</span>
+        </div>
+
         <div class="br-leaderboard">
-          ${sorted.map(entry => `
-            <div class="br-row">
-              <span class="rank">#${portal.esc(entry.placement ?? "-")}</span>
-              <strong>${portal.esc(entry.participant_name || "Entry")}</strong>
-              <span>${portal.esc(entry.eliminations ?? 0)} elims</span>
-              <span>${portal.esc(entry.total_points ?? 0)} pts</span>
+          ${standings.map((entry, index) => `
+            <div class="br-row br-standings-row">
+              <span class="rank">#${index + 1}</span>
+              <strong>${portal.esc(entry.name)}${entry.tag ? ` <small>${portal.esc(entry.tag)}</small>` : ""}</strong>
+              <div class="br-metrics">
+                <span data-label="Victory"><small>Victory</small><b>${portal.esc(entry.victories)}</b></span>
+                <span data-label="Placement Pts"><small>Placement Pts</small><b>${portal.esc(entry.placementPoints)}</b></span>
+                <span data-label="Elimination Pts"><small>Elimination Pts</small><b>${portal.esc(entry.eliminationPoints)}</b></span>
+                <span data-label="Total Pts"><small>Total Pts</small><b>${portal.esc(entry.totalPoints)}</b></span>
+              </div>
             </div>
           `).join("")}
         </div>
+
+        <p class="br-tiebreak-note">
+          Tiebreak order: Total Victory → Total Elimination Points → Last Round Survival Rank.
+        </p>
       </article>
     `;
   });
@@ -635,6 +775,70 @@ function resetFaqFilters() {
   renderFaqList();
 }
 
+function openSupportGateModal() {
+  const modal = portal.qs("#supportGateModal");
+  const input = portal.qs("#supportGateInput");
+  const status = portal.qs("#supportGateStatus");
+
+  if (!modal) return;
+  if (status) {
+    status.textContent = "";
+    status.classList.add("hidden");
+  }
+  if (input) input.value = "";
+
+  modal.classList.remove("hidden");
+  document.body.classList.add("support-modal-open");
+  setTimeout(() => input?.focus(), 50);
+}
+
+function closeSupportGateModal() {
+  const modal = portal.qs("#supportGateModal");
+  modal?.classList.add("hidden");
+  document.body.classList.remove("support-modal-open");
+}
+
+async function submitPendingSupportInquiry() {
+  const status = portal.qs("#supportGateStatus");
+  const mainStatus = portal.qs("#supportFormStatus");
+  const gate = portal.text(portal.qs("#supportGateInput")?.value).toUpperCase();
+
+  if (!pendingSupportPayload || !pendingSupportForm) return;
+
+  if (gate !== "CODM") {
+    status.textContent = "Verification failed. Type CODM exactly.";
+    status.classList.remove("hidden");
+    return;
+  }
+
+  try {
+    status.textContent = "Submitting inquiry...";
+    status.classList.remove("hidden");
+
+    const { error } = await sb.from("support_inquiries").insert({
+      ...pendingSupportPayload,
+      gatekeeper_code: gate
+    });
+
+    if (error) throw error;
+
+    localStorage.setItem("codm_support_last_submit", String(Date.now()));
+    pendingSupportForm.reset();
+    pendingSupportPayload = null;
+    pendingSupportForm = null;
+    closeSupportGateModal();
+
+    if (mainStatus) {
+      mainStatus.textContent = "Inquiry submitted. The admin team will review it.";
+      mainStatus.classList.remove("hidden");
+    }
+  } catch (err) {
+    console.error(err);
+    status.textContent = err.message || "Could not submit inquiry.";
+    status.classList.remove("hidden");
+  }
+}
+
 function wireSupportSection() {
   if (supportWired) return;
   supportWired = true;
@@ -649,6 +853,7 @@ function wireSupportSection() {
     const status = portal.qs("#supportFormStatus");
     const lastSubmit = Number(localStorage.getItem("codm_support_last_submit") || 0);
     const now = Date.now();
+    const hp = portal.text(portal.qs("#supportWebsite")?.value);
 
     if (now - lastSubmit < 60000) {
       status.textContent = "Please wait at least 60 seconds before submitting another inquiry.";
@@ -656,16 +861,7 @@ function wireSupportSection() {
       return;
     }
 
-    const gate = portal.text(portal.qs("#supportGatekeeper")?.value).toUpperCase();
-    const hp = portal.text(portal.qs("#supportWebsite")?.value);
-
     if (hp) return;
-
-    if (gate !== "CODM") {
-      status.textContent = "Gatekeeper failed. Type CODM exactly.";
-      status.classList.remove("hidden");
-      return;
-    }
 
     const payload = {
       tournament_slug: tournament?.slug || cfg.DEFAULT_TOURNAMENT_SLUG || "main-event",
@@ -676,7 +872,6 @@ function wireSupportSection() {
       category: portal.text(portal.qs("#supportCategory")?.value) || "General",
       subject: portal.text(portal.qs("#supportSubject")?.value),
       message: portal.text(portal.qs("#supportMessage")?.value),
-      gatekeeper_code: gate,
       honeypot: hp,
       status: "New",
       is_published: false
@@ -688,20 +883,23 @@ function wireSupportSection() {
       return;
     }
 
-    try {
-      status.textContent = "Submitting inquiry...";
-      status.classList.remove("hidden");
+    pendingSupportPayload = payload;
+    pendingSupportForm = event.target;
+    openSupportGateModal();
+  });
 
-      const { error } = await sb.from("support_inquiries").insert(payload);
-      if (error) throw error;
+  portal.qs("#supportGateForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await submitPendingSupportInquiry();
+  });
 
-      localStorage.setItem("codm_support_last_submit", String(now));
-      event.target.reset();
-      status.textContent = "Inquiry submitted. The admin team will review it.";
-    } catch (err) {
-      console.error(err);
-      status.textContent = err.message || "Could not submit inquiry.";
-    }
+  portal.qsa?.("[data-support-gate-close]")?.forEach(button => {
+    button.addEventListener("click", closeSupportGateModal);
+  });
+
+  // Fallback in case portal does not expose qsa.
+  document.querySelectorAll("[data-support-gate-close]").forEach(button => {
+    button.addEventListener("click", closeSupportGateModal);
   });
 }
 

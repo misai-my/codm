@@ -40,12 +40,15 @@ function tournamentUrl(path, slug = getSelectedTournamentSlug()) {
 async function listTournaments() {
   const { data, error } = await sb
     .from("tournaments")
-    .select("*")
-    .order("start_at", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false });
+    .select("*");
 
   if (error) throw error;
-  return data || [];
+
+  return [...(data || [])].sort((a, b) => {
+    const titleA = String(a.title || a.slug || "");
+    const titleB = String(b.title || b.slug || "");
+    return titleA.localeCompare(titleB);
+  });
 }
 
 async function getTournamentBySlug(slug = getSelectedTournamentSlug()) {

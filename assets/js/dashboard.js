@@ -298,22 +298,37 @@ function mpResultCards(rows) {
     const winner = group.find(r => String(r.result).toUpperCase() === "W");
 
     return `
-      <article class="result-card">
+      <article class="result-card mp-result-card">
         <div class="result-top">
-          <div>
-            <span class="pill pill-gold">${portal.esc(modeLabel(row.mode))}</span>
-            <span class="pill">${portal.esc(row.game_mode || "Map")}</span>
+          <div class="result-heading">
+            <div class="result-pills">
+              <span class="pill pill-gold">${portal.esc(modeLabel(row.mode))}</span>
+              <span class="pill">${portal.esc(row.game_mode || "Map")}</span>
+            </div>
             <h3>${portal.esc(title)}</h3>
             <p>${portal.esc(row.map_name || "")}</p>
           </div>
           <span class="pill pill-green">${portal.esc(row.status || "Final")}</span>
         </div>
-        <div class="result-score">
-          <div class="result-team"><strong>${portal.esc(teamA)}</strong></div>
-          <div class="score">${portal.esc(scoreA ?? "-")} - ${portal.esc(scoreB ?? "-")}</div>
-          <div class="result-team"><strong>${portal.esc(teamB)}</strong></div>
+
+        <div class="mp-scoreboard">
+          <div class="mp-team mp-team-a">
+            <span class="mp-team-label">Team / Player A</span>
+            <strong>${portal.esc(teamA)}</strong>
+          </div>
+
+          <div class="mp-score-box">
+            <span class="mp-score-label">Final Score</span>
+            <span class="score">${portal.esc(scoreA ?? "-")} <i>:</i> ${portal.esc(scoreB ?? "-")}</span>
+          </div>
+
+          <div class="mp-team mp-team-b">
+            <span class="mp-team-label">Team / Player B</span>
+            <strong>${portal.esc(teamB)}</strong>
+          </div>
         </div>
-        ${winner ? `<p><strong>Winner:</strong> ${portal.esc(winner.participant_name || "")}</p>` : ""}
+
+        ${winner ? `<div class="mp-winner"><span>Winner</span><strong>${portal.esc(winner.participant_name || "")}</strong></div>` : ""}
       </article>
     `;
   });
@@ -471,10 +486,12 @@ function brResultCards(rows) {
         <div class="br-standings-header" aria-hidden="true">
           <span>Rank</span>
           <span>Team / Player</span>
-          <span>Victory</span>
-          <span>Placement Pts</span>
-          <span>Elimination Pts</span>
-          <span>Total Pts</span>
+          <div class="br-header-metrics">
+            <span>Victory</span>
+            <span>Placement Pts</span>
+            <span>Elimination Pts</span>
+            <span>Total Pts</span>
+          </div>
         </div>
 
         <div class="br-leaderboard">

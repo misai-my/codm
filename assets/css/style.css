@@ -2439,3 +2439,293 @@ iframe#rulebookFrame,
   }
 }
 
+
+/* ============================================================
+   FINAL RESULTS ALIGNMENT FIX
+   Multiplayer score cards + BR standings header alignment
+   ============================================================ */
+
+/* -------------------- Multiplayer -------------------- */
+.mp-result-card .result-top {
+  align-items: flex-start;
+}
+
+.mp-result-card .result-heading {
+  min-width: 0;
+}
+
+.mp-result-card .result-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.mp-result-card .result-top h3,
+.mp-result-card .result-top p {
+  margin-left: 0;
+}
+
+.mp-scoreboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(124px, 150px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, .22);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.mp-team {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.mp-team-a {
+  text-align: left;
+  align-items: flex-start;
+}
+
+.mp-team-b {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.mp-team-label,
+.mp-score-label {
+  color: var(--muted2);
+  font-size: 9px;
+  line-height: 1.15;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.mp-team strong {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+.mp-score-box {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 9px 8px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(248,209,92,.12), rgba(255,255,255,.035));
+  border: 1px solid rgba(248,209,92,.20);
+  text-align: center;
+}
+
+.mp-score-box .score {
+  color: var(--gold);
+  font-size: 26px;
+  font-weight: 1000;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mp-score-box .score i {
+  font-style: normal;
+  color: rgba(255,255,255,.36);
+  padding-inline: 2px;
+}
+
+.mp-winner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 10px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.mp-winner span {
+  color: var(--muted2);
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 9px;
+}
+
+.mp-winner strong {
+  color: var(--green);
+}
+
+/* -------------------- Battle Royale -------------------- */
+.br-standings-card {
+  overflow: visible;
+}
+
+.br-standings-header,
+.br-standings-row {
+  display: grid;
+  grid-template-columns: 54px minmax(150px, 1.25fr) minmax(330px, 1.75fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.br-standings-header {
+  margin-top: 14px;
+  padding: 0 10px 9px;
+  color: var(--muted2);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.br-standings-header > span {
+  min-width: 0;
+}
+
+.br-standings-header > span:nth-child(2) {
+  padding-left: 2px;
+}
+
+.br-header-metrics,
+.br-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+}
+
+.br-header-metrics > span {
+  min-width: 0;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.br-standings-row {
+  min-width: 0;
+  padding: 10px;
+  border-radius: 14px;
+}
+
+.br-standings-row > .rank {
+  display: grid;
+  place-items: center start;
+  min-width: 0;
+}
+
+.br-standings-row > strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+}
+
+.br-metrics > span {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  min-height: 47px;
+  padding: 7px 5px;
+  border-radius: 10px;
+  background: rgba(0,0,0,.16);
+}
+
+.br-metrics b {
+  line-height: 1;
+}
+
+.br-tiebreak-note {
+  text-align: center;
+}
+
+/* -------------------- Responsive result layouts -------------------- */
+@media (max-width: 760px) {
+  .mp-scoreboard {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .mp-score-box {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .mp-team {
+    grid-row: 2;
+  }
+
+  .mp-team-a {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .mp-team-b {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .mp-team strong {
+    font-size: 13px;
+  }
+
+  .mp-score-box .score {
+    font-size: 23px;
+  }
+
+  .br-standings-header {
+    display: none;
+  }
+
+  .br-standings-row {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 8px 10px;
+  }
+
+  .br-standings-row > .rank {
+    align-self: start;
+    padding-top: 2px;
+  }
+
+  .br-metrics {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .br-metrics small {
+    display: block;
+  }
+}
+
+@media (max-width: 430px) {
+  .mp-scoreboard {
+    grid-template-columns: 1fr;
+  }
+
+  .mp-score-box,
+  .mp-team {
+    grid-column: auto;
+    grid-row: auto;
+    text-align: center;
+    align-items: center;
+  }
+
+  .mp-team-a,
+  .mp-team-b {
+    text-align: center;
+    align-items: center;
+  }
+
+  .br-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+

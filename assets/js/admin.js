@@ -1,6 +1,8 @@
 let currentProfile = null;
 let activeTournament = null;
 let announcementFormWired = false;
+let adminMatchRows = [];
+let adminFiltersWired = false;
 
 async function loadProfile() {
   const session = await portal.getSession();
@@ -161,6 +163,124 @@ async function loadMatchDetails() {
   return fallback.data || [];
 }
 
+
+function uniqueSorted(rows, field) {
+  return [...new Set(rows.map(row => row[field]).filter(value => value !== null && value !== undefined && String(value).trim() !== ""))]
+    .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
+}
+
+function setSelectOptions(selectId, values, allLabel, labeler = value => value) {
+  const select = portal.qs(`#${selectId}`);
+  if (!select) return;
+
+  const current = select.value;
+  select.innerHTML = [`<option value="">${portal.esc(allLabel)}</option>`]
+    .concat(values.map(value => `<option value="${portal.esc(value)}">${portal.esc(labeler(value))}</option>`))
+    .join("");
+
+  if (values.map(String).includes(String(current))) {
+    select.value = current;
+  }
+}
+
+function adminRowSearchText(row) {
+  return [
+    modeLabel(row.mode),
+    row.mode,
+    row.stage,
+    row.status,
+    row.bracket,
+    row.match_title,
+    row.game_mode,
+    row.map_name,
+    row.team_a,
+    row.tag_a,
+    row.team_b,
+    row.tag_b,
+    row.participant_name,
+    row.participant_tag,
+    row.notes
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function modeOrder(value) {
+  return ({
+    MP_1V1: 1,
+    MP_TEAM_5V5: 2,
+    BR_SOLO: 3,
+    BR_SQUAD: 4
+  })[value] || 99;
+}
+
+function populateAdminFilters(rows) {
+  const modes = uniqueSorted(rows, "mode").sort((a, b) => modeOrder(a) - modeOrder(b));
+  const stages = uniqueSorted(rows, "stage");
+  const statuses = uniqueSorted(rows, "status");
+  const days = uniqueSorted(rows, "day_no");
+
+  ["adminSchedule", "adminResults"].forEach(prefix => {
+    setSelectOptions(`${prefix}ModeFilter`, modes, "All Modes", modeLabel);
+    setSelectOptions(`${prefix}StageFilter`, stages, "All Stages");
+    setSelectOptions(`${prefix}StatusFilter`, statuses, "All Status");
+    setSelectOptions(`${prefix}DayFilter`, days, "All Days", value => `Day ${value}`);
+  });
+}
+
+function currentAdminFilter(prefix) {
+  return {
+    mode: portal.qs(`#${prefix}ModeFilter`)?.value || "",
+    stage: portal.qs(`#${prefix}StageFilter`)?.value || "",
+    status: portal.qs(`#${prefix}StatusFilter`)?.value || "",
+    day: portal.qs(`#${prefix}DayFilter`)?.value || "",
+    search: (portal.qs(`#${prefix}SearchFilter`)?.value || "").trim().toLowerCase()
+  };
+}
+
+function applyAdminFilter(rows, prefix) {
+  const filter = currentAdminFilter(prefix);
+
+  return rows.filter(row => {
+    if (filter.mode && String(row.mode) !== filter.mode) return false;
+    if (filter.stage && String(row.stage || "") !== filter.stage) return false;
+    if (filter.status && String(row.status || "") !== filter.status) return false;
+    if (filter.day && String(row.day_no ?? "") !== filter.day) return false;
+    if (filter.search && !adminRowSearchText(row).includes(filter.search)) return false;
+    return true;
+  });
+}
+
+function renderAdminMatchPreviews() {
+  renderScheduleTable(applyAdminFilter(adminMatchRows, "adminSchedule"));
+  renderResultsTable(applyAdminFilter(adminMatchRows, "adminResults"));
+}
+
+function resetAdminFilter(prefix) {
+  [`${prefix}ModeFilter`, `${prefix}StageFilter`, `${prefix}StatusFilter`, `${prefix}DayFilter`].forEach(id => {
+    const el = portal.qs(`#${id}`);
+    if (el) el.value = "";
+  });
+
+  const search = portal.qs(`#${prefix}SearchFilter`);
+  if (search) search.value = "";
+
+  renderAdminMatchPreviews();
+}
+
+function wireAdminFilters() {
+  if (adminFiltersWired) return;
+  adminFiltersWired = true;
+
+  ["adminSchedule", "adminResults"].forEach(prefix => {
+    [`${prefix}ModeFilter`, `${prefix}StageFilter`, `${prefix}StatusFilter`, `${prefix}DayFilter`, `${prefix}SearchFilter`].forEach(id => {
+      const el = portal.qs(`#${id}`);
+      if (!el) return;
+      el.addEventListener(el.tagName === "INPUT" ? "input" : "change", renderAdminMatchPreviews);
+    });
+
+    portal.qs(`#${prefix}FilterReset`)?.addEventListener("click", () => resetAdminFilter(prefix));
+  });
+}
+
 async function loadAdminData() {
   const [annRes, matchRows] = await Promise.all([
     sb.from("announcements").select("*").order("created_at", { ascending: false }).limit(25),
@@ -169,9 +289,12 @@ async function loadAdminData() {
 
   if (annRes.error) throw annRes.error;
 
+  adminMatchRows = matchRows || [];
+
   renderAnnouncementsTable(annRes.data || []);
-  renderScheduleTable(matchRows);
-  renderResultsTable(matchRows);
+  populateAdminFilters(adminMatchRows);
+  wireAdminFilters();
+  renderAdminMatchPreviews();
 }
 
 function modeLabel(value) {

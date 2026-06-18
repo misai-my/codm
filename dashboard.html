@@ -59,6 +59,29 @@
               <p>Published matches, lobby times, and series windows.</p>
             </div>
           </div>
+          <div class="filter-panel" id="scheduleFilters">
+            <div class="field">
+              <label for="scheduleModeFilter">Mode</label>
+              <select id="scheduleModeFilter"><option value="">All Modes</option></select>
+            </div>
+            <div class="field">
+              <label for="scheduleStageFilter">Stage</label>
+              <select id="scheduleStageFilter"><option value="">All Stages</option></select>
+            </div>
+            <div class="field">
+              <label for="scheduleStatusFilter">Status</label>
+              <select id="scheduleStatusFilter"><option value="">All Status</option></select>
+            </div>
+            <div class="field">
+              <label for="scheduleDayFilter">Day</label>
+              <select id="scheduleDayFilter"><option value="">All Days</option></select>
+            </div>
+            <div class="field filter-search">
+              <label for="scheduleSearchFilter">Search</label>
+              <input id="scheduleSearchFilter" type="search" placeholder="Team, player, map..."/>
+            </div>
+            <button class="btn btn-small filter-reset" id="scheduleFilterReset" type="button">Reset</button>
+          </div>
           <div id="scheduleList" class="schedule-list"></div>
         </section>
 
@@ -69,6 +92,29 @@
               <h2>Match Results</h2>
               <p>Finalized scores and published standings entries.</p>
             </div>
+          </div>
+          <div class="filter-panel" id="resultsFilters">
+            <div class="field">
+              <label for="resultsModeFilter">Mode</label>
+              <select id="resultsModeFilter"><option value="">All Modes</option></select>
+            </div>
+            <div class="field">
+              <label for="resultsStageFilter">Stage</label>
+              <select id="resultsStageFilter"><option value="">All Stages</option></select>
+            </div>
+            <div class="field">
+              <label for="resultsStatusFilter">Status</label>
+              <select id="resultsStatusFilter"><option value="">All Status</option></select>
+            </div>
+            <div class="field">
+              <label for="resultsDayFilter">Day</label>
+              <select id="resultsDayFilter"><option value="">All Days</option></select>
+            </div>
+            <div class="field filter-search">
+              <label for="resultsSearchFilter">Search</label>
+              <input id="resultsSearchFilter" type="search" placeholder="Team, player, map..."/>
+            </div>
+            <button class="btn btn-small filter-reset" id="resultsFilterReset" type="button">Reset</button>
           </div>
           <div id="resultsList" class="results-list"></div>
         </section>

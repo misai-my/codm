@@ -156,6 +156,30 @@
               <div id="matchTableWarning"></div>
 
               <h3 id="schedulePreview">Schedule Preview</h3>
+              <div class="filter-panel admin-filter-panel" id="adminScheduleFilters">
+                <div class="field">
+                  <label for="adminScheduleModeFilter">Mode</label>
+                  <select id="adminScheduleModeFilter"><option value="">All Modes</option></select>
+                </div>
+                <div class="field">
+                  <label for="adminScheduleStageFilter">Stage</label>
+                  <select id="adminScheduleStageFilter"><option value="">All Stages</option></select>
+                </div>
+                <div class="field">
+                  <label for="adminScheduleStatusFilter">Status</label>
+                  <select id="adminScheduleStatusFilter"><option value="">All Status</option></select>
+                </div>
+                <div class="field">
+                  <label for="adminScheduleDayFilter">Day</label>
+                  <select id="adminScheduleDayFilter"><option value="">All Days</option></select>
+                </div>
+                <div class="field filter-search">
+                  <label for="adminScheduleSearchFilter">Search</label>
+                  <input id="adminScheduleSearchFilter" type="search" placeholder="Team, player, map..."/>
+                </div>
+                <button class="btn btn-small filter-reset" id="adminScheduleFilterReset" type="button">Reset</button>
+              </div>
+
               <div class="admin-table-wrap section-tight">
                 <table>
                   <thead><tr><th>Mode</th><th>Match</th><th>Schedule</th><th>Status</th></tr></thead>
@@ -164,6 +188,30 @@
               </div>
 
               <h3 id="resultsPreview" class="section-tight">Results Preview</h3>
+              <div class="filter-panel admin-filter-panel" id="adminResultsFilters">
+                <div class="field">
+                  <label for="adminResultsModeFilter">Mode</label>
+                  <select id="adminResultsModeFilter"><option value="">All Modes</option></select>
+                </div>
+                <div class="field">
+                  <label for="adminResultsStageFilter">Stage</label>
+                  <select id="adminResultsStageFilter"><option value="">All Stages</option></select>
+                </div>
+                <div class="field">
+                  <label for="adminResultsStatusFilter">Status</label>
+                  <select id="adminResultsStatusFilter"><option value="">All Status</option></select>
+                </div>
+                <div class="field">
+                  <label for="adminResultsDayFilter">Day</label>
+                  <select id="adminResultsDayFilter"><option value="">All Days</option></select>
+                </div>
+                <div class="field filter-search">
+                  <label for="adminResultsSearchFilter">Search</label>
+                  <input id="adminResultsSearchFilter" type="search" placeholder="Team, player, map..."/>
+                </div>
+                <button class="btn btn-small filter-reset" id="adminResultsFilterReset" type="button">Reset</button>
+              </div>
+
               <div class="admin-table-wrap section-tight">
                 <table>
                   <thead><tr><th>Mode</th><th>Match / Entry</th><th>Result</th><th>Status</th></tr></thead>

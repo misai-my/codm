@@ -1,4 +1,6 @@
 let tournament = null;
+let dashboardMatchDetails = null;
+let dashboardFiltersWired = false;
 
 async function loadTournament(slug) {
   const row = await portal.getActiveTournament(slug || cfg.DEFAULT_TOURNAMENT_SLUG);
@@ -394,6 +396,123 @@ function renderResults(matchResult) {
   }).join("");
 }
 
+
+function uniqueSorted(rows, field) {
+  return [...new Set(rows.map(row => row[field]).filter(value => value !== null && value !== undefined && String(value).trim() !== ""))]
+    .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
+}
+
+function setSelectOptions(selectId, values, allLabel, labeler = value => value) {
+  const select = portal.qs(`#${selectId}`);
+  if (!select) return;
+
+  const current = select.value;
+  const optionHtml = [`<option value="">${portal.esc(allLabel)}</option>`]
+    .concat(values.map(value => `<option value="${portal.esc(value)}">${portal.esc(labeler(value))}</option>`))
+    .join("");
+
+  select.innerHTML = optionHtml;
+
+  if (values.map(String).includes(String(current))) {
+    select.value = current;
+  }
+}
+
+function rowSearchText(row) {
+  return [
+    modeLabel(row.mode),
+    row.mode,
+    row.stage,
+    row.status,
+    row.bracket,
+    row.match_title,
+    row.game_mode,
+    row.map_name,
+    row.team_a,
+    row.tag_a,
+    row.team_b,
+    row.tag_b,
+    row.participant_name,
+    row.participant_tag,
+    row.notes
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function populateDashboardFilters(rows) {
+  const modes = uniqueSorted(rows, "mode").sort((a, b) => modeOrder(a) - modeOrder(b));
+  const stages = uniqueSorted(rows, "stage");
+  const statuses = uniqueSorted(rows, "status");
+  const days = uniqueSorted(rows, "day_no");
+
+  ["schedule", "results"].forEach(prefix => {
+    setSelectOptions(`${prefix}ModeFilter`, modes, "All Modes", modeLabel);
+    setSelectOptions(`${prefix}StageFilter`, stages, "All Stages");
+    setSelectOptions(`${prefix}StatusFilter`, statuses, "All Status");
+    setSelectOptions(`${prefix}DayFilter`, days, "All Days", value => `Day ${value}`);
+  });
+}
+
+function currentDashboardFilter(prefix) {
+  return {
+    mode: portal.qs(`#${prefix}ModeFilter`)?.value || "",
+    stage: portal.qs(`#${prefix}StageFilter`)?.value || "",
+    status: portal.qs(`#${prefix}StatusFilter`)?.value || "",
+    day: portal.qs(`#${prefix}DayFilter`)?.value || "",
+    search: (portal.qs(`#${prefix}SearchFilter`)?.value || "").trim().toLowerCase()
+  };
+}
+
+function applyDashboardFilter(rows, prefix) {
+  const filter = currentDashboardFilter(prefix);
+
+  return rows.filter(row => {
+    if (filter.mode && String(row.mode) !== filter.mode) return false;
+    if (filter.stage && String(row.stage || "") !== filter.stage) return false;
+    if (filter.status && String(row.status || "") !== filter.status) return false;
+    if (filter.day && String(row.day_no ?? "") !== filter.day) return false;
+    if (filter.search && !rowSearchText(row).includes(filter.search)) return false;
+    return true;
+  });
+}
+
+function renderDashboardMatchViews() {
+  if (!dashboardMatchDetails) return;
+
+  const baseRows = dashboardMatchDetails.rows || [];
+  const scheduleRows = applyDashboardFilter(baseRows, "schedule");
+  const resultRows = applyDashboardFilter(baseRows, "results");
+
+  renderSchedule({ ...dashboardMatchDetails, rows: scheduleRows });
+  renderResults({ ...dashboardMatchDetails, rows: resultRows });
+}
+
+function resetDashboardFilter(prefix) {
+  [`${prefix}ModeFilter`, `${prefix}StageFilter`, `${prefix}StatusFilter`, `${prefix}DayFilter`].forEach(id => {
+    const el = portal.qs(`#${id}`);
+    if (el) el.value = "";
+  });
+
+  const search = portal.qs(`#${prefix}SearchFilter`);
+  if (search) search.value = "";
+
+  renderDashboardMatchViews();
+}
+
+function wireDashboardFilters() {
+  if (dashboardFiltersWired) return;
+  dashboardFiltersWired = true;
+
+  ["schedule", "results"].forEach(prefix => {
+    [`${prefix}ModeFilter`, `${prefix}StageFilter`, `${prefix}StatusFilter`, `${prefix}DayFilter`, `${prefix}SearchFilter`].forEach(id => {
+      const el = portal.qs(`#${id}`);
+      if (!el) return;
+      el.addEventListener(el.tagName === "INPUT" ? "input" : "change", renderDashboardMatchViews);
+    });
+
+    portal.qs(`#${prefix}FilterReset`)?.addEventListener("click", () => resetDashboardFilter(prefix));
+  });
+}
+
 function renderRulebook() {
   const url = tournament?.rulebook_url || cfg.RULEBOOK_URL || "";
   const frame = portal.qs("#rulebookFrame");
@@ -422,9 +541,12 @@ async function renderDashboardData() {
     loadMatchDetails()
   ]);
 
+  dashboardMatchDetails = matchDetails;
+
   renderAnnouncements(announcements);
-  renderSchedule(matchDetails);
-  renderResults(matchDetails);
+  populateDashboardFilters(matchDetails.rows || []);
+  wireDashboardFilters();
+  renderDashboardMatchViews();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

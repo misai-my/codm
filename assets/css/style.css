@@ -2016,3 +2016,112 @@ iframe#rulebookFrame,
   }
 }
 
+
+/* ============================================================
+   FINAL MATCH FILTERS UI
+   Dashboard + Admin schedule/results filters
+   ============================================================ */
+.filter-panel {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr)) minmax(180px, 1.4fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin: 14px 0 18px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid rgba(255, 255, 255, .09);
+}
+
+.filter-panel .field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.filter-panel label {
+  color: var(--muted2);
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.filter-panel select,
+.filter-panel input {
+  min-height: 36px;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text);
+  background: rgba(5, 9, 18, .82);
+  border: 1px solid rgba(255, 255, 255, .12);
+  outline: none;
+}
+
+.filter-panel select:focus,
+.filter-panel input:focus {
+  border-color: rgba(248, 209, 92, .55);
+  box-shadow: 0 0 0 3px rgba(248, 209, 92, .12);
+}
+
+.filter-panel .filter-reset {
+  min-height: 36px;
+  padding: 8px 14px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.admin-filter-panel {
+  margin-top: 10px;
+}
+
+@media (max-width: 1080px) {
+  .filter-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .filter-panel .filter-search {
+    grid-column: span 2;
+  }
+
+  .filter-panel .filter-reset {
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .filter-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .filter-panel .filter-search {
+    grid-column: 1 / -1;
+  }
+
+  .filter-panel .filter-reset {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .filter-panel select,
+  .filter-panel input {
+    min-height: 34px;
+    font-size: 11px;
+    padding: 7px 9px;
+  }
+}
+
+@media (max-width: 390px) {
+  .filter-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-panel .filter-search,
+  .filter-panel .filter-reset {
+    grid-column: auto;
+  }
+}
+

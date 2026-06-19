@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>Event Hub · CODM Tournament OS</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=participating-teams-v7"/>
+  <link rel="stylesheet" href="assets/css/style.css?v=collapsible-sections-v8"/>
 </head>
 <body>
 <header class="nav dashboard-sticky-nav">
@@ -17,12 +17,12 @@
     </a>
     <nav class="nav-links">
       <a class="nav-link" href="#announcements">Announcements</a>
+      <a class="nav-link nav-link-registration" href="#registration">Registration</a>
       <a class="nav-link" href="#teams">Teams</a>
       <a class="nav-link" href="#schedule">Schedule</a>
       <a class="nav-link" href="#results">Results</a>
-      <a class="nav-link" href="#support">FAQ & Support</a>
-      <a class="nav-link nav-link-registration" href="#registration">Registration</a>
-      <a class="nav-link" href="rulebook.html" data-tournament-link="rulebook.html">Rulebook</a>
+      <a class="nav-link" href="#rulebook">Rulebook</a>
+      <a class="nav-link" href="#support">FAQ &amp; Support</a>
     </nav>
     <div class="tournament-switcher dashboard-tournament-switcher">
       <label for="dashboardTournamentSelect">Tournament</label>
@@ -75,14 +75,17 @@
 
 
 
-        <section class="card participating-teams-section" id="teams">
+        <section class="card participating-teams-section dashboard-collapsible is-collapsed" id="teams" data-collapsible-section>
           <div class="section-head">
             <div>
               <div class="eyebrow">Tournament Directory</div>
               <h2>Participating Teams & Players</h2>
               <p class="muted">Published teams and player rosters for the selected tournament. Player UIDs are never displayed publicly.</p>
             </div>
+          
+            <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="teamsContent" data-section-toggle="teams"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
           </div>
+          <div class="dashboard-collapsible-body" id="teamsContent" hidden>
 
           <div class="team-directory-filters">
             <label>
@@ -101,16 +104,21 @@
           </div>
 
           <div id="participatingTeamsList" class="participating-teams-grid"></div>
-        </section>
+        
+          </div>
+</section>
 
-        <section class="card" id="schedule">
+        <section class="card dashboard-collapsible is-collapsed" id="schedule" data-collapsible-section>
           <div class="section-head">
             <div>
               <div class="eyebrow">Match Flow</div>
               <h2>Match Schedule</h2>
               <p>Published matches, lobby times, and series windows.</p>
             </div>
+          
+            <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="scheduleContent" data-section-toggle="schedule"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
           </div>
+          <div class="dashboard-collapsible-body" id="scheduleContent" hidden>
           <div class="filter-panel" id="scheduleFilters">
             <div class="field">
               <label for="scheduleModeFilter">Mode</label>
@@ -135,16 +143,21 @@
             <button class="btn btn-small filter-reset" id="scheduleFilterReset" type="button">Reset</button>
           </div>
           <div id="scheduleList" class="schedule-list"></div>
-        </section>
+        
+          </div>
+</section>
 
-        <section class="card" id="results">
+        <section class="card dashboard-collapsible is-collapsed" id="results" data-collapsible-section>
           <div class="section-head">
             <div>
               <div class="eyebrow">Published</div>
               <h2>Match Results</h2>
               <p>Finalized scores and published standings entries.</p>
             </div>
+          
+            <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="resultsContent" data-section-toggle="results"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
           </div>
+          <div class="dashboard-collapsible-body" id="resultsContent" hidden>
           <div class="filter-panel" id="resultsFilters">
             <div class="field">
               <label for="resultsModeFilter">Mode</label>
@@ -169,7 +182,31 @@
             <button class="btn btn-small filter-reset" id="resultsFilterReset" type="button">Reset</button>
           </div>
           <div id="resultsList" class="results-list"></div>
-        </section>
+        
+          </div>
+</section>
+
+        
+
+
+
+        <section class="card dashboard-collapsible is-collapsed" id="rulebook" data-collapsible-section>
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Official Rules</div>
+              <h2>Rulebook</h2>
+              <p>Review the official tournament rules before match day.</p>
+            </div>
+            <a class="btn btn-primary btn-small" href="rulebook.html" data-tournament-link="rulebook.html">Full Rulebook Viewer</a>
+          
+            <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="rulebookContent" data-section-toggle="rulebook"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
+          </div>
+          <div class="dashboard-collapsible-body" id="rulebookContent" hidden>
+          <iframe id="rulebookFrame" class="rulebook-frame hidden" title="Rulebook"></iframe>
+          <div id="rulebookFallback"></div>
+        
+          </div>
+</section>
 
         <section class="card" id="support">
           <div class="section-head">
@@ -257,21 +294,6 @@
             </form>
           </div>
         </section>
-
-
-
-        <section class="card" id="rulebook">
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">Official Rules</div>
-              <h2>Rulebook</h2>
-              <p>Review the official tournament rules before match day.</p>
-            </div>
-            <a class="btn btn-primary btn-small" href="rulebook.html" data-tournament-link="rulebook.html">Full Rulebook Viewer</a>
-          </div>
-          <iframe id="rulebookFrame" class="rulebook-frame hidden" title="Rulebook"></iframe>
-          <div id="rulebookFallback"></div>
-        </section>
       </div>
     </div>
   </section>
@@ -281,7 +303,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
 <script src="assets/js/app.js?v=mt-public-visibility-v4"></script>
-<script src="assets/js/dashboard.js?v=participating-teams-v7"></script>
+<script src="assets/js/dashboard.js?v=collapsible-sections-v8"></script>
 
 <div id="supportGateModal" class="support-gate-modal hidden" role="dialog" aria-modal="true" aria-labelledby="supportGateTitle">
   <div class="support-gate-backdrop" data-support-gate-close></div>

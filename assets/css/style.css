@@ -3147,3 +3147,106 @@ header.dashboard-sticky-nav,
   }
 }
 
+
+/* ============================================================
+   DASHBOARD COLLAPSIBLE SECTIONS
+   ============================================================ */
+.dashboard-collapsible .section-head {
+  align-items: center;
+}
+
+.dashboard-collapsible-body {
+  min-width: 0;
+}
+
+.dashboard-collapsible.is-collapsed .dashboard-collapsible-body,
+.dashboard-collapsible-body[hidden] {
+  display: none !important;
+}
+
+.section-collapse-toggle,
+.section-head-actions {
+  display: inline-flex;
+  align-items: center;
+}
+
+.section-collapse-toggle {
+  justify-content: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid rgba(248, 209, 92, .30);
+  border-radius: 10px;
+  color: #f8d15c;
+  background: rgba(248, 209, 92, .08);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .03em;
+  transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+
+.section-collapse-toggle:hover {
+  border-color: rgba(248, 209, 92, .62);
+  background: rgba(248, 209, 92, .14);
+}
+
+.section-collapse-toggle:focus-visible {
+  outline: 2px solid #f8d15c;
+  outline-offset: 2px;
+}
+
+.section-collapse-chevron {
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform .18s ease;
+}
+
+.dashboard-collapsible:not(.is-collapsed) .section-collapse-chevron {
+  transform: rotate(225deg) translate(-1px, -1px);
+}
+
+.section-head-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+#teams,
+#schedule,
+#results,
+#rulebook {
+  scroll-margin-top: 160px;
+}
+
+@media (max-width: 760px) {
+  .dashboard-collapsible .section-head {
+    align-items: flex-start;
+  }
+
+  .section-collapse-toggle {
+    min-width: 76px;
+  }
+
+  .section-head-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .section-head-actions > * {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  #teams,
+  #schedule,
+  #results,
+  #rulebook {
+    scroll-margin-top: 190px;
+  }
+}
+

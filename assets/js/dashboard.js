@@ -88,6 +88,78 @@ function wireDashboardTournamentSelector() {
 }
 
 
+
+function setDashboardSectionCollapsed(section, collapsed) {
+  if (!section || !section.matches("[data-collapsible-section]")) return;
+
+  const body = section.querySelector(".dashboard-collapsible-body");
+  const toggle = section.querySelector(".section-collapse-toggle");
+  const toggleText = section.querySelector(".section-collapse-toggle-text");
+
+  section.classList.toggle("is-collapsed", collapsed);
+
+  if (body) body.hidden = collapsed;
+  if (toggle) toggle.setAttribute("aria-expanded", String(!collapsed));
+  if (toggleText) toggleText.textContent = collapsed ? "Show" : "Hide";
+}
+
+function expandDashboardSectionById(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section || !section.matches("[data-collapsible-section]")) return false;
+
+  setDashboardSectionCollapsed(section, false);
+  return true;
+}
+
+function scrollToDashboardSection(sectionId, smooth) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+
+  expandDashboardSectionById(sectionId);
+
+  requestAnimationFrame(() => {
+    section.scrollIntoView({
+      behavior: smooth ? "smooth" : "auto",
+      block: "start"
+    });
+  });
+}
+
+function initializeDashboardCollapsibles() {
+  document.querySelectorAll("[data-collapsible-section]").forEach(section => {
+    const toggle = section.querySelector(".section-collapse-toggle");
+    const shouldStartCollapsed = section.classList.contains("is-collapsed");
+
+    setDashboardSectionCollapsed(section, shouldStartCollapsed);
+
+    toggle?.addEventListener("click", () => {
+      setDashboardSectionCollapsed(section, !section.classList.contains("is-collapsed"));
+    });
+  });
+
+  document.querySelectorAll('.nav-link[href^="#"]').forEach(link => {
+    link.addEventListener("click", event => {
+      const sectionId = (link.getAttribute("href") || "").slice(1);
+      if (!expandDashboardSectionById(sectionId)) return;
+
+      event.preventDefault();
+      window.history.pushState({}, "", `#${sectionId}`);
+      scrollToDashboardSection(sectionId, true);
+    });
+  });
+
+  window.addEventListener("hashchange", () => {
+    const sectionId = window.location.hash.replace(/^#/, "");
+    if (sectionId) scrollToDashboardSection(sectionId, false);
+  });
+
+  const initialSectionId = window.location.hash.replace(/^#/, "");
+  if (initialSectionId) {
+    setTimeout(() => scrollToDashboardSection(initialSectionId, false), 0);
+  }
+}
+
+
 async function loadParticipatingTeams() {
   const slug = tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
 
@@ -1220,6 +1292,7 @@ async function renderDashboardData() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  initializeDashboardCollapsibles();
   if (!portal.requireConfig()) return;
 
   try {

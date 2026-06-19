@@ -2974,3 +2974,176 @@ header.dashboard-sticky-nav,
   letter-spacing: .01em;
 }
 
+
+/* ============================================================
+   PARTICIPATING TEAMS DIRECTORY
+   ============================================================ */
+.team-directory-filters {
+  display: grid;
+  grid-template-columns: minmax(160px, .45fr) minmax(240px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin: 18px 0 22px;
+}
+
+.team-directory-filters label {
+  display: grid;
+  gap: 6px;
+}
+
+.team-directory-filters label span,
+.team-roster-label {
+  color: var(--muted2);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.team-directory-filters select,
+.team-directory-filters input {
+  min-width: 0;
+}
+
+.team-mode-group + .team-mode-group {
+  margin-top: 26px;
+}
+
+.team-mode-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.team-mode-title small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.team-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.team-directory-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, .10);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 90% 6%, rgba(248, 209, 92, .08), transparent 38%),
+    rgba(6, 10, 20, .42);
+}
+
+.team-directory-card-head {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.team-directory-logo {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(248, 209, 92, .25);
+  border-radius: 12px;
+  background: rgba(248, 209, 92, .08);
+}
+
+.team-directory-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.team-directory-monogram {
+  color: #f8d15c;
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: .06em;
+}
+
+.team-directory-name {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.team-directory-name strong {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-directory-name span {
+  overflow: hidden;
+  color: #f8d15c;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-roster-label {
+  margin: 12px 0 7px;
+}
+
+.team-roster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.team-roster span {
+  max-width: 100%;
+  padding: 5px 7px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 8px;
+  color: #d9e2f0;
+  background: rgba(255, 255, 255, .045);
+  font-size: 10px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-roster span.team-roster-empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+@media (max-width: 760px) {
+  .team-directory-filters {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .team-directory-filters .filter-reset {
+    width: 100%;
+  }
+
+  .team-mode-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

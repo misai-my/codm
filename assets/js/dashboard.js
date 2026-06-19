@@ -7,6 +7,8 @@ let supportWired = false;
 let pendingSupportPayload = null;
 let pendingSupportForm = null;
 let dashboardTournaments = [];
+let dashboardParticipatingTeams = [];
+let teamDirectoryFiltersWired = false;
 
 
 function tournamentRulebookUrl(row) {
@@ -84,6 +86,212 @@ function wireDashboardTournamentSelector() {
     }
   });
 }
+
+
+async function loadParticipatingTeams() {
+  const slug = tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+
+  try {
+    const { data, error } = await sb
+      .from("v_public_participating_teams")
+      .select("*")
+      .eq("tournament_slug", slug)
+      .order("mode", { ascending: true })
+      .order("team_name", { ascending: true });
+
+    return { rows: data || [], error: error || null, slug };
+  } catch (err) {
+    console.error("Participating teams load failed:", err);
+    return { rows: [], error: err, slug };
+  }
+}
+
+function safeTeamRoster(row) {
+  const value = row?.players;
+
+  if (Array.isArray(value)) return value;
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function teamSearchText(row) {
+  return [
+    row?.team_name,
+    row?.team_tag,
+    row?.mode,
+    ...safeTeamRoster(row).map(player => player?.name)
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function populateTeamDirectoryFilters(rows) {
+  const modeSelect = portal.qs("#teamsModeFilter");
+  if (!modeSelect) return;
+
+  const currentValue = modeSelect.value;
+  const modes = [...new Set(rows.map(row => row.mode).filter(Boolean))]
+    .sort((a, b) => modeOrder(a) - modeOrder(b));
+
+  modeSelect.innerHTML =
+    '<option value="">All Modes</option>' +
+    modes.map(mode => `<option value="${portal.esc(mode)}">${portal.esc(modeLabel(mode))}</option>`).join("");
+
+  modeSelect.value = modes.includes(currentValue) ? currentValue : "";
+}
+
+function currentTeamDirectoryFilter() {
+  return {
+    mode: portal.qs("#teamsModeFilter")?.value || "",
+    search: portal.text(portal.qs("#teamsSearchFilter")?.value || "").toLowerCase()
+  };
+}
+
+function filteredParticipatingTeams(rows) {
+  const filter = currentTeamDirectoryFilter();
+
+  return rows.filter(row => {
+    if (filter.mode && row.mode !== filter.mode) return false;
+    if (filter.search && !teamSearchText(row).includes(filter.search)) return false;
+    return true;
+  });
+}
+
+function teamMonogram(value) {
+  const words = portal.text(value).split(/\s+/).filter(Boolean);
+  return (words.slice(0, 2).map(word => word[0]).join("") || "TM").toUpperCase();
+}
+
+function teamLogoMarkup(row) {
+  const label = portal.text(row?.team_name || row?.team_tag || "Team");
+  const url = portal.text(row?.team_logo_url);
+
+  if (!url) {
+    return `<div class="team-directory-logo team-directory-monogram" aria-hidden="true">${portal.esc(teamMonogram(label))}</div>`;
+  }
+
+  return `
+    <div class="team-directory-logo">
+      <img
+        src="${portal.esc(url)}"
+        alt=""
+        loading="lazy"
+        onerror="this.style.display='none';this.parentElement.classList.add('team-directory-monogram');this.parentElement.textContent='${portal.esc(teamMonogram(label))}'"
+      />
+    </div>
+  `;
+}
+
+function renderParticipatingTeams(result) {
+  const wrap = portal.qs("#participatingTeamsList");
+  if (!wrap) return;
+
+  if (result?.error) {
+    const errorText = portal.text(result.error?.message || "");
+
+    if (/v_public_participating_teams|relation .* does not exist|schema cache/i.test(errorText)) {
+      wrap.innerHTML = `<div class="notice notice-warning">Participating teams are not configured yet. Run <strong>supabase_participating_teams_schema.sql</strong> in Supabase first.</div>`;
+      return;
+    }
+
+    wrap.innerHTML = `<div class="notice notice-warning">Could not load participating teams for this tournament.</div>`;
+    return;
+  }
+
+  const rows = filteredParticipatingTeams(result?.rows || []);
+
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="notice notice-info">No published participating teams are available for the selected tournament yet.</div>`;
+    return;
+  }
+
+  const groups = groupRows(
+    [...rows].sort((a, b) => {
+      const modeDiff = modeOrder(a.mode) - modeOrder(b.mode);
+      if (modeDiff !== 0) return modeDiff;
+      return portal.text(a.team_name).localeCompare(portal.text(b.team_name));
+    }),
+    row => row.mode || "Other"
+  );
+
+  wrap.innerHTML = groups.map(group => {
+    const mode = group[0]?.mode || "Other";
+
+    return `
+      <div class="team-mode-group">
+        <div class="team-mode-title">
+          <span>${portal.esc(modeLabel(mode))}</span>
+          <small>${group.length} ${group.length === 1 ? "entry" : "entries"}</small>
+        </div>
+
+        <div class="team-mode-grid">
+          ${group.map(row => {
+            const roster = safeTeamRoster(row)
+              .sort((a, b) => Number(a?.order || 0) - Number(b?.order || 0))
+              .filter(player => portal.text(player?.name));
+
+            return `
+              <article class="team-directory-card">
+                <div class="team-directory-card-head">
+                  ${teamLogoMarkup(row)}
+                  <div class="team-directory-name">
+                    <strong>${portal.esc(row.team_name || row.team_tag || "Team")}</strong>
+                    ${row.team_tag ? `<span>${portal.esc(row.team_tag)}</span>` : ""}
+                  </div>
+                </div>
+
+                <div class="team-roster-label">Roster</div>
+                <div class="team-roster">
+                  ${roster.length
+                    ? roster.map(player => `<span>${portal.esc(player.name)}</span>`).join("")
+                    : `<span class="team-roster-empty">Roster pending</span>`
+                  }
+                </div>
+              </article>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderTeamDirectory() {
+  renderParticipatingTeams({
+    rows: dashboardParticipatingTeams,
+    error: dashboardParticipatingTeams?.error || null
+  });
+}
+
+function resetTeamDirectoryFilters() {
+  const mode = portal.qs("#teamsModeFilter");
+  const search = portal.qs("#teamsSearchFilter");
+  if (mode) mode.value = "";
+  if (search) search.value = "";
+  renderTeamDirectory();
+}
+
+function wireTeamDirectoryFilters() {
+  if (teamDirectoryFiltersWired) return;
+
+  const mode = portal.qs("#teamsModeFilter");
+  const search = portal.qs("#teamsSearchFilter");
+  const reset = portal.qs("#teamsFilterReset");
+
+  mode?.addEventListener("change", renderTeamDirectory);
+  search?.addEventListener("input", renderTeamDirectory);
+  reset?.addEventListener("click", resetTeamDirectoryFilters);
+
+  teamDirectoryFiltersWired = true;
+}
+
 
 async function loadTournament(slug) {
   const targetSlug = slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
@@ -989,17 +1197,25 @@ async function renderDashboardData() {
 
   renderRulebook();
 
-  const [announcements, matchDetails] = await Promise.all([
+  const [announcements, matchDetails, participatingTeams] = await Promise.all([
     safeLoadAnnouncements(),
-    loadMatchDetails()
+    loadMatchDetails(),
+    loadParticipatingTeams()
   ]);
 
   dashboardMatchDetails = matchDetails;
+  dashboardParticipatingTeams = participatingTeams.rows || [];
+  dashboardParticipatingTeams.error = participatingTeams.error || null;
 
   renderAnnouncements(announcements);
   populateDashboardFilters(matchDetails.rows || []);
   wireDashboardFilters();
   renderDashboardMatchViews();
+
+  populateTeamDirectoryFilters(dashboardParticipatingTeams);
+  wireTeamDirectoryFilters();
+  renderParticipatingTeams(participatingTeams);
+
   await renderSupportSection();
 }
 

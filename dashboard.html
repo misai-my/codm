@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>Event Hub · CODM Tournament OS</title>
-  <link rel="stylesheet" href="assets/css/style.css"/>
+  <link rel="stylesheet" href="assets/css/style.css?v=participating-teams-v7"/>
 </head>
 <body>
 <header class="nav dashboard-sticky-nav">
@@ -17,6 +17,7 @@
     </a>
     <nav class="nav-links">
       <a class="nav-link" href="#announcements">Announcements</a>
+      <a class="nav-link" href="#teams">Teams</a>
       <a class="nav-link" href="#schedule">Schedule</a>
       <a class="nav-link" href="#results">Results</a>
       <a class="nav-link" href="#support">FAQ & Support</a>
@@ -72,6 +73,35 @@
         </section>
 
 
+
+
+        <section class="card participating-teams-section" id="teams">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Tournament Directory</div>
+              <h2>Participating Teams & Players</h2>
+              <p class="muted">Published teams and player rosters for the selected tournament. Player UIDs are never displayed publicly.</p>
+            </div>
+          </div>
+
+          <div class="team-directory-filters">
+            <label>
+              <span>Mode</span>
+              <select id="teamsModeFilter">
+                <option value="">All Modes</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Search</span>
+              <input id="teamsSearchFilter" type="search" placeholder="Team, tag, or player..."/>
+            </label>
+
+            <button class="btn btn-small filter-reset" id="teamsFilterReset" type="button">Reset</button>
+          </div>
+
+          <div id="participatingTeamsList" class="participating-teams-grid"></div>
+        </section>
 
         <section class="card" id="schedule">
           <div class="section-head">
@@ -251,7 +281,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
 <script src="assets/js/app.js?v=mt-public-visibility-v4"></script>
-<script src="assets/js/dashboard.js?v=mt-public-visibility-v4"></script>
+<script src="assets/js/dashboard.js?v=participating-teams-v7"></script>
 
 <div id="supportGateModal" class="support-gate-modal hidden" role="dialog" aria-modal="true" aria-labelledby="supportGateTitle">
   <div class="support-gate-backdrop" data-support-gate-close></div>

@@ -4,7 +4,7 @@
  <meta charset="utf-8"/>
  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
  <title>Event Hub · CODM Tournament OS</title>
- <link rel="stylesheet" href="assets/css/style.css?v=remove-uid-note-v14"/>
+ <link rel="stylesheet" href="assets/css/style.css?v=i18n-v1"/>
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/favicon-192x192.png?v=favicon-yellow-v1">
@@ -31,6 +31,15 @@
    <a class="nav-link" href="#rulebook">Rulebook</a>
    <a class="nav-link" href="#support">FAQ &amp; Support</a>
   </nav>
+  <div class="language-switcher">
+   <label for="languageSelect">Language</label>
+   <select id="languageSelect" data-language-select aria-label="Language">
+    <option value="en">English</option>
+    <option value="ms">Bahasa Malaysia</option>
+    <option value="fil">Filipino</option>
+   </select>
+  </div>
+
   <div class="tournament-switcher dashboard-tournament-switcher">
    <label for="dashboardTournamentSelect">Tournament</label>
    <select id="dashboardTournamentSelect" aria-label="Select tournament"></select>
@@ -325,6 +334,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
 <script src="assets/js/app.js?v=mt-public-visibility-v4"></script>
+ <script src="assets/js/i18n.js?v=i18n-v1"></script>
 <script src="assets/js/dashboard.js?v=remove-uid-note-v14"></script>
 
 <div id="supportGateModal" class="support-gate-modal hidden" role="dialog" aria-modal="true" aria-labelledby="supportGateTitle">

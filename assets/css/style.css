@@ -3514,3 +3514,46 @@ select option:disabled {
  font-weight: 700;
 }
 
+
+/* ============================================================
+   LANGUAGE SWITCHER
+   ============================================================ */
+.language-switcher {
+  display: grid;
+  gap: 4px;
+  min-width: 142px;
+}
+
+.language-switcher label {
+  color: var(--muted2);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.language-switcher select {
+  min-height: 36px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+@media (max-width: 980px) {
+  .language-switcher {
+    min-width: 132px;
+  }
+}
+
+@media (max-width: 640px) {
+  .language-switcher {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .language-switcher select {
+    width: 100%;
+  }
+}
+

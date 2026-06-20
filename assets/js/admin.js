@@ -1,6 +1,7 @@
 let currentProfile = null;
 let activeTournament = null;
 let announcementFormWired = false;
+let adminAnnouncementRows = [];
 let adminMatchRows = [];
 let adminFiltersWired = false;
 let faqAdminRows = [];
@@ -46,6 +47,7 @@ async function switchAdminTournament(slug) {
   activeTournament = adminTournaments.find(row => row.slug === slug) || await loadTournament(slug);
 
   adminMatchRows = [];
+  adminAnnouncementRows = [];
   faqAdminRows = [];
   inquiryRows = [];
   adminTimelineRows = [];
@@ -676,7 +678,8 @@ async function loadAdminData() {
 
   renderTournamentSettings();
   renderTimelineTable();
-  renderAnnouncementsTable(annRes.data || []);
+  adminAnnouncementRows = annRes.data || [];
+  renderAnnouncementsTable(adminAnnouncementRows);
   populateAdminFilters(adminMatchRows);
   wireAdminFilters();
   renderAdminMatchPreviews();
@@ -691,14 +694,112 @@ function modeLabel(value) {
   })[value] || value || "Mode";
 }
 
+function resetAnnouncementForm() {
+  const form = portal.qs("#announcementForm");
+  if (!form) return;
+
+  form.reset();
+  portal.qs("#announcementId").value = "";
+  portal.qs("#announcementPublished").value = "true";
+  portal.qs("#announcementPriority").value = "Info";
+
+  portal.qs("#announcementSubmitButton").textContent = "Publish Announcement";
+  portal.qs("#announcementCancelEdit").classList.add("hidden");
+  portal.qs("#announcementEditBanner").classList.add("hidden");
+}
+
+function priorityOrder(value) {
+  return value === "Urgent" ? 1 : value === "Important" ? 2 : 3;
+}
+
+function fillAnnouncementForm(row) {
+  if (!row) return;
+
+  portal.qs("#announcementId").value = row.id || "";
+  portal.qs("#announcementTitle").value = row.title || "";
+  portal.qs("#announcementBody").value = row.body || "";
+  portal.qs("#announcementPriority").value = row.priority || "Info";
+  portal.qs("#announcementPublished").value = row.is_published === false ? "false" : "true";
+
+  portal.qs("#announcementSubmitButton").textContent = "Save Announcement";
+  portal.qs("#announcementCancelEdit").classList.remove("hidden");
+  portal.qs("#announcementEditBanner").classList.remove("hidden");
+
+  document.getElementById("announcementsAdmin")?.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
 function renderAnnouncementsTable(rows) {
-  portal.qs("#announcementsTable").innerHTML = rows.map(row => `
+  const table = portal.qs("#announcementsTable");
+  if (!table) return;
+
+  table.innerHTML = rows.map(row => `
     <tr>
       <td>${portal.esc(row.priority || "Info")}</td>
-      <td><strong>${portal.esc(row.title)}</strong><div>${portal.esc(row.body || "")}</div></td>
+      <td>
+        <strong>${portal.esc(row.title)}</strong>
+        <div>${portal.esc(row.body || "")}</div>
+        ${row.published_at ? `<small>${new Date(row.published_at).toLocaleString()}</small>` : ""}
+      </td>
       <td>${row.is_published ? "Published" : "Draft"}</td>
+      <td>
+        <div class="table-actions">
+          <button class="btn btn-small" type="button" data-announcement-edit="${portal.esc(row.id)}">Edit</button>
+          <button class="btn btn-small" type="button" data-announcement-publish="${portal.esc(row.id)}">${row.is_published ? "Hide" : "Publish"}</button>
+          <button class="btn btn-small btn-danger" type="button" data-announcement-delete="${portal.esc(row.id)}">Delete</button>
+        </div>
+      </td>
     </tr>
-  `).join("") || `<tr><td colspan="3">No announcements.</td></tr>`;
+  `).join("") || `<tr><td colspan="4">No announcements.</td></tr>`;
+
+  table.querySelectorAll("[data-announcement-edit]").forEach(button => {
+    button.addEventListener("click", () => {
+      const row = adminAnnouncementRows.find(item => item.id === button.dataset.announcementEdit);
+      fillAnnouncementForm(row);
+    });
+  });
+
+  table.querySelectorAll("[data-announcement-publish]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const row = adminAnnouncementRows.find(item => item.id === button.dataset.announcementPublish);
+      if (!row) return;
+
+      const nextPublished = !row.is_published;
+      const payload = {
+        is_published: nextPublished,
+        published_at: nextPublished ? (row.published_at || new Date().toISOString()) : row.published_at
+      };
+
+      const { error } = await sb
+        .from("announcements")
+        .update(payload)
+        .eq("id", row.id);
+
+      if (error) throw error;
+
+      portal.toast(nextPublished ? "Announcement published." : "Announcement hidden.");
+      await loadAdminData();
+    });
+  });
+
+  table.querySelectorAll("[data-announcement-delete]").forEach(button => {
+    button.addEventListener("click", async () => {
+      if (!confirm("Delete this announcement?")) return;
+
+      const { error } = await sb
+        .from("announcements")
+        .delete()
+        .eq("id", button.dataset.announcementDelete);
+
+      if (error) throw error;
+
+      resetAnnouncementForm();
+      portal.toast("Announcement deleted.");
+      await loadAdminData();
+    });
+  });
 }
 
 function renderScheduleTable(rows) {
@@ -1069,24 +1170,48 @@ function wireAnnouncementForm() {
   if (announcementFormWired) return;
   announcementFormWired = true;
 
+  portal.qs("#announcementCancelEdit")?.addEventListener("click", resetAnnouncementForm);
+
   portal.qs("#announcementForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    const id = portal.qs("#announcementId").value;
+    const isPublished = portal.qs("#announcementPublished").value === "true";
 
     const payload = {
       tournament_id: activeTournament?.id || null,
       title: portal.text(portal.qs("#announcementTitle").value),
       body: portal.text(portal.qs("#announcementBody").value),
       priority: portal.qs("#announcementPriority").value,
-      priority_order: portal.qs("#announcementPriority").value === "Urgent" ? 1 : portal.qs("#announcementPriority").value === "Important" ? 2 : 3,
-      is_published: true,
-      published_at: new Date().toISOString(),
+      priority_order: priorityOrder(portal.qs("#announcementPriority").value),
+      is_published: isPublished,
+      published_at: isPublished ? new Date().toISOString() : null,
       created_by: currentProfile?.id || null
     };
 
-    const { error } = await sb.from("announcements").insert(payload);
-    if (error) throw error;
-    event.target.reset();
-    portal.toast("Announcement posted.");
+    if (id) {
+      // Do not overwrite the original creator when editing.
+      delete payload.created_by;
+
+      const { error } = await sb
+        .from("announcements")
+        .update(payload)
+        .eq("id", id);
+
+      if (error) throw error;
+
+      portal.toast("Announcement updated.");
+    } else {
+      const { error } = await sb
+        .from("announcements")
+        .insert(payload);
+
+      if (error) throw error;
+
+      portal.toast(isPublished ? "Announcement posted." : "Announcement saved as draft.");
+    }
+
+    resetAnnouncementForm();
     await loadAdminData();
   });
 }

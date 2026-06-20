@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>Admin · CODM Tournament OS</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=dropdown-contrast-v11"/>
+  <link rel="stylesheet" href="assets/css/style.css?v=announcement-edit-v12"/>
 </head>
 <body>
 <header class="nav admin-nav">
@@ -227,13 +227,18 @@
               </div>
 
               <form id="announcementForm" class="form">
+                <input id="announcementId" type="hidden"/>
+                <div class="announcement-edit-banner hidden" id="announcementEditBanner">
+                  Editing announcement. Save changes or cancel to create a new post.
+                </div>
+
                 <div class="grid grid-two">
                   <div class="field">
-                    <label>Title</label>
+                    <label for="announcementTitle">Title</label>
                     <input id="announcementTitle" maxlength="100" required/>
                   </div>
                   <div class="field">
-                    <label>Priority</label>
+                    <label for="announcementPriority">Priority</label>
                     <select id="announcementPriority">
                       <option>Info</option>
                       <option>Important</option>
@@ -241,16 +246,31 @@
                     </select>
                   </div>
                 </div>
+
+                <div class="grid grid-two">
+                  <div class="field">
+                    <label for="announcementPublished">Status</label>
+                    <select id="announcementPublished">
+                      <option value="true">Published</option>
+                      <option value="false">Draft / Hidden</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div class="field">
-                  <label>Message</label>
+                  <label for="announcementBody">Message</label>
                   <textarea id="announcementBody" required></textarea>
                 </div>
-                <button class="btn btn-primary" type="submit">Publish Announcement</button>
+
+                <div class="actions">
+                  <button class="btn btn-primary" id="announcementSubmitButton" type="submit">Publish Announcement</button>
+                  <button class="btn hidden" id="announcementCancelEdit" type="button">Cancel Edit</button>
+                </div>
               </form>
 
               <div class="admin-table-wrap section-tight">
                 <table>
-                  <thead><tr><th>Priority</th><th>Post</th><th>Status</th></tr></thead>
+                  <thead><tr><th>Priority</th><th>Post</th><th>Status</th><th>Actions</th></tr></thead>
                   <tbody id="announcementsTable"></tbody>
                 </table>
               </div>
@@ -454,6 +474,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
 <script src="assets/js/app.js?v=mt-public-visibility-v4"></script>
-<script src="assets/js/admin.js?v=timeline-registration-v10"></script>
+<script src="assets/js/admin.js?v=announcement-edit-v12"></script>
 </body>
 </html>

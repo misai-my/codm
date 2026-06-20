@@ -3479,3 +3479,38 @@ select option:disabled {
   background-color: #1e3a5f;
 }
 
+
+/* ============================================================
+   ANNOUNCEMENT EDITING
+   ============================================================ */
+.announcement-edit-banner {
+  border: 1px solid rgba(248, 209, 92, .30);
+  border-radius: 14px;
+  padding: 10px 12px;
+  color: #f8d15c;
+  background: rgba(248, 209, 92, .08);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.table-actions .btn-danger,
+.btn-danger.btn-small {
+  border-color: rgba(255, 75, 104, .30);
+  color: #ffd0d8;
+  background: rgba(255, 75, 104, .08);
+}
+
+.table-actions .btn-danger:hover,
+.btn-danger.btn-small:hover {
+  border-color: rgba(255, 75, 104, .55);
+  background: rgba(255, 75, 104, .14);
+}
+
+#announcementsTable small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted2);
+  font-size: 10px;
+  font-weight: 700;
+}
+

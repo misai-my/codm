@@ -8,6 +8,7 @@ let pendingSupportPayload = null;
 let pendingSupportForm = null;
 let dashboardTournaments = [];
 let dashboardParticipatingTeams = [];
+let dashboardTimelineRows = [];
 let teamDirectoryFiltersWired = false;
 
 
@@ -157,6 +158,88 @@ function initializeDashboardCollapsibles() {
   if (initialSectionId) {
     setTimeout(() => scrollToDashboardSection(initialSectionId, false), 0);
   }
+}
+
+
+
+async function loadTournamentTimeline() {
+  const slug = tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+
+  try {
+    const { data, error } = await sb
+      .from("v_public_tournament_schedule")
+      .select("*")
+      .eq("tournament_slug", slug)
+      .order("sort_order", { ascending: true })
+      .order("start_at", { ascending: true, nullsFirst: false });
+
+    return { rows: data || [], error: error || null };
+  } catch (err) {
+    console.error("Tournament timeline load failed:", err);
+    return { rows: [], error: err };
+  }
+}
+
+function timelineDateText(row) {
+  if (row?.display_date_text) return row.display_date_text;
+
+  if (row?.start_at && row?.end_at) {
+    return `${dateLabel(row.start_at)} · ${timeLabel(row.start_at)}–${timeLabel(row.end_at)}`;
+  }
+
+  if (row?.start_at) {
+    return `${dateLabel(row.start_at)} · ${timeLabel(row.start_at)}`;
+  }
+
+  return "Date TBA";
+}
+
+function timelineStatusClass(value) {
+  const normalized = portal.text(value || "Upcoming").toLowerCase();
+  if (normalized === "live") return "is-live";
+  if (normalized === "completed") return "is-completed";
+  if (normalized === "postponed" || normalized === "cancelled") return "is-muted";
+  return "is-upcoming";
+}
+
+function renderTournamentTimeline(result) {
+  const wrap = portal.qs("#tournamentTimelineList");
+  if (!wrap) return;
+
+  if (result?.error) {
+    const errorText = portal.text(result.error?.message || "");
+
+    if (/v_public_tournament_schedule|relation .* does not exist|schema cache/i.test(errorText)) {
+      wrap.innerHTML = `<div class="notice notice-warning">Tournament timeline is not configured yet. Run <strong>supabase_tournament_timeline_registration_admin.sql</strong> in Supabase first.</div>`;
+      return;
+    }
+
+    wrap.innerHTML = `<div class="notice notice-warning">Could not load the tournament timeline.</div>`;
+    return;
+  }
+
+  const rows = result?.rows || [];
+
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="notice notice-info">No published timeline items are available for this tournament yet.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = rows.map(row => `
+    <article class="timeline-item ${portal.esc(timelineStatusClass(row.event_status))}">
+      <div class="timeline-pin" aria-hidden="true"></div>
+      <div class="timeline-card">
+        <div class="timeline-meta">
+          <span>${portal.esc(row.event_type || "Milestone")}</span>
+          <strong>${portal.esc(row.event_status || "Upcoming")}</strong>
+        </div>
+        <h3>${portal.esc(row.title || "Timeline Item")}</h3>
+        <div class="timeline-date">${portal.esc(timelineDateText(row))}</div>
+        ${row.location ? `<div class="timeline-location">${portal.esc(row.location)}</div>` : ""}
+        ${row.description ? `<p>${portal.esc(row.description)}</p>` : ""}
+      </div>
+    </article>
+  `).join("");
 }
 
 
@@ -1269,17 +1352,20 @@ async function renderDashboardData() {
 
   renderRulebook();
 
-  const [announcements, matchDetails, participatingTeams] = await Promise.all([
+  const [announcements, timeline, matchDetails, participatingTeams] = await Promise.all([
     safeLoadAnnouncements(),
+    loadTournamentTimeline(),
     loadMatchDetails(),
     loadParticipatingTeams()
   ]);
 
   dashboardMatchDetails = matchDetails;
+  dashboardTimelineRows = timeline.rows || [];
   dashboardParticipatingTeams = participatingTeams.rows || [];
   dashboardParticipatingTeams.error = participatingTeams.error || null;
 
   renderAnnouncements(announcements);
+  renderTournamentTimeline(timeline);
   populateDashboardFilters(matchDetails.rows || []);
   wireDashboardFilters();
   renderDashboardMatchViews();

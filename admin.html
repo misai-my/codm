@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>Admin · CODM Tournament OS</title>
-  <link rel="stylesheet" href="assets/css/style.css"/>
+  <link rel="stylesheet" href="assets/css/style.css?v=timeline-registration-v10"/>
 </head>
 <body>
 <header class="nav admin-nav">
@@ -76,6 +76,7 @@
         </div>
 
         <div class="admin-tabs">
+          <a class="admin-tab" href="#tournamentSetupAdmin" title="Tournament Setup">Tournament Setup</a>
           <a class="admin-tab" href="#announcementsAdmin" title="Announcements">Announcements</a>
           <a class="admin-tab" href="#sheetSyncAdmin" title="Sheet Sync">Sheet Sync</a>
           <a class="admin-tab" href="#matchPreviewAdmin" title="Match Preview">Match Preview</a>
@@ -85,6 +86,7 @@
 
         <section class="admin-grid">
           <aside class="admin-side-menu card">
+            <a href="#tournamentSetupAdmin">Tournament Setup</a>
             <a href="#announcementsAdmin">Announcements</a>
             <a href="#sheetSyncAdmin">Sheet Sync</a>
             <a href="#schedulePreview">Schedule Preview</a>
@@ -92,7 +94,131 @@
           </aside>
 
           <div class="admin-stack">
-            <section class="card" id="announcementsAdmin">
+            
+            <section class="card" id="tournamentSetupAdmin">
+              <div class="section-head">
+                <div>
+                  <div class="eyebrow">Tournament Control</div>
+                  <h2>Registration & Timeline</h2>
+                  <p>Open or close registration and publish the tournament schedule/timeline for the selected event.</p>
+                </div>
+              </div>
+
+              <form id="tournamentRegistrationForm" class="form">
+                <div class="grid grid-two">
+                  <div class="field">
+                    <label for="adminRegistrationOpen">Registration Status</label>
+                    <select id="adminRegistrationOpen">
+                      <option value="true">Open Registration</option>
+                      <option value="false">Close Registration</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="adminRegistrationUrl">Registration Form URL</label>
+                    <input id="adminRegistrationUrl" type="url" placeholder="https://docs.google.com/forms/..."/>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="adminRulebookUrl">Rulebook URL</label>
+                  <input id="adminRulebookUrl" type="url" placeholder="https://docs.google.com/document/..."/>
+                </div>
+                <div class="actions">
+                  <button class="btn btn-primary" type="submit">Save Registration Settings</button>
+                  <a class="btn" href="dashboard.html#registration" data-tournament-link="dashboard.html#registration" target="_blank" rel="noopener">View Registration Card</a>
+                </div>
+                <div id="tournamentSetupStatus" class="notice section-tight"></div>
+              </form>
+
+              <h3 class="section-tight">Tournament Timeline</h3>
+              <form id="timelineForm" class="form">
+                <input id="timelineId" type="hidden"/>
+                <div class="grid grid-two">
+                  <div class="field">
+                    <label for="timelineTitle">Timeline Title</label>
+                    <input id="timelineTitle" maxlength="140" placeholder="Registration Window" required/>
+                  </div>
+                  <div class="field">
+                    <label for="timelineType">Type</label>
+                    <select id="timelineType">
+                      <option>Registration</option>
+                      <option>Check-in</option>
+                      <option>Competition</option>
+                      <option>Broadcast</option>
+                      <option>Roster Lock</option>
+                      <option>General</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-two">
+                  <div class="field">
+                    <label for="timelineStatus">Status</label>
+                    <select id="timelineStatus">
+                      <option>Upcoming</option>
+                      <option>Live</option>
+                      <option>Completed</option>
+                      <option>Postponed</option>
+                      <option>Cancelled</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="timelineDisplayDate">Display Date Text</label>
+                    <input id="timelineDisplayDate" maxlength="120" placeholder="July 15–18, 2026"/>
+                  </div>
+                </div>
+
+                <div class="grid grid-two">
+                  <div class="field">
+                    <label for="timelineStartAt">Start Date/Time</label>
+                    <input id="timelineStartAt" type="datetime-local"/>
+                  </div>
+                  <div class="field">
+                    <label for="timelineEndAt">End Date/Time</label>
+                    <input id="timelineEndAt" type="datetime-local"/>
+                  </div>
+                </div>
+
+                <div class="grid grid-two">
+                  <div class="field">
+                    <label for="timelineLocation">Location / Platform</label>
+                    <input id="timelineLocation" maxlength="160" placeholder="Online / Discord / Broadcast"/>
+                  </div>
+                  <div class="field">
+                    <label for="timelineSortOrder">Sort Order</label>
+                    <input id="timelineSortOrder" type="number" value="100"/>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="timelineDescription">Description</label>
+                  <textarea id="timelineDescription" maxlength="1000" placeholder="Short note for players and viewers."></textarea>
+                </div>
+
+                <div class="grid grid-two">
+                  <div class="field">
+                    <label for="timelinePublished">Published</label>
+                    <select id="timelinePublished">
+                      <option value="true">Published</option>
+                      <option value="false">Draft / Hidden</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="actions">
+                  <button class="btn btn-primary" type="submit">Save Timeline Item</button>
+                  <button class="btn" id="timelineCancelEdit" type="button">Cancel Edit</button>
+                </div>
+              </form>
+
+              <div class="admin-table-wrap section-tight">
+                <table>
+                  <thead><tr><th>Order</th><th>Timeline Item</th><th>Date</th><th>Status</th><th>Public</th><th>Actions</th></tr></thead>
+                  <tbody id="timelineTable"></tbody>
+                </table>
+              </div>
+            </section>
+
+<section class="card" id="announcementsAdmin">
               <div class="section-head">
                 <div>
                   <div class="eyebrow">Official Updates</div>
@@ -328,6 +454,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
 <script src="assets/js/app.js?v=mt-public-visibility-v4"></script>
-<script src="assets/js/admin.js?v=mt-admin-isolation-v5"></script>
+<script src="assets/js/admin.js?v=timeline-registration-v10"></script>
 </body>
 </html>

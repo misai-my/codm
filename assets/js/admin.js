@@ -8,6 +8,9 @@ let inquiryRows = [];
 let inquiryFiltersWired = false;
 let faqFormWired = false;
 let adminTournaments = [];
+let adminTimelineRows = [];
+let tournamentSettingsWired = false;
+let timelineFormWired = false;
 
 
 function adminTournamentSlug() {
@@ -45,8 +48,11 @@ async function switchAdminTournament(slug) {
   adminMatchRows = [];
   faqAdminRows = [];
   inquiryRows = [];
+  adminTimelineRows = [];
 
   renderAdminTournamentSelector();
+  renderTournamentSettings();
+  renderTimelineTable();
   renderAdminMatchPreviews();
   await loadAdminData();
   await loadFaqAndSupportAdmin();
@@ -67,6 +73,288 @@ function wireAdminTournamentSelector() {
     }
   });
 }
+
+
+function toDateTimeLocal(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const pad = number => String(number).padStart(2, "0");
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate())
+  ].join("-") + "T" + [
+    pad(date.getHours()),
+    pad(date.getMinutes())
+  ].join(":");
+}
+
+function toIsoOrNull(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function renderTournamentSettings() {
+  const openSelect = portal.qs("#adminRegistrationOpen");
+  const formUrl = portal.qs("#adminRegistrationUrl");
+  const rulebookUrl = portal.qs("#adminRulebookUrl");
+  const status = portal.qs("#tournamentSetupStatus");
+
+  if (openSelect) openSelect.value = activeTournament?.registration_open === false ? "false" : "true";
+  if (formUrl) formUrl.value = activeTournament?.registration_form_url || "";
+  if (rulebookUrl) rulebookUrl.value = activeTournament?.rulebook_doc_url || activeTournament?.rulebook_url || "";
+
+  if (status) {
+    const isOpen = activeTournament?.registration_open !== false;
+    status.className = `notice section-tight ${isOpen ? "notice-success" : "notice-warning"}`;
+    status.innerHTML = `
+      <strong>${portal.esc(activeTournament?.title || adminTournamentSlug())}</strong>
+      registration is currently <strong>${isOpen ? "OPEN" : "CLOSED"}</strong>.
+    `;
+  }
+}
+
+async function saveTournamentRegistrationSettings(event) {
+  event.preventDefault();
+
+  const payload = {
+    registration_open: portal.qs("#adminRegistrationOpen")?.value === "true",
+    registration_form_url: portal.text(portal.qs("#adminRegistrationUrl")?.value),
+    rulebook_doc_url: portal.text(portal.qs("#adminRulebookUrl")?.value)
+  };
+
+  const { data, error } = await sb
+    .from("tournaments")
+    .update(payload)
+    .eq("slug", adminTournamentSlug())
+    .select("*")
+    .maybeSingle();
+
+  if (error) throw error;
+
+  activeTournament = data || { ...activeTournament, ...payload };
+  adminTournaments = adminTournaments.map(row => row.slug === activeTournament.slug ? activeTournament : row);
+
+  renderAdminTournamentSelector();
+  renderTournamentSettings();
+  portal.updateTournamentLinks(document, adminTournamentSlug());
+  portal.toast(payload.registration_open ? "Registration opened." : "Registration closed.");
+}
+
+function wireTournamentRegistrationForm() {
+  if (tournamentSettingsWired) return;
+  tournamentSettingsWired = true;
+
+  portal.qs("#tournamentRegistrationForm")?.addEventListener("submit", async event => {
+    try {
+      await saveTournamentRegistrationSettings(event);
+    } catch (err) {
+      console.error(err);
+      portal.toast(err.message || "Could not save registration settings.");
+    }
+  });
+}
+
+async function loadAdminTimelineRows() {
+  const slug = adminTournamentSlug();
+
+  const { data, error } = await sb
+    .from("tournament_schedule_events")
+    .select("*")
+    .eq("tournament_slug", slug)
+    .order("sort_order", { ascending: true })
+    .order("start_at", { ascending: true, nullsFirst: false });
+
+  if (error) {
+    if (["42P01", "PGRST205"].includes(error.code)) {
+      portal.qs("#timelineTable").innerHTML = `
+        <tr><td colspan="6">Timeline table missing. Run supabase_tournament_timeline_registration_admin.sql first.</td></tr>
+      `;
+      return [];
+    }
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+function resetTimelineForm() {
+  const form = portal.qs("#timelineForm");
+  if (!form) return;
+
+  form.reset();
+  portal.qs("#timelineId").value = "";
+  portal.qs("#timelineSortOrder").value = "100";
+  portal.qs("#timelinePublished").value = "true";
+  portal.qs("#timelineType").value = "Registration";
+  portal.qs("#timelineStatus").value = "Upcoming";
+}
+
+function timelinePayloadFromForm() {
+  return {
+    tournament_id: activeTournament?.id || null,
+    tournament_slug: adminTournamentSlug(),
+    title: portal.text(portal.qs("#timelineTitle")?.value),
+    event_type: portal.text(portal.qs("#timelineType")?.value) || "General",
+    event_status: portal.text(portal.qs("#timelineStatus")?.value) || "Upcoming",
+    display_date_text: portal.text(portal.qs("#timelineDisplayDate")?.value),
+    start_at: toIsoOrNull(portal.qs("#timelineStartAt")?.value),
+    end_at: toIsoOrNull(portal.qs("#timelineEndAt")?.value),
+    location: portal.text(portal.qs("#timelineLocation")?.value),
+    sort_order: Number(portal.qs("#timelineSortOrder")?.value || 100),
+    description: portal.text(portal.qs("#timelineDescription")?.value),
+    is_published: portal.qs("#timelinePublished")?.value === "true",
+    created_by: currentProfile?.id || null,
+    updated_at: new Date().toISOString()
+  };
+}
+
+async function saveTimelineItem(event) {
+  event.preventDefault();
+
+  const id = portal.qs("#timelineId")?.value;
+  const payload = timelinePayloadFromForm();
+
+  if (!payload.title) {
+    portal.toast("Timeline title is required.");
+    return;
+  }
+
+  if (id) {
+    const { error } = await sb
+      .from("tournament_schedule_events")
+      .update(payload)
+      .eq("id", id);
+
+    if (error) throw error;
+    portal.toast("Timeline item updated.");
+  } else {
+    const { error } = await sb
+      .from("tournament_schedule_events")
+      .insert(payload);
+
+    if (error) throw error;
+    portal.toast("Timeline item added.");
+  }
+
+  resetTimelineForm();
+  adminTimelineRows = await loadAdminTimelineRows();
+  renderTimelineTable();
+}
+
+function editTimelineItem(row) {
+  portal.qs("#timelineId").value = row.id || "";
+  portal.qs("#timelineTitle").value = row.title || "";
+  portal.qs("#timelineType").value = row.event_type || "General";
+  portal.qs("#timelineStatus").value = row.event_status || "Upcoming";
+  portal.qs("#timelineDisplayDate").value = row.display_date_text || "";
+  portal.qs("#timelineStartAt").value = toDateTimeLocal(row.start_at);
+  portal.qs("#timelineEndAt").value = toDateTimeLocal(row.end_at);
+  portal.qs("#timelineLocation").value = row.location || "";
+  portal.qs("#timelineSortOrder").value = row.sort_order ?? 100;
+  portal.qs("#timelineDescription").value = row.description || "";
+  portal.qs("#timelinePublished").value = row.is_published === false ? "false" : "true";
+
+  document.getElementById("tournamentSetupAdmin")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function timelineDateLabel(row) {
+  if (row.display_date_text) return row.display_date_text;
+  if (row.start_at && row.end_at) {
+    return `${new Date(row.start_at).toLocaleString()} – ${new Date(row.end_at).toLocaleString()}`;
+  }
+  if (row.start_at) return new Date(row.start_at).toLocaleString();
+  return "TBA";
+}
+
+function renderTimelineTable() {
+  const table = portal.qs("#timelineTable");
+  if (!table) return;
+
+  table.innerHTML = adminTimelineRows.map(row => `
+    <tr>
+      <td>${Number(row.sort_order ?? 100)}</td>
+      <td>
+        <strong>${portal.esc(row.title || "Timeline Item")}</strong>
+        <div>${portal.esc(row.description || row.location || "")}</div>
+      </td>
+      <td>${portal.esc(timelineDateLabel(row))}</td>
+      <td>${portal.esc(row.event_type || "General")} · ${portal.esc(row.event_status || "Upcoming")}</td>
+      <td>${row.is_published ? "Published" : "Draft"}</td>
+      <td>
+        <div class="table-actions">
+          <button class="btn btn-small" type="button" data-timeline-edit="${portal.esc(row.id)}">Edit</button>
+          <button class="btn btn-small" type="button" data-timeline-publish="${portal.esc(row.id)}">${row.is_published ? "Hide" : "Publish"}</button>
+          <button class="btn btn-small btn-danger" type="button" data-timeline-delete="${portal.esc(row.id)}">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join("") || `<tr><td colspan="6">No timeline items for this tournament yet.</td></tr>`;
+
+  table.querySelectorAll("[data-timeline-edit]").forEach(button => {
+    button.addEventListener("click", () => {
+      const row = adminTimelineRows.find(item => item.id === button.dataset.timelineEdit);
+      if (row) editTimelineItem(row);
+    });
+  });
+
+  table.querySelectorAll("[data-timeline-publish]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const row = adminTimelineRows.find(item => item.id === button.dataset.timelinePublish);
+      if (!row) return;
+
+      const { error } = await sb
+        .from("tournament_schedule_events")
+        .update({
+          is_published: !row.is_published,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", row.id);
+
+      if (error) throw error;
+      adminTimelineRows = await loadAdminTimelineRows();
+      renderTimelineTable();
+      portal.toast(row.is_published ? "Timeline item hidden." : "Timeline item published.");
+    });
+  });
+
+  table.querySelectorAll("[data-timeline-delete]").forEach(button => {
+    button.addEventListener("click", async () => {
+      if (!confirm("Delete this timeline item?")) return;
+
+      const { error } = await sb
+        .from("tournament_schedule_events")
+        .delete()
+        .eq("id", button.dataset.timelineDelete);
+
+      if (error) throw error;
+      adminTimelineRows = await loadAdminTimelineRows();
+      renderTimelineTable();
+      portal.toast("Timeline item deleted.");
+    });
+  });
+}
+
+function wireTimelineForm() {
+  if (timelineFormWired) return;
+  timelineFormWired = true;
+
+  portal.qs("#timelineForm")?.addEventListener("submit", async event => {
+    try {
+      await saveTimelineItem(event);
+    } catch (err) {
+      console.error(err);
+      portal.toast(err.message || "Could not save timeline item.");
+    }
+  });
+
+  portal.qs("#timelineCancelEdit")?.addEventListener("click", resetTimelineForm);
+}
+
 
 async function loadProfile() {
   const session = await portal.getSession();
@@ -375,15 +663,19 @@ async function loadAdminData() {
     announcementQuery = announcementQuery.or(`tournament_id.is.null,tournament_id.eq.${activeTournament.id}`);
   }
 
-  const [annRes, matchRows] = await Promise.all([
+  const [annRes, matchRows, timelineRows] = await Promise.all([
     announcementQuery,
-    loadMatchDetails()
+    loadMatchDetails(),
+    loadAdminTimelineRows()
   ]);
 
   if (annRes.error) throw annRes.error;
 
   adminMatchRows = matchRows || [];
+  adminTimelineRows = timelineRows || [];
 
+  renderTournamentSettings();
+  renderTimelineTable();
   renderAnnouncementsTable(annRes.data || []);
   populateAdminFilters(adminMatchRows);
   wireAdminFilters();
@@ -452,6 +744,8 @@ async function bootAdminConsole() {
   wireAdminTournamentSelector();
   await loadAdminData();
   await loadFaqAndSupportAdmin();
+  wireTournamentRegistrationForm();
+  wireTimelineForm();
   wireAnnouncementForm();
 }
 

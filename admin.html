@@ -1,479 +1,479 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>Admin · CODM Tournament OS</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=announcement-edit-v12"/>
-    <link rel="icon" href="favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
-    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/favicon-192x192.png?v=favicon-yellow-v1">
-    <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=favicon-yellow-v1">
-    <link rel="manifest" href="assets/favicons/site.webmanifest?v=favicon-yellow-v1">
-    <meta name="theme-color" content="#05070d">
-  </head>
+ <meta charset="utf-8"/>
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+ <title>Admin · CODM Tournament OS</title>
+ <link rel="stylesheet" href="assets/css/style.css?v=announcement-edit-v12"/>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/favicon-192x192.png?v=favicon-yellow-v1">
+  <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=favicon-yellow-v1">
+  <link rel="manifest" href="assets/favicons/site.webmanifest?v=favicon-yellow-v1">
+  <meta name="theme-color" content="#05070d">
+ </head>
 <body>
 <header class="nav admin-nav">
-  <div class="container nav-inner">
-    <a class="brand codm-premium-brand" href="admin.html">
-      <span class="brand-mark logo-image" style="width:44px;height:44px;min-width:44px;max-width:44px;min-height:44px;max-height:44px;flex:0 0 44px;overflow:hidden;display:grid;place-items:center;padding:6px;border-radius:14px;box-sizing:border-box;">
-        <img src="assets/img/codm-logo.png" width="32" height="32" alt="CODM Tournament OS logo" style="width:32px;height:32px;max-width:32px;max-height:32px;object-fit:contain;display:block;position:static;"/>
-      </span>
-      <span class="brand-title">CODM TOURNAMENT OS<small>ADMIN CONTROL CENTER</small></span>
-    </a>
-    <nav class="nav-links admin-only-nav">
-      <a class="nav-link" href="dashboard.html" data-tournament-link="dashboard.html" data-tournament-link="dashboard.html" target="_blank" rel="noopener">View Public Site</a>
-      <button class="btn btn-danger btn-small hidden" id="adminSignOutBtn" data-signout>Sign Out</button>
-    </nav>
-  </div>
+ <div class="container nav-inner">
+  <a class="brand codm-premium-brand" href="admin.html">
+   <span class="brand-mark logo-image" style="width:44px;height:44px;min-width:44px;max-width:44px;min-height:44px;max-height:44px;flex:0 0 44px;overflow:hidden;display:grid;place-items:center;padding:6px;border-radius:14px;box-sizing:border-box;">
+    <img src="assets/img/codm-logo.png" width="32" height="32" alt="CODM Tournament OS logo" style="width:32px;height:32px;max-width:32px;max-height:32px;object-fit:contain;display:block;position:static;"/>
+   </span>
+   <span class="brand-title">CODM TOURNAMENT OS<small>ADMIN CONTROL CENTER</small></span>
+  </a>
+  <nav class="nav-links admin-only-nav">
+   <a class="nav-link" href="dashboard.html" data-tournament-link="dashboard.html" data-tournament-link="dashboard.html" target="_blank" rel="noopener">View Public Site</a>
+   <button class="btn btn-danger btn-small hidden" id="adminSignOutBtn" data-signout>Sign Out</button>
+  </nav>
+ </div>
 </header>
 
 <main>
-  <section class="section">
-    <div class="container">
-      <section id="adminLoginCard" class="card admin-login-card hidden">
-        <div class="eyebrow">Admin Login</div>
-        <h1>Organizer access only.</h1>
-        <p class="lead">Public viewers do not need a login. Approved admins can sign in with email and password. The page now stays on the admin console after login.</p>
-        <form id="adminLoginForm" class="form" style="max-width:520px;">
-          <div class="field">
-            <label for="adminLoginEmail">Admin Email</label>
-            <input id="adminLoginEmail" type="email" placeholder="admin@email.com" autocomplete="username" required/>
-          </div>
-          <div class="field">
-            <label for="adminLoginPassword">Password</label>
-            <input id="adminLoginPassword" type="password" placeholder="Enter password" autocomplete="current-password" required/>
-          </div>
-          <button class="btn btn-primary" type="submit">Login to Admin</button>
-          <div id="adminLoginStatus" class="notice hidden"></div>
-        </form>
-        <div class="actions" style="margin-top:14px;">
-          <a class="btn" href="dashboard.html" data-tournament-link="dashboard.html">Back to Public Event Hub</a>
+ <section class="section">
+  <div class="container">
+   <section id="adminLoginCard" class="card admin-login-card hidden">
+    <div class="eyebrow">Admin Login</div>
+    <h1>Organizer access only.</h1>
+    <p class="lead">Public viewers do not need a login. Approved admins can sign in with email and password. The page now stays on the admin console after login.</p>
+    <form id="adminLoginForm" class="form" style="max-width:520px;">
+     <div class="field">
+      <label for="adminLoginEmail">Admin Email</label>
+      <input id="adminLoginEmail" type="email" placeholder="admin@email.com" autocomplete="username" required/>
+     </div>
+     <div class="field">
+      <label for="adminLoginPassword">Password</label>
+      <input id="adminLoginPassword" type="password" placeholder="Enter password" autocomplete="current-password" required/>
+     </div>
+     <button class="btn btn-primary" type="submit">Login to Admin</button>
+     <div id="adminLoginStatus" class="notice hidden"></div>
+    </form>
+    <div class="actions" style="margin-top:14px;">
+     <a class="btn" href="dashboard.html" data-tournament-link="dashboard.html">Back to Public Event Hub</a>
+    </div>
+   </section>
+
+   <section id="adminDenied" class="card hidden">
+    <div class="eyebrow">Admin Only</div>
+    <h1>Admin role required.</h1>
+    <p class="lead">You are logged in, but this account is not marked as an admin in Supabase profiles.</p>
+    <div class="notice notice-warning">
+     This account is logged in but is not marked as admin yet.
+     <br/>
+     The exact SQL will appear here after login.
+    </div>
+    <div class="actions" style="margin-top:14px;">
+     <button class="btn btn-danger" data-signout>Sign Out</button>
+     <a class="btn" href="dashboard.html" data-tournament-link="dashboard.html">View Public Site</a>
+    </div>
+   </section>
+
+   <div id="adminMain" class="hidden">
+    <div class="admin-hero card">
+     <div>
+      <div class="eyebrow">Command Center</div>
+      <h1>Admin Console</h1>
+      <p>Post announcements and monitor match data synced from Google Sheets.</p>
+     </div>
+     <div class="admin-tournament-control">
+      <label for="adminTournamentSelect">Managing Tournament</label>
+      <select id="adminTournamentSelect" aria-label="Select tournament"></select>
+      <span id="adminTournamentStatus">Loading tournament...</span>
+     </div>
+    </div>
+
+    <div class="admin-tabs">
+     <a class="admin-tab" href="#tournamentSetupAdmin" title="Tournament Setup">Tournament Setup</a>
+     <a class="admin-tab" href="#announcementsAdmin" title="Announcements">Announcements</a>
+     <a class="admin-tab" href="#sheetSyncAdmin" title="Sheet Sync">Sheet Sync</a>
+     <a class="admin-tab" href="#matchPreviewAdmin" title="Match Preview">Match Preview</a>
+     <a class="admin-tab" href="#faqAdmin" title="FAQ">FAQ</a>
+     <a class="admin-tab" href="#inquiriesAdmin" title="Inquiries">Inquiries</a>
+    </div>
+
+    <section class="admin-grid">
+     <aside class="admin-side-menu card">
+      <a href="#tournamentSetupAdmin">Tournament Setup</a>
+      <a href="#announcementsAdmin">Announcements</a>
+      <a href="#sheetSyncAdmin">Sheet Sync</a>
+      <a href="#schedulePreview">Schedule Preview</a>
+      <a href="#resultsPreview">Results Preview</a>
+     </aside>
+
+     <div class="admin-stack">
+      
+      <section class="card" id="tournamentSetupAdmin">
+       <div class="section-head">
+        <div>
+         <div class="eyebrow">Tournament Control</div>
+         <h2>Registration & Timeline</h2>
+         <p>Open or close registration and publish the tournament schedule/timeline for the selected event.</p>
         </div>
+       </div>
+
+       <form id="tournamentRegistrationForm" class="form">
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="adminRegistrationOpen">Registration Status</label>
+          <select id="adminRegistrationOpen">
+           <option value="true">Open Registration</option>
+           <option value="false">Close Registration</option>
+          </select>
+         </div>
+         <div class="field">
+          <label for="adminRegistrationUrl">Registration Form URL</label>
+          <input id="adminRegistrationUrl" type="url" placeholder="https://docs.google.com/forms/..."/>
+         </div>
+        </div>
+        <div class="field">
+         <label for="adminRulebookUrl">Rulebook URL</label>
+         <input id="adminRulebookUrl" type="url" placeholder="https://docs.google.com/document/..."/>
+        </div>
+        <div class="actions">
+         <button class="btn btn-primary" type="submit">Save Registration Settings</button>
+         <a class="btn" href="dashboard.html#registration" data-tournament-link="dashboard.html#registration" target="_blank" rel="noopener">View Registration Card</a>
+        </div>
+        <div id="tournamentSetupStatus" class="notice section-tight"></div>
+       </form>
+
+       <h3 class="section-tight">Tournament Timeline</h3>
+       <form id="timelineForm" class="form">
+        <input id="timelineId" type="hidden"/>
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="timelineTitle">Timeline Title</label>
+          <input id="timelineTitle" maxlength="140" placeholder="Registration Window" required/>
+         </div>
+         <div class="field">
+          <label for="timelineType">Type</label>
+          <select id="timelineType">
+           <option>Registration</option>
+           <option>Check-in</option>
+           <option>Competition</option>
+           <option>Broadcast</option>
+           <option>Roster Lock</option>
+           <option>General</option>
+          </select>
+         </div>
+        </div>
+
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="timelineStatus">Status</label>
+          <select id="timelineStatus">
+           <option>Upcoming</option>
+           <option>Live</option>
+           <option>Completed</option>
+           <option>Postponed</option>
+           <option>Cancelled</option>
+          </select>
+         </div>
+         <div class="field">
+          <label for="timelineDisplayDate">Display Date Text</label>
+          <input id="timelineDisplayDate" maxlength="120" placeholder="July 15–18, 2026"/>
+         </div>
+        </div>
+
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="timelineStartAt">Start Date/Time</label>
+          <input id="timelineStartAt" type="datetime-local"/>
+         </div>
+         <div class="field">
+          <label for="timelineEndAt">End Date/Time</label>
+          <input id="timelineEndAt" type="datetime-local"/>
+         </div>
+        </div>
+
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="timelineLocation">Location / Platform</label>
+          <input id="timelineLocation" maxlength="160" placeholder="Online / Discord / Broadcast"/>
+         </div>
+         <div class="field">
+          <label for="timelineSortOrder">Sort Order</label>
+          <input id="timelineSortOrder" type="number" value="100"/>
+         </div>
+        </div>
+
+        <div class="field">
+         <label for="timelineDescription">Description</label>
+         <textarea id="timelineDescription" maxlength="1000" placeholder="Short note for players and viewers."></textarea>
+        </div>
+
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="timelinePublished">Published</label>
+          <select id="timelinePublished">
+           <option value="true">Published</option>
+           <option value="false">Draft / Hidden</option>
+          </select>
+         </div>
+        </div>
+
+        <div class="actions">
+         <button class="btn btn-primary" type="submit">Save Timeline Item</button>
+         <button class="btn" id="timelineCancelEdit" type="button">Cancel Edit</button>
+        </div>
+       </form>
+
+       <div class="admin-table-wrap section-tight">
+        <table>
+         <thead><tr><th>Order</th><th>Timeline Item</th><th>Date</th><th>Status</th><th>Public</th><th>Actions</th></tr></thead>
+         <tbody id="timelineTable"></tbody>
+        </table>
+       </div>
       </section>
-
-      <section id="adminDenied" class="card hidden">
-        <div class="eyebrow">Admin Only</div>
-        <h1>Admin role required.</h1>
-        <p class="lead">You are logged in, but this account is not marked as an admin in Supabase profiles.</p>
-        <div class="notice notice-warning">
-          This account is logged in but is not marked as admin yet.
-          <br/>
-          The exact SQL will appear here after login.
-        </div>
-        <div class="actions" style="margin-top:14px;">
-          <button class="btn btn-danger" data-signout>Sign Out</button>
-          <a class="btn" href="dashboard.html" data-tournament-link="dashboard.html">View Public Site</a>
-        </div>
-      </section>
-
-      <div id="adminMain" class="hidden">
-        <div class="admin-hero card">
-          <div>
-            <div class="eyebrow">Command Center</div>
-            <h1>Admin Console</h1>
-            <p>Post announcements and monitor match data synced from Google Sheets.</p>
-          </div>
-          <div class="admin-tournament-control">
-            <label for="adminTournamentSelect">Managing Tournament</label>
-            <select id="adminTournamentSelect" aria-label="Select tournament"></select>
-            <span id="adminTournamentStatus">Loading tournament...</span>
-          </div>
-        </div>
-
-        <div class="admin-tabs">
-          <a class="admin-tab" href="#tournamentSetupAdmin" title="Tournament Setup">Tournament Setup</a>
-          <a class="admin-tab" href="#announcementsAdmin" title="Announcements">Announcements</a>
-          <a class="admin-tab" href="#sheetSyncAdmin" title="Sheet Sync">Sheet Sync</a>
-          <a class="admin-tab" href="#matchPreviewAdmin" title="Match Preview">Match Preview</a>
-          <a class="admin-tab" href="#faqAdmin" title="FAQ">FAQ</a>
-          <a class="admin-tab" href="#inquiriesAdmin" title="Inquiries">Inquiries</a>
-        </div>
-
-        <section class="admin-grid">
-          <aside class="admin-side-menu card">
-            <a href="#tournamentSetupAdmin">Tournament Setup</a>
-            <a href="#announcementsAdmin">Announcements</a>
-            <a href="#sheetSyncAdmin">Sheet Sync</a>
-            <a href="#schedulePreview">Schedule Preview</a>
-            <a href="#resultsPreview">Results Preview</a>
-          </aside>
-
-          <div class="admin-stack">
-            
-            <section class="card" id="tournamentSetupAdmin">
-              <div class="section-head">
-                <div>
-                  <div class="eyebrow">Tournament Control</div>
-                  <h2>Registration & Timeline</h2>
-                  <p>Open or close registration and publish the tournament schedule/timeline for the selected event.</p>
-                </div>
-              </div>
-
-              <form id="tournamentRegistrationForm" class="form">
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="adminRegistrationOpen">Registration Status</label>
-                    <select id="adminRegistrationOpen">
-                      <option value="true">Open Registration</option>
-                      <option value="false">Close Registration</option>
-                    </select>
-                  </div>
-                  <div class="field">
-                    <label for="adminRegistrationUrl">Registration Form URL</label>
-                    <input id="adminRegistrationUrl" type="url" placeholder="https://docs.google.com/forms/..."/>
-                  </div>
-                </div>
-                <div class="field">
-                  <label for="adminRulebookUrl">Rulebook URL</label>
-                  <input id="adminRulebookUrl" type="url" placeholder="https://docs.google.com/document/..."/>
-                </div>
-                <div class="actions">
-                  <button class="btn btn-primary" type="submit">Save Registration Settings</button>
-                  <a class="btn" href="dashboard.html#registration" data-tournament-link="dashboard.html#registration" target="_blank" rel="noopener">View Registration Card</a>
-                </div>
-                <div id="tournamentSetupStatus" class="notice section-tight"></div>
-              </form>
-
-              <h3 class="section-tight">Tournament Timeline</h3>
-              <form id="timelineForm" class="form">
-                <input id="timelineId" type="hidden"/>
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="timelineTitle">Timeline Title</label>
-                    <input id="timelineTitle" maxlength="140" placeholder="Registration Window" required/>
-                  </div>
-                  <div class="field">
-                    <label for="timelineType">Type</label>
-                    <select id="timelineType">
-                      <option>Registration</option>
-                      <option>Check-in</option>
-                      <option>Competition</option>
-                      <option>Broadcast</option>
-                      <option>Roster Lock</option>
-                      <option>General</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="timelineStatus">Status</label>
-                    <select id="timelineStatus">
-                      <option>Upcoming</option>
-                      <option>Live</option>
-                      <option>Completed</option>
-                      <option>Postponed</option>
-                      <option>Cancelled</option>
-                    </select>
-                  </div>
-                  <div class="field">
-                    <label for="timelineDisplayDate">Display Date Text</label>
-                    <input id="timelineDisplayDate" maxlength="120" placeholder="July 15–18, 2026"/>
-                  </div>
-                </div>
-
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="timelineStartAt">Start Date/Time</label>
-                    <input id="timelineStartAt" type="datetime-local"/>
-                  </div>
-                  <div class="field">
-                    <label for="timelineEndAt">End Date/Time</label>
-                    <input id="timelineEndAt" type="datetime-local"/>
-                  </div>
-                </div>
-
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="timelineLocation">Location / Platform</label>
-                    <input id="timelineLocation" maxlength="160" placeholder="Online / Discord / Broadcast"/>
-                  </div>
-                  <div class="field">
-                    <label for="timelineSortOrder">Sort Order</label>
-                    <input id="timelineSortOrder" type="number" value="100"/>
-                  </div>
-                </div>
-
-                <div class="field">
-                  <label for="timelineDescription">Description</label>
-                  <textarea id="timelineDescription" maxlength="1000" placeholder="Short note for players and viewers."></textarea>
-                </div>
-
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="timelinePublished">Published</label>
-                    <select id="timelinePublished">
-                      <option value="true">Published</option>
-                      <option value="false">Draft / Hidden</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="actions">
-                  <button class="btn btn-primary" type="submit">Save Timeline Item</button>
-                  <button class="btn" id="timelineCancelEdit" type="button">Cancel Edit</button>
-                </div>
-              </form>
-
-              <div class="admin-table-wrap section-tight">
-                <table>
-                  <thead><tr><th>Order</th><th>Timeline Item</th><th>Date</th><th>Status</th><th>Public</th><th>Actions</th></tr></thead>
-                  <tbody id="timelineTable"></tbody>
-                </table>
-              </div>
-            </section>
 
 <section class="card" id="announcementsAdmin">
-              <div class="section-head">
-                <div>
-                  <div class="eyebrow">Official Updates</div>
-                  <h2>Post Announcement</h2>
-                </div>
-              </div>
+       <div class="section-head">
+        <div>
+         <div class="eyebrow">Official Updates</div>
+         <h2>Post Announcement</h2>
+        </div>
+       </div>
 
-              <form id="announcementForm" class="form">
-                <input id="announcementId" type="hidden"/>
-                <div class="announcement-edit-banner hidden" id="announcementEditBanner">
-                  Editing announcement. Save changes or cancel to create a new post.
-                </div>
+       <form id="announcementForm" class="form">
+        <input id="announcementId" type="hidden"/>
+        <div class="announcement-edit-banner hidden" id="announcementEditBanner">
+         Editing announcement. Save changes or cancel to create a new post.
+        </div>
 
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="announcementTitle">Title</label>
-                    <input id="announcementTitle" maxlength="100" required/>
-                  </div>
-                  <div class="field">
-                    <label for="announcementPriority">Priority</label>
-                    <select id="announcementPriority">
-                      <option>Info</option>
-                      <option>Important</option>
-                      <option>Urgent</option>
-                    </select>
-                  </div>
-                </div>
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="announcementTitle">Title</label>
+          <input id="announcementTitle" maxlength="100" required/>
+         </div>
+         <div class="field">
+          <label for="announcementPriority">Priority</label>
+          <select id="announcementPriority">
+           <option>Info</option>
+           <option>Important</option>
+           <option>Urgent</option>
+          </select>
+         </div>
+        </div>
 
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="announcementPublished">Status</label>
-                    <select id="announcementPublished">
-                      <option value="true">Published</option>
-                      <option value="false">Draft / Hidden</option>
-                    </select>
-                  </div>
-                </div>
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="announcementPublished">Status</label>
+          <select id="announcementPublished">
+           <option value="true">Published</option>
+           <option value="false">Draft / Hidden</option>
+          </select>
+         </div>
+        </div>
 
-                <div class="field">
-                  <label for="announcementBody">Message</label>
-                  <textarea id="announcementBody" required></textarea>
-                </div>
+        <div class="field">
+         <label for="announcementBody">Message</label>
+         <textarea id="announcementBody" required></textarea>
+        </div>
 
-                <div class="actions">
-                  <button class="btn btn-primary" id="announcementSubmitButton" type="submit">Publish Announcement</button>
-                  <button class="btn hidden" id="announcementCancelEdit" type="button">Cancel Edit</button>
-                </div>
-              </form>
+        <div class="actions">
+         <button class="btn btn-primary" id="announcementSubmitButton" type="submit">Publish Announcement</button>
+         <button class="btn hidden" id="announcementCancelEdit" type="button">Cancel Edit</button>
+        </div>
+       </form>
 
-              <div class="admin-table-wrap section-tight">
-                <table>
-                  <thead><tr><th>Priority</th><th>Post</th><th>Status</th><th>Actions</th></tr></thead>
-                  <tbody id="announcementsTable"></tbody>
-                </table>
-              </div>
-            </section>
+       <div class="admin-table-wrap section-tight">
+        <table>
+         <thead><tr><th>Priority</th><th>Post</th><th>Status</th><th>Actions</th></tr></thead>
+         <tbody id="announcementsTable"></tbody>
+        </table>
+       </div>
+      </section>
 
-            <section class="card" id="sheetSyncAdmin">
-              <div class="section-head">
-                <div>
-                  <div class="eyebrow">Google Sheet Source</div>
-                  <h2>Match Data Sync</h2>
-                  <p>Use the match data template and run Apps Script to push schedule/results into Supabase.</p>
-                </div>
-              </div>
-              <div class="notice">
-                Source tabs:
-                <strong>MP_1V1</strong>, <strong>MP_TEAM_5V5</strong>, <strong>BR_SOLO</strong>, <strong>BR_SQUAD</strong>
-                <br/>
-                Database table:
-                <strong>public.match_details</strong>
-              </div>
-              <div class="actions">
-                <a class="btn btn-primary" href="dashboard.html#schedule" data-tournament-link="dashboard.html#schedule" data-tournament-link="dashboard.html#schedule" target="_blank" rel="noopener">View Public Schedule</a>
-                <a class="btn" href="dashboard.html#results" data-tournament-link="dashboard.html#results" data-tournament-link="dashboard.html#results" target="_blank" rel="noopener">View Public Results</a>
-              </div>
-            </section>
+      <section class="card" id="sheetSyncAdmin">
+       <div class="section-head">
+        <div>
+         <div class="eyebrow">Google Sheet Source</div>
+         <h2>Match Data Sync</h2>
+         <p>Use the match data template and run Apps Script to push schedule/results into Supabase.</p>
+        </div>
+       </div>
+       <div class="notice">
+        Source tabs:
+        <strong>MP_1V1</strong>, <strong>MP_TEAM_5V5</strong>, <strong>BR_SOLO</strong>, <strong>BR_SQUAD</strong>
+        <br/>
+        Database table:
+        <strong>public.match_details</strong>
+       </div>
+       <div class="actions">
+        <a class="btn btn-primary" href="dashboard.html#schedule" data-tournament-link="dashboard.html#schedule" data-tournament-link="dashboard.html#schedule" target="_blank" rel="noopener">View Public Schedule</a>
+        <a class="btn" href="dashboard.html#results" data-tournament-link="dashboard.html#results" data-tournament-link="dashboard.html#results" target="_blank" rel="noopener">View Public Results</a>
+       </div>
+      </section>
 
-            <section class="card" id="matchPreviewAdmin">
-              <div class="section-head">
-                <div>
-                  <div class="eyebrow">Supabase Preview</div>
-                  <h2>Published Match Data</h2>
-                  <p>This preview reads from public.match_details, the same source used by the public page.</p>
-                  <div class="match-preview-tournament" id="matchPreviewTournament">Loading selected tournament...</div>
-                </div>
-              </div>
+      <section class="card" id="matchPreviewAdmin">
+       <div class="section-head">
+        <div>
+         <div class="eyebrow">Supabase Preview</div>
+         <h2>Published Match Data</h2>
+         <p>This preview reads from public.match_details, the same source used by the public page.</p>
+         <div class="match-preview-tournament" id="matchPreviewTournament">Loading selected tournament...</div>
+        </div>
+       </div>
 
-              <div id="matchTableWarning"></div>
+       <div id="matchTableWarning"></div>
 
-              <h3 id="schedulePreview">Schedule Preview</h3>
-              <div class="filter-panel admin-filter-panel" id="adminScheduleFilters">
-                <div class="field">
-                  <label for="adminScheduleModeFilter">Mode</label>
-                  <select id="adminScheduleModeFilter"><option value="">All Modes</option></select>
-                </div>
-                <div class="field">
-                  <label for="adminScheduleStageFilter">Stage</label>
-                  <select id="adminScheduleStageFilter"><option value="">All Stages</option></select>
-                </div>
-                <div class="field">
-                  <label for="adminScheduleStatusFilter">Status</label>
-                  <select id="adminScheduleStatusFilter"><option value="">All Status</option></select>
-                </div>
-                <div class="field">
-                  <label for="adminScheduleDayFilter">Day</label>
-                  <select id="adminScheduleDayFilter"><option value="">All Days</option></select>
-                </div>
-                <div class="field filter-search">
-                  <label for="adminScheduleSearchFilter">Search</label>
-                  <input id="adminScheduleSearchFilter" type="search" placeholder="Team, player, map..."/>
-                </div>
-                <button class="btn btn-small filter-reset" id="adminScheduleFilterReset" type="button">Reset</button>
-              </div>
+       <h3 id="schedulePreview">Schedule Preview</h3>
+       <div class="filter-panel admin-filter-panel" id="adminScheduleFilters">
+        <div class="field">
+         <label for="adminScheduleModeFilter">Mode</label>
+         <select id="adminScheduleModeFilter"><option value="">All Modes</option></select>
+        </div>
+        <div class="field">
+         <label for="adminScheduleStageFilter">Stage</label>
+         <select id="adminScheduleStageFilter"><option value="">All Stages</option></select>
+        </div>
+        <div class="field">
+         <label for="adminScheduleStatusFilter">Status</label>
+         <select id="adminScheduleStatusFilter"><option value="">All Status</option></select>
+        </div>
+        <div class="field">
+         <label for="adminScheduleDayFilter">Day</label>
+         <select id="adminScheduleDayFilter"><option value="">All Days</option></select>
+        </div>
+        <div class="field filter-search">
+         <label for="adminScheduleSearchFilter">Search</label>
+         <input id="adminScheduleSearchFilter" type="search" placeholder="Team, player, map..."/>
+        </div>
+        <button class="btn btn-small filter-reset" id="adminScheduleFilterReset" type="button">Reset</button>
+       </div>
 
-              <div class="admin-table-wrap section-tight">
-                <table>
-                  <thead><tr><th>Mode</th><th>Match</th><th>Schedule</th><th>Status</th></tr></thead>
-                  <tbody id="scheduleTable"></tbody>
-                </table>
-              </div>
+       <div class="admin-table-wrap section-tight">
+        <table>
+         <thead><tr><th>Mode</th><th>Match</th><th>Schedule</th><th>Status</th></tr></thead>
+         <tbody id="scheduleTable"></tbody>
+        </table>
+       </div>
 
-              <h3 id="resultsPreview" class="section-tight">Results Preview</h3>
-              <div class="filter-panel admin-filter-panel" id="adminResultsFilters">
-                <div class="field">
-                  <label for="adminResultsModeFilter">Mode</label>
-                  <select id="adminResultsModeFilter"><option value="">All Modes</option></select>
-                </div>
-                <div class="field">
-                  <label for="adminResultsStageFilter">Stage</label>
-                  <select id="adminResultsStageFilter"><option value="">All Stages</option></select>
-                </div>
-                <div class="field">
-                  <label for="adminResultsStatusFilter">Status</label>
-                  <select id="adminResultsStatusFilter"><option value="">All Status</option></select>
-                </div>
-                <div class="field">
-                  <label for="adminResultsDayFilter">Day</label>
-                  <select id="adminResultsDayFilter"><option value="">All Days</option></select>
-                </div>
-                <div class="field filter-search">
-                  <label for="adminResultsSearchFilter">Search</label>
-                  <input id="adminResultsSearchFilter" type="search" placeholder="Team, player, map..."/>
-                </div>
-                <button class="btn btn-small filter-reset" id="adminResultsFilterReset" type="button">Reset</button>
-              </div>
+       <h3 id="resultsPreview" class="section-tight">Results Preview</h3>
+       <div class="filter-panel admin-filter-panel" id="adminResultsFilters">
+        <div class="field">
+         <label for="adminResultsModeFilter">Mode</label>
+         <select id="adminResultsModeFilter"><option value="">All Modes</option></select>
+        </div>
+        <div class="field">
+         <label for="adminResultsStageFilter">Stage</label>
+         <select id="adminResultsStageFilter"><option value="">All Stages</option></select>
+        </div>
+        <div class="field">
+         <label for="adminResultsStatusFilter">Status</label>
+         <select id="adminResultsStatusFilter"><option value="">All Status</option></select>
+        </div>
+        <div class="field">
+         <label for="adminResultsDayFilter">Day</label>
+         <select id="adminResultsDayFilter"><option value="">All Days</option></select>
+        </div>
+        <div class="field filter-search">
+         <label for="adminResultsSearchFilter">Search</label>
+         <input id="adminResultsSearchFilter" type="search" placeholder="Team, player, map..."/>
+        </div>
+        <button class="btn btn-small filter-reset" id="adminResultsFilterReset" type="button">Reset</button>
+       </div>
 
-              <div class="admin-table-wrap section-tight">
-                <table>
-                  <thead><tr><th>Mode</th><th>Match / Entry</th><th>Result</th><th>Status</th></tr></thead>
-                  <tbody id="resultsTable"></tbody>
-                </table>
-              </div>
-            </section>
-          
-            <section class="card" id="faqAdmin">
-              <div class="section-head">
-                <div>
-                  <div class="eyebrow">Public Help</div>
-                  <h2>FAQ Management</h2>
-                  <p>Create FAQ items that appear on the public dashboard.</p>
-                </div>
-              </div>
+       <div class="admin-table-wrap section-tight">
+        <table>
+         <thead><tr><th>Mode</th><th>Match / Entry</th><th>Result</th><th>Status</th></tr></thead>
+         <tbody id="resultsTable"></tbody>
+        </table>
+       </div>
+      </section>
+     
+      <section class="card" id="faqAdmin">
+       <div class="section-head">
+        <div>
+         <div class="eyebrow">Public Help</div>
+         <h2>FAQ Management</h2>
+         <p>Create FAQ items that appear on the public dashboard.</p>
+        </div>
+       </div>
 
-              <form id="faqForm" class="form">
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="faqQuestion">Question</label>
-                    <input id="faqQuestion" maxlength="220" required/>
-                  </div>
-                  <div class="field">
-                    <label for="faqCategory">Category</label>
-                    <input id="faqCategory" maxlength="80" value="General"/>
-                  </div>
-                </div>
-                <div class="field">
-                  <label for="faqAnswer">Answer</label>
-                  <textarea id="faqAnswer" maxlength="2000" required></textarea>
-                </div>
-                <div class="grid grid-two">
-                  <div class="field">
-                    <label for="faqPriority">Priority Order</label>
-                    <input id="faqPriority" type="number" value="100"/>
-                  </div>
-                  <div class="field">
-                    <label for="faqPublished">Published</label>
-                    <select id="faqPublished">
-                      <option value="true">Published</option>
-                      <option value="false">Unpublished</option>
-                    </select>
-                  </div>
-                </div>
-                <button class="btn btn-primary" type="submit">Save FAQ</button>
-              </form>
+       <form id="faqForm" class="form">
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="faqQuestion">Question</label>
+          <input id="faqQuestion" maxlength="220" required/>
+         </div>
+         <div class="field">
+          <label for="faqCategory">Category</label>
+          <input id="faqCategory" maxlength="80" value="General"/>
+         </div>
+        </div>
+        <div class="field">
+         <label for="faqAnswer">Answer</label>
+         <textarea id="faqAnswer" maxlength="2000" required></textarea>
+        </div>
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="faqPriority">Priority Order</label>
+          <input id="faqPriority" type="number" value="100"/>
+         </div>
+         <div class="field">
+          <label for="faqPublished">Published</label>
+          <select id="faqPublished">
+           <option value="true">Published</option>
+           <option value="false">Unpublished</option>
+          </select>
+         </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Save FAQ</button>
+       </form>
 
-              <div class="admin-table-wrap section-tight">
-                <table>
-                  <thead><tr><th>Category</th><th>Question</th><th>Status</th><th>Actions</th></tr></thead>
-                  <tbody id="faqAdminTable"></tbody>
-                </table>
-              </div>
-            </section>
+       <div class="admin-table-wrap section-tight">
+        <table>
+         <thead><tr><th>Category</th><th>Question</th><th>Status</th><th>Actions</th></tr></thead>
+         <tbody id="faqAdminTable"></tbody>
+        </table>
+       </div>
+      </section>
 
-            <section class="card" id="inquiriesAdmin">
-              <div class="section-head">
-                <div>
-                  <div class="eyebrow">Support Queue</div>
-                  <h2>Support Inquiries</h2>
-                  <p>Review inquiries. Publish answered items to public FAQ/support, unpublish, or delete spam.</p>
-                </div>
-              </div>
+      <section class="card" id="inquiriesAdmin">
+       <div class="section-head">
+        <div>
+         <div class="eyebrow">Support Queue</div>
+         <h2>Support Inquiries</h2>
+         <p>Review inquiries. Publish answered items to public FAQ/support, unpublish, or delete spam.</p>
+        </div>
+       </div>
 
-              <div class="filter-panel admin-filter-panel" id="inquiryFilters">
-                <div class="field">
-                  <label for="inquiryStatusFilter">Status</label>
-                  <select id="inquiryStatusFilter"><option value="">All Status</option></select>
-                </div>
-                <div class="field">
-                  <label for="inquiryCategoryFilter">Category</label>
-                  <select id="inquiryCategoryFilter"><option value="">All Categories</option></select>
-                </div>
-                <div class="field">
-                  <label for="inquiryPublishedFilter">Published</label>
-                  <select id="inquiryPublishedFilter">
-                    <option value="">All</option>
-                    <option value="true">Published</option>
-                    <option value="false">Unpublished</option>
-                  </select>
-                </div>
-                <div class="field filter-search">
-                  <label for="inquirySearchFilter">Search</label>
-                  <input id="inquirySearchFilter" type="search" placeholder="Name, subject, message..."/>
-                </div>
-                <button class="btn btn-small filter-reset" id="inquiryFilterReset" type="button">Reset</button>
-              </div>
+       <div class="filter-panel admin-filter-panel" id="inquiryFilters">
+        <div class="field">
+         <label for="inquiryStatusFilter">Status</label>
+         <select id="inquiryStatusFilter"><option value="">All Status</option></select>
+        </div>
+        <div class="field">
+         <label for="inquiryCategoryFilter">Category</label>
+         <select id="inquiryCategoryFilter"><option value="">All Categories</option></select>
+        </div>
+        <div class="field">
+         <label for="inquiryPublishedFilter">Published</label>
+         <select id="inquiryPublishedFilter">
+          <option value="">All</option>
+          <option value="true">Published</option>
+          <option value="false">Unpublished</option>
+         </select>
+        </div>
+        <div class="field filter-search">
+         <label for="inquirySearchFilter">Search</label>
+         <input id="inquirySearchFilter" type="search" placeholder="Name, subject, message..."/>
+        </div>
+        <button class="btn btn-small filter-reset" id="inquiryFilterReset" type="button">Reset</button>
+       </div>
 
-              <div class="admin-table-wrap section-tight">
-                <table>
-                  <thead><tr><th>Inquiry</th><th>Contact</th><th>Status</th><th>Public Answer</th><th>Actions</th></tr></thead>
-                  <tbody id="inquiriesAdminTable"></tbody>
-                </table>
-              </div>
-            </section>
+       <div class="admin-table-wrap section-tight">
+        <table>
+         <thead><tr><th>Inquiry</th><th>Contact</th><th>Status</th><th>Public Answer</th><th>Actions</th></tr></thead>
+         <tbody id="inquiriesAdminTable"></tbody>
+        </table>
+       </div>
+      </section>
 
-          </div>
-        </section>
-      </div>
-    </div>
-  </section>
+     </div>
+    </section>
+   </div>
+  </div>
+ </section>
 </main>
 
 <div id="toast" class="toast"></div>

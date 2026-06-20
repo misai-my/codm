@@ -1,348 +1,348 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>Event Hub · CODM Tournament OS</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=dropdown-contrast-v11"/>
-    <link rel="icon" href="favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
-    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/favicon-192x192.png?v=favicon-yellow-v1">
-    <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=favicon-yellow-v1">
-    <link rel="manifest" href="assets/favicons/site.webmanifest?v=favicon-yellow-v1">
-    <meta name="theme-color" content="#05070d">
-  </head>
+ <meta charset="utf-8"/>
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+ <title>Event Hub · CODM Tournament OS</title>
+ <link rel="stylesheet" href="assets/css/style.css?v=remove-uid-note-v14"/>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/favicon-192x192.png?v=favicon-yellow-v1">
+  <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=favicon-yellow-v1">
+  <link rel="manifest" href="assets/favicons/site.webmanifest?v=favicon-yellow-v1">
+  <meta name="theme-color" content="#05070d">
+ </head>
 <body>
 <header class="nav dashboard-sticky-nav">
-  <div class="container nav-inner">
-    <a class="brand codm-premium-brand" href="index.html" data-tournament-link="index.html">
-      <span class="brand-mark logo-image" style="width:44px;height:44px;min-width:44px;max-width:44px;min-height:44px;max-height:44px;flex:0 0 44px;overflow:hidden;display:grid;place-items:center;padding:6px;border-radius:14px;box-sizing:border-box;">
-        <img src="assets/img/codm-logo.png" width="32" height="32" alt="CODM Tournament OS logo" style="width:32px;height:32px;max-width:32px;max-height:32px;object-fit:contain;display:block;position:static;"/>
-      </span>
-      <span class="brand-title">CODM TOURNAMENT OS<small>ELITE COMPETITION PLATFORM</small></span>
-    </a>
-    <nav class="nav-links">
-      <a class="nav-link" href="#announcements">Announcements</a>
-      <a class="nav-link nav-link-registration" href="#registration">Registration</a>
-      <a class="nav-link" href="#timeline">Timeline</a>
-      <a class="nav-link" href="#teams">Teams</a>
-      <a class="nav-link" href="#schedule">Schedule</a>
-      <a class="nav-link" href="#results">Results</a>
-      <a class="nav-link" href="#rulebook">Rulebook</a>
-      <a class="nav-link" href="#support">FAQ &amp; Support</a>
-    </nav>
-    <div class="tournament-switcher dashboard-tournament-switcher">
-      <label for="dashboardTournamentSelect">Tournament</label>
-      <select id="dashboardTournamentSelect" aria-label="Select tournament"></select>
-    </div>
+ <div class="container nav-inner">
+  <a class="brand codm-premium-brand" href="index.html" data-tournament-link="index.html">
+   <span class="brand-mark logo-image" style="width:44px;height:44px;min-width:44px;max-width:44px;min-height:44px;max-height:44px;flex:0 0 44px;overflow:hidden;display:grid;place-items:center;padding:6px;border-radius:14px;box-sizing:border-box;">
+    <img src="assets/img/codm-logo.png" width="32" height="32" alt="CODM Tournament OS logo" style="width:32px;height:32px;max-width:32px;max-height:32px;object-fit:contain;display:block;position:static;"/>
+   </span>
+   <span class="brand-title">CODM TOURNAMENT OS<small>ELITE COMPETITION PLATFORM</small></span>
+  </a>
+  <nav class="nav-links">
+   <a class="nav-link" href="#announcements">Announcements</a>
+   <a class="nav-link nav-link-registration" href="#registration">Registration</a>
+   <a class="nav-link" href="#timeline">Timeline</a>
+   <a class="nav-link" href="#teams">Teams</a>
+   <a class="nav-link" href="#schedule">Schedule</a>
+   <a class="nav-link" href="#results">Results</a>
+   <a class="nav-link" href="#rulebook">Rulebook</a>
+   <a class="nav-link" href="#support">FAQ &amp; Support</a>
+  </nav>
+  <div class="tournament-switcher dashboard-tournament-switcher">
+   <label for="dashboardTournamentSelect">Tournament</label>
+   <select id="dashboardTournamentSelect" aria-label="Select tournament"></select>
   </div>
+ </div>
 </header>
 
 <main>
-  <section class="hero">
-    <div class="container">
-      <div class="eyebrow">Public Event Hub</div>
-      <h1 class="h1"><span class="gradient-text">Announcements, schedule,</span><br/>rulebook, and results.</h1>
-      <p id="portalMeta" class="lead">Loading tournament hub...</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="#schedule">View Match Schedule</a>
-        <a class="btn" href="rulebook.html" data-tournament-link="rulebook.html">Open Rulebook</a>
+ <section class="hero">
+  <div class="container">
+   <div class="eyebrow">Public Event Hub</div>
+   <h1 class="h1"><span class="gradient-text">Announcements, schedule,</span><br/>rulebook, and results.</h1>
+   <p id="portalMeta" class="lead">Loading tournament hub...</p>
+   <div class="hero-actions">
+    <a class="btn btn-primary" href="#schedule">View Match Schedule</a>
+    <a class="btn" href="rulebook.html" data-tournament-link="rulebook.html">Open Rulebook</a>
+   </div>
+  </div>
+ </section>
+
+ <section class="section">
+  <div class="container public-hub-content">
+   <div class="panel-stack">
+    <section class="card" id="announcements">
+     <div class="section-head">
+      <div>
+       <div class="eyebrow">Official Updates</div>
+       <h2>Announcements</h2>
+       <p>Latest tournament notices from admins and organizers.</p>
       </div>
-    </div>
-  </section>
+     </div>
+     <div id="announcementList" class="announcement-list"></div>
+    </section>
 
-  <section class="section">
-    <div class="container public-hub-content">
-      <div class="panel-stack">
-        <section class="card" id="announcements">
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">Official Updates</div>
-              <h2>Announcements</h2>
-              <p>Latest tournament notices from admins and organizers.</p>
-            </div>
-          </div>
-          <div id="announcementList" class="announcement-list"></div>
-        </section>
+    <section class="card registration-cta" id="registration">
+     <div class="registration-cta-copy">
+      <div class="eyebrow">Join the Competition</div>
+      <h2>Event Registration</h2>
+      <p>Ready to compete? Open the official registration form and complete your team or player submission.</p>
+     </div>
+     <div class="registration-cta-actions">
+      <a class="btn btn-primary registration-cta-button" href="#" id="registrationLink" target="_blank" rel="noopener noreferrer">
+       Register Now
+      </a>
+      <span class="registration-cta-note" id="registrationCtaNote">Opens the official Google Form in a new tab.</span>
+     </div>
+    </section>
 
-        <section class="card registration-cta" id="registration">
-          <div class="registration-cta-copy">
-            <div class="eyebrow">Join the Competition</div>
-            <h2>Event Registration</h2>
-            <p>Ready to compete? Open the official registration form and complete your team or player submission.</p>
-          </div>
-          <div class="registration-cta-actions">
-            <a class="btn btn-primary registration-cta-button" href="#" id="registrationLink" target="_blank" rel="noopener noreferrer">
-              Register Now
-            </a>
-            <span class="registration-cta-note" id="registrationCtaNote">Opens the official Google Form in a new tab.</span>
-          </div>
-        </section>
-
-        <section class="card dashboard-collapsible is-collapsed tournament-timeline-section" id="timeline" data-collapsible-section>
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">Tournament Roadmap</div>
-              <h2>Tournament Timeline</h2>
-              <p>Admin-controlled dates and stage milestones for the selected event.</p>
-            </div>
-            <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="timelineContent" data-section-toggle="timeline"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
-          </div>
-          <div class="dashboard-collapsible-body" id="timelineContent" hidden>
-            <div id="tournamentTimelineList" class="tournament-timeline-list"></div>
-          </div>
-        </section>
-
-
-
-
-
-        <section class="card participating-teams-section dashboard-collapsible is-collapsed" id="teams" data-collapsible-section>
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">Tournament Directory</div>
-              <h2>Participating Teams & Players</h2>
-              <p class="muted">Published teams and player rosters for the selected tournament. Player UIDs are never displayed publicly.</p>
-            </div>
-          
-            <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="teamsContent" data-section-toggle="teams"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
-          </div>
-          <div class="dashboard-collapsible-body" id="teamsContent" hidden>
-
-          <div class="team-directory-filters">
-            <label>
-              <span>Mode</span>
-              <select id="teamsModeFilter">
-                <option value="">All Modes</option>
-              </select>
-            </label>
-
-            <label>
-              <span>Search</span>
-              <input id="teamsSearchFilter" type="search" placeholder="Team, tag, or player..."/>
-            </label>
-
-            <button class="btn btn-small filter-reset" id="teamsFilterReset" type="button">Reset</button>
-          </div>
-
-          <div id="participatingTeamsList" class="participating-teams-grid"></div>
-        
-          </div>
-</section>
-
-        <section class="card dashboard-collapsible is-collapsed" id="schedule" data-collapsible-section>
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">Match Flow</div>
-              <h2>Match Schedule</h2>
-              <p>Published matches, lobby times, and series windows.</p>
-            </div>
-          
-            <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="scheduleContent" data-section-toggle="schedule"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
-          </div>
-          <div class="dashboard-collapsible-body" id="scheduleContent" hidden>
-          <div class="filter-panel" id="scheduleFilters">
-            <div class="field">
-              <label for="scheduleModeFilter">Mode</label>
-              <select id="scheduleModeFilter"><option value="">All Modes</option></select>
-            </div>
-            <div class="field">
-              <label for="scheduleStageFilter">Stage</label>
-              <select id="scheduleStageFilter"><option value="">All Stages</option></select>
-            </div>
-            <div class="field">
-              <label for="scheduleStatusFilter">Status</label>
-              <select id="scheduleStatusFilter"><option value="">All Status</option></select>
-            </div>
-            <div class="field">
-              <label for="scheduleDayFilter">Day</label>
-              <select id="scheduleDayFilter"><option value="">All Days</option></select>
-            </div>
-            <div class="field filter-search">
-              <label for="scheduleSearchFilter">Search</label>
-              <input id="scheduleSearchFilter" type="search" placeholder="Team, player, map..."/>
-            </div>
-            <button class="btn btn-small filter-reset" id="scheduleFilterReset" type="button">Reset</button>
-          </div>
-          <div id="scheduleList" class="schedule-list"></div>
-        
-          </div>
-</section>
-
-        <section class="card dashboard-collapsible is-collapsed" id="results" data-collapsible-section>
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">Published</div>
-              <h2>Match Results</h2>
-              <p>Finalized scores and published standings entries.</p>
-            </div>
-          
-            <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="resultsContent" data-section-toggle="results"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
-          </div>
-          <div class="dashboard-collapsible-body" id="resultsContent" hidden>
-          <div class="filter-panel" id="resultsFilters">
-            <div class="field">
-              <label for="resultsModeFilter">Mode</label>
-              <select id="resultsModeFilter"><option value="">All Modes</option></select>
-            </div>
-            <div class="field">
-              <label for="resultsStageFilter">Stage</label>
-              <select id="resultsStageFilter"><option value="">All Stages</option></select>
-            </div>
-            <div class="field">
-              <label for="resultsStatusFilter">Status</label>
-              <select id="resultsStatusFilter"><option value="">All Status</option></select>
-            </div>
-            <div class="field">
-              <label for="resultsDayFilter">Day</label>
-              <select id="resultsDayFilter"><option value="">All Days</option></select>
-            </div>
-            <div class="field filter-search">
-              <label for="resultsSearchFilter">Search</label>
-              <input id="resultsSearchFilter" type="search" placeholder="Team, player, map..."/>
-            </div>
-            <button class="btn btn-small filter-reset" id="resultsFilterReset" type="button">Reset</button>
-          </div>
-          <div id="resultsList" class="results-list"></div>
-        
-          </div>
-</section>
-
-        
-
-
-
-        <section class="card dashboard-collapsible is-collapsed" id="rulebook" data-collapsible-section>
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">Official Rules</div>
-              <h2>Rulebook</h2>
-              <p>Review the official tournament rules before match day.</p>
-            </div>
-            <a class="btn btn-primary btn-small" href="rulebook.html" data-tournament-link="rulebook.html">Full Rulebook Viewer</a>
-          
-            <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="rulebookContent" data-section-toggle="rulebook"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
-          </div>
-          <div class="dashboard-collapsible-body" id="rulebookContent" hidden>
-          <iframe id="rulebookFrame" class="rulebook-frame hidden" title="Rulebook"></iframe>
-          <div id="rulebookFallback"></div>
-        
-          </div>
-</section>
-
-        <section class="card" id="support">
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">Help Desk</div>
-              <h2>FAQ & Support</h2>
-              <p>Check common questions first. If you still need help, submit an inquiry for the admin team.</p>
-            </div>
-          </div>
-
-          <div class="support-layout">
-            <div>
-              <div class="filter-panel support-filter-panel">
-                <div class="field">
-                  <label for="faqCategoryFilter">FAQ Category</label>
-                  <select id="faqCategoryFilter"><option value="">All Categories</option></select>
-                </div>
-                <div class="field filter-search">
-                  <label for="faqSearchFilter">Search FAQ</label>
-                  <input id="faqSearchFilter" type="search" placeholder="Search question or answer..."/>
-                </div>
-                <button class="btn btn-small filter-reset" id="faqFilterReset" type="button">Reset</button>
-              </div>
-
-              <div id="faqList" class="faq-list"></div>
-
-              <div class="section-tight">
-                <div class="eyebrow">Published Answers</div>
-                <div id="publicInquiryList" class="faq-list"></div>
-              </div>
-            </div>
-
-            <form id="supportForm" class="support-form form">
-              <div>
-                <div class="eyebrow">Submit Inquiry</div>
-                <h3>Ask the admin team</h3>
-                <p class="muted">A quick verification appears after you click Submit Inquiry.</p>
-              </div>
-
-              <div class="grid grid-two">
-                <div class="field">
-                  <label for="supportName">Name / Team</label>
-                  <input id="supportName" maxlength="120" placeholder="Team or player name" required/>
-                </div>
-                <div class="field">
-                  <label for="supportEmail">Email optional</label>
-                  <input id="supportEmail" type="email" maxlength="160" placeholder="you@email.com"/>
-                </div>
-              </div>
-
-              <div class="grid grid-two">
-                <div class="field">
-                  <label for="supportDiscord">Discord optional</label>
-                  <input id="supportDiscord" maxlength="120" placeholder="Discord username"/>
-                </div>
-                <div class="field">
-                  <label for="supportCategory">Category</label>
-                  <select id="supportCategory">
-                    <option>General</option>
-                    <option>Schedule</option>
-                    <option>Match Result</option>
-                    <option>Rulebook</option>
-                    <option>Technical Issue</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="supportSubject">Subject</label>
-                <input id="supportSubject" maxlength="160" placeholder="Brief summary" required/>
-              </div>
-
-              <div class="field">
-                <label for="supportMessage">Message</label>
-                <textarea id="supportMessage" maxlength="2000" minlength="20" placeholder="Include mode, match, team/player, and issue details." required></textarea>
-              </div>
-
-              <div class="support-honeypot" aria-hidden="true">
-                <label for="supportWebsite">Website</label>
-                <input id="supportWebsite" tabindex="-1" autocomplete="off"/>
-              </div>
-
-              <button class="btn btn-primary" type="submit">Submit Inquiry</button>
-              <div id="supportFormStatus" class="notice hidden"></div>
-            </form>
-          </div>
-        </section>
+    <section class="card dashboard-collapsible is-collapsed tournament-timeline-section" id="timeline" data-collapsible-section>
+     <div class="section-head">
+      <div>
+       <div class="eyebrow">Tournament Roadmap</div>
+       <h2>Tournament Timeline</h2>
+       <p>Admin-controlled dates and stage milestones for the selected event.</p>
       </div>
-    </div>
-  </section>
+      <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="timelineContent" data-section-toggle="timeline"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
+     </div>
+     <div class="dashboard-collapsible-body" id="timelineContent" hidden>
+      <div id="tournamentTimelineList" class="tournament-timeline-list"></div>
+     </div>
+    </section>
+
+
+
+
+
+    <section class="card participating-teams-section dashboard-collapsible is-collapsed" id="teams" data-collapsible-section>
+     <div class="section-head">
+      <div>
+       <div class="eyebrow">Tournament Directory</div>
+       <h2>Participating Teams & Players</h2>
+       <p class="muted">Published teams and player rosters for the selected tournament.</p>
+      </div>
+     
+      <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="teamsContent" data-section-toggle="teams"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
+     </div>
+     <div class="dashboard-collapsible-body" id="teamsContent" hidden>
+
+     <div class="team-directory-filters">
+      <label>
+       <span>Mode</span>
+       <select id="teamsModeFilter">
+        <option value="">All Modes</option>
+       </select>
+      </label>
+
+      <label>
+       <span>Search</span>
+       <input id="teamsSearchFilter" type="search" placeholder="Team, tag, or player..."/>
+      </label>
+
+      <button class="btn btn-small filter-reset" id="teamsFilterReset" type="button">Reset</button>
+     </div>
+
+     <div id="participatingTeamsList" class="participating-teams-grid"></div>
+    
+     </div>
+</section>
+
+    <section class="card dashboard-collapsible is-collapsed" id="schedule" data-collapsible-section>
+     <div class="section-head">
+      <div>
+       <div class="eyebrow">Match Flow</div>
+       <h2>Match Schedule</h2>
+       <p>Published matches, lobby times, and series windows.</p>
+      </div>
+     
+      <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="scheduleContent" data-section-toggle="schedule"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
+     </div>
+     <div class="dashboard-collapsible-body" id="scheduleContent" hidden>
+     <div class="filter-panel" id="scheduleFilters">
+      <div class="field">
+       <label for="scheduleModeFilter">Mode</label>
+       <select id="scheduleModeFilter"><option value="">All Modes</option></select>
+      </div>
+      <div class="field">
+       <label for="scheduleStageFilter">Stage</label>
+       <select id="scheduleStageFilter"><option value="">All Stages</option></select>
+      </div>
+      <div class="field">
+       <label for="scheduleStatusFilter">Status</label>
+       <select id="scheduleStatusFilter"><option value="">All Status</option></select>
+      </div>
+      <div class="field">
+       <label for="scheduleDayFilter">Day</label>
+       <select id="scheduleDayFilter"><option value="">All Days</option></select>
+      </div>
+      <div class="field filter-search">
+       <label for="scheduleSearchFilter">Search</label>
+       <input id="scheduleSearchFilter" type="search" placeholder="Team, player, map..."/>
+      </div>
+      <button class="btn btn-small filter-reset" id="scheduleFilterReset" type="button">Reset</button>
+     </div>
+     <div id="scheduleList" class="schedule-list"></div>
+    
+     </div>
+</section>
+
+    <section class="card dashboard-collapsible is-collapsed" id="results" data-collapsible-section>
+     <div class="section-head">
+      <div>
+       <div class="eyebrow">Published</div>
+       <h2>Match Results</h2>
+       <p>Finalized scores and published standings entries.</p>
+      </div>
+     
+      <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="resultsContent" data-section-toggle="results"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
+     </div>
+     <div class="dashboard-collapsible-body" id="resultsContent" hidden>
+     <div class="filter-panel" id="resultsFilters">
+      <div class="field">
+       <label for="resultsModeFilter">Mode</label>
+       <select id="resultsModeFilter"><option value="">All Modes</option></select>
+      </div>
+      <div class="field">
+       <label for="resultsStageFilter">Stage</label>
+       <select id="resultsStageFilter"><option value="">All Stages</option></select>
+      </div>
+      <div class="field">
+       <label for="resultsStatusFilter">Status</label>
+       <select id="resultsStatusFilter"><option value="">All Status</option></select>
+      </div>
+      <div class="field">
+       <label for="resultsDayFilter">Day</label>
+       <select id="resultsDayFilter"><option value="">All Days</option></select>
+      </div>
+      <div class="field filter-search">
+       <label for="resultsSearchFilter">Search</label>
+       <input id="resultsSearchFilter" type="search" placeholder="Team, player, map..."/>
+      </div>
+      <button class="btn btn-small filter-reset" id="resultsFilterReset" type="button">Reset</button>
+     </div>
+     <div id="resultsList" class="results-list"></div>
+    
+     </div>
+</section>
+
+    
+
+
+
+    <section class="card dashboard-collapsible is-collapsed" id="rulebook" data-collapsible-section>
+     <div class="section-head">
+      <div>
+       <div class="eyebrow">Official Rules</div>
+       <h2>Rulebook</h2>
+       <p>Review the official tournament rules before match day.</p>
+      </div>
+      <a class="btn btn-primary btn-small" href="rulebook.html" data-tournament-link="rulebook.html">Full Rulebook Viewer</a>
+     
+      <button class="section-collapse-toggle" type="button" aria-expanded="false" aria-controls="rulebookContent" data-section-toggle="rulebook"><span class="section-collapse-toggle-text">Show</span><span class="section-collapse-chevron" aria-hidden="true"></span></button>
+     </div>
+     <div class="dashboard-collapsible-body" id="rulebookContent" hidden>
+     <iframe id="rulebookFrame" class="rulebook-frame hidden" title="Rulebook"></iframe>
+     <div id="rulebookFallback"></div>
+    
+     </div>
+</section>
+
+    <section class="card" id="support">
+     <div class="section-head">
+      <div>
+       <div class="eyebrow">Help Desk</div>
+       <h2>FAQ & Support</h2>
+       <p>Check common questions first. If you still need help, submit an inquiry for the admin team.</p>
+      </div>
+     </div>
+
+     <div class="support-layout">
+      <div>
+       <div class="filter-panel support-filter-panel">
+        <div class="field">
+         <label for="faqCategoryFilter">FAQ Category</label>
+         <select id="faqCategoryFilter"><option value="">All Categories</option></select>
+        </div>
+        <div class="field filter-search">
+         <label for="faqSearchFilter">Search FAQ</label>
+         <input id="faqSearchFilter" type="search" placeholder="Search question or answer..."/>
+        </div>
+        <button class="btn btn-small filter-reset" id="faqFilterReset" type="button">Reset</button>
+       </div>
+
+       <div id="faqList" class="faq-list"></div>
+
+       <div class="section-tight">
+        <div class="eyebrow">Published Answers</div>
+        <div id="publicInquiryList" class="faq-list"></div>
+       </div>
+      </div>
+
+      <form id="supportForm" class="support-form form">
+       <div>
+        <div class="eyebrow">Submit Inquiry</div>
+        <h3>Ask the admin team</h3>
+        <p class="muted">A quick verification appears after you click Submit Inquiry.</p>
+       </div>
+
+       <div class="grid grid-two">
+        <div class="field">
+         <label for="supportName">Name / Team</label>
+         <input id="supportName" maxlength="120" placeholder="Team or player name" required/>
+        </div>
+        <div class="field">
+         <label for="supportEmail">Email optional</label>
+         <input id="supportEmail" type="email" maxlength="160" placeholder="you@email.com"/>
+        </div>
+       </div>
+
+       <div class="grid grid-two">
+        <div class="field">
+         <label for="supportDiscord">Discord optional</label>
+         <input id="supportDiscord" maxlength="120" placeholder="Discord username"/>
+        </div>
+        <div class="field">
+         <label for="supportCategory">Category</label>
+         <select id="supportCategory">
+          <option>General</option>
+          <option>Schedule</option>
+          <option>Match Result</option>
+          <option>Rulebook</option>
+          <option>Technical Issue</option>
+         </select>
+        </div>
+       </div>
+
+       <div class="field">
+        <label for="supportSubject">Subject</label>
+        <input id="supportSubject" maxlength="160" placeholder="Brief summary" required/>
+       </div>
+
+       <div class="field">
+        <label for="supportMessage">Message</label>
+        <textarea id="supportMessage" maxlength="2000" minlength="20" placeholder="Include mode, match, team/player, and issue details." required></textarea>
+       </div>
+
+       <div class="support-honeypot" aria-hidden="true">
+        <label for="supportWebsite">Website</label>
+        <input id="supportWebsite" tabindex="-1" autocomplete="off"/>
+       </div>
+
+       <button class="btn btn-primary" type="submit">Submit Inquiry</button>
+       <div id="supportFormStatus" class="notice hidden"></div>
+      </form>
+     </div>
+    </section>
+   </div>
+  </div>
+ </section>
 </main>
 
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
 <script src="assets/js/app.js?v=mt-public-visibility-v4"></script>
-<script src="assets/js/dashboard.js?v=timeline-registration-v10"></script>
+<script src="assets/js/dashboard.js?v=remove-uid-note-v14"></script>
 
 <div id="supportGateModal" class="support-gate-modal hidden" role="dialog" aria-modal="true" aria-labelledby="supportGateTitle">
-  <div class="support-gate-backdrop" data-support-gate-close></div>
-  <div class="support-gate-dialog">
-    <button class="support-gate-close" type="button" aria-label="Close verification" data-support-gate-close>×</button>
-    <div class="eyebrow">Quick Verification</div>
-    <h3 id="supportGateTitle">Before we submit your inquiry</h3>
-    <p>To protect the support queue from spam, type <strong>CODM</strong> below.</p>
-    <form id="supportGateForm" class="form">
-      <div class="field">
-        <label for="supportGateInput">Verification Code</label>
-        <input id="supportGateInput" maxlength="12" autocomplete="off" placeholder="CODM" required/>
-      </div>
-      <button class="btn btn-primary" type="submit">Confirm & Submit</button>
-      <div id="supportGateStatus" class="notice hidden"></div>
-    </form>
-  </div>
+ <div class="support-gate-backdrop" data-support-gate-close></div>
+ <div class="support-gate-dialog">
+  <button class="support-gate-close" type="button" aria-label="Close verification" data-support-gate-close>×</button>
+  <div class="eyebrow">Quick Verification</div>
+  <h3 id="supportGateTitle">Before we submit your inquiry</h3>
+  <p>To protect the support queue from spam, type <strong>CODM</strong> below.</p>
+  <form id="supportGateForm" class="form">
+   <div class="field">
+    <label for="supportGateInput">Verification Code</label>
+    <input id="supportGateInput" maxlength="12" autocomplete="off" placeholder="CODM" required/>
+   </div>
+   <button class="btn btn-primary" type="submit">Confirm & Submit</button>
+   <div id="supportGateStatus" class="notice hidden"></div>
+  </form>
+ </div>
 </div>
 
 </body>

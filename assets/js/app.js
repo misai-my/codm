@@ -1,218 +1,218 @@
 const cfg = window.PORTAL_CONFIG || {};
 const sb = window.supabase?.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
+ auth: {
+  persistSession: true,
+  autoRefreshToken: true,
+  detectSessionInUrl: true
+ }
 });
 
 
 const TOURNAMENT_STORAGE_KEY = "codm_selected_tournament_slug";
 
 function getTournamentSlugFromUrl() {
-  return new URLSearchParams(window.location.search).get("tournament") || "";
+ return new URLSearchParams(window.location.search).get("tournament") || "";
 }
 
 function getSelectedTournamentSlug(fallback = cfg.DEFAULT_TOURNAMENT_SLUG || "community-gladiators-2026-season-2") {
-  return getTournamentSlugFromUrl() || localStorage.getItem(TOURNAMENT_STORAGE_KEY) || fallback;
+ return getTournamentSlugFromUrl() || localStorage.getItem(TOURNAMENT_STORAGE_KEY) || fallback;
 }
 
 function setSelectedTournamentSlug(slug, updateUrl = true) {
-  const cleanSlug = text(slug);
-  if (!cleanSlug) return;
+ const cleanSlug = text(slug);
+ if (!cleanSlug) return;
 
-  localStorage.setItem(TOURNAMENT_STORAGE_KEY, cleanSlug);
+ localStorage.setItem(TOURNAMENT_STORAGE_KEY, cleanSlug);
 
-  if (updateUrl) {
-    const url = new URL(window.location.href);
-    url.searchParams.set("tournament", cleanSlug);
-    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-  }
+ if (updateUrl) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("tournament", cleanSlug);
+  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+ }
 }
 
 function tournamentUrl(path, slug = getSelectedTournamentSlug()) {
-  const url = new URL(path, window.location.href);
-  url.searchParams.set("tournament", slug);
-  return `${url.pathname.split("/").pop()}${url.search}${url.hash}`;
+ const url = new URL(path, window.location.href);
+ url.searchParams.set("tournament", slug);
+ return `${url.pathname.split("/").pop()}${url.search}${url.hash}`;
 }
 
 async function listTournaments(options = {}) {
-  const publicOnly = Boolean(options.publicOnly);
+ const publicOnly = Boolean(options.publicOnly);
 
-  const { data, error } = await sb
-    .from("tournaments")
-    .select("*");
+ const { data, error } = await sb
+  .from("tournaments")
+  .select("*");
 
-  if (error) {
-    console.warn("Tournament list unavailable; using local fallbacks.", error);
+ if (error) {
+  console.warn("Tournament list unavailable; using local fallbacks.", error);
 
-    return Object.entries(cfg.TOURNAMENT_FALLBACKS || {})
-      .map(([slug, row]) => ({
-        id: null,
-        slug,
-        title: row.title || slug,
-        registration_open: Boolean(row.registration_form_url),
-        registration_form_url: row.registration_form_url || "",
-        rulebook_doc_url: row.rulebook_url || "",
-        event_hub_enabled: true,
-        show_in_public_selector: row.show_in_public_selector !== false
-      }))
-      .filter(row => !publicOnly || row.show_in_public_selector !== false);
-  }
-
-  return [...(data || [])]
-    .filter(row => row.event_hub_enabled !== false)
-    .filter(row => !publicOnly || row.show_in_public_selector !== false)
-    .sort((a, b) => {
-      const titleA = String(a.title || a.slug || "");
-      const titleB = String(b.title || b.slug || "");
-      return titleA.localeCompare(titleB);
-    });
-}
-
-async function getTournamentBySlug(slug = getSelectedTournamentSlug()) {
-  const targetSlug = slug || cfg.DEFAULT_TOURNAMENT_SLUG || "community-gladiators-2026-season-2";
-  const { data, error } = await sb
-    .from("tournaments")
-    .select("*")
-    .eq("slug", targetSlug)
-    .maybeSingle();
-
-  if (error) {
-    console.warn("Tournament lookup unavailable; using local fallback.", error);
-    return null;
-  }
-
-  return data;
-}
-
-function tournamentFallback(slug = getSelectedTournamentSlug()) {
-  const fallback = cfg.TOURNAMENT_FALLBACKS?.[slug] || {};
-  return {
+  return Object.entries(cfg.TOURNAMENT_FALLBACKS || {})
+   .map(([slug, row]) => ({
     id: null,
     slug,
-    title: fallback.title || cfg.SITE_NAME || "CODM Tournament OS",
-    registration_form_url: fallback.registration_form_url || "",
-    rulebook_url: fallback.rulebook_url || cfg.RULEBOOK_URL || "",
-    rulebook_doc_url: fallback.rulebook_url || cfg.RULEBOOK_URL || ""
-  };
-}
+    title: row.title || slug,
+    registration_open: Boolean(row.registration_form_url),
+    registration_form_url: row.registration_form_url || "",
+    rulebook_doc_url: row.rulebook_url || "",
+    event_hub_enabled: true,
+    show_in_public_selector: row.show_in_public_selector !== false
+   }))
+   .filter(row => !publicOnly || row.show_in_public_selector !== false);
+ }
 
-function updateTournamentLinks(root = document, slug = getSelectedTournamentSlug()) {
-  qsa("[data-tournament-link]", root).forEach(link => {
-    const target = link.getAttribute("data-tournament-link");
-    if (!target) return;
-    link.href = tournamentUrl(target, slug);
+ return [...(data || [])]
+  .filter(row => row.event_hub_enabled !== false)
+  .filter(row => !publicOnly || row.show_in_public_selector !== false)
+  .sort((a, b) => {
+   const titleA = String(a.title || a.slug || "");
+   const titleB = String(b.title || b.slug || "");
+   return titleA.localeCompare(titleB);
   });
 }
 
+async function getTournamentBySlug(slug = getSelectedTournamentSlug()) {
+ const targetSlug = slug || cfg.DEFAULT_TOURNAMENT_SLUG || "community-gladiators-2026-season-2";
+ const { data, error } = await sb
+  .from("tournaments")
+  .select("*")
+  .eq("slug", targetSlug)
+  .maybeSingle();
+
+ if (error) {
+  console.warn("Tournament lookup unavailable; using local fallback.", error);
+  return null;
+ }
+
+ return data;
+}
+
+function tournamentFallback(slug = getSelectedTournamentSlug()) {
+ const fallback = cfg.TOURNAMENT_FALLBACKS?.[slug] || {};
+ return {
+  id: null,
+  slug,
+  title: fallback.title || cfg.SITE_NAME || "CODM Tournament OS",
+  registration_form_url: fallback.registration_form_url || "",
+  rulebook_url: fallback.rulebook_url || cfg.RULEBOOK_URL || "",
+  rulebook_doc_url: fallback.rulebook_url || cfg.RULEBOOK_URL || ""
+ };
+}
+
+function updateTournamentLinks(root = document, slug = getSelectedTournamentSlug()) {
+ qsa("[data-tournament-link]", root).forEach(link => {
+  const target = link.getAttribute("data-tournament-link");
+  if (!target) return;
+  link.href = tournamentUrl(target, slug);
+ });
+}
+
 function appBaseUrl() {
-  const path = window.location.pathname;
-  const basePath = path.endsWith("/") ? path : path.replace(/\/[^/]*$/, "/");
-  return `${window.location.origin}${basePath}`;
+ const path = window.location.pathname;
+ const basePath = path.endsWith("/") ? path : path.replace(/\/[^/]*$/, "/");
+ return `${window.location.origin}${basePath}`;
 }
 
 function authCallbackUrl() {
-  return `${appBaseUrl()}auth-callback.html`;
+ return `${appBaseUrl()}auth-callback.html`;
 }
 
 function qs(sel, root = document) { return root.querySelector(sel); }
 function qsa(sel, root = document) { return [...root.querySelectorAll(sel)]; }
 function text(v) { return String(v ?? "").trim(); }
 function esc(v) {
-  return text(v).replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
-  })[c]);
+ return text(v).replace(/[&<>"']/g, c => ({
+  "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+ })[c]);
 }
 
 function toast(message) {
-  let el = qs("#toast");
-  if (!el) {
-    el = document.createElement("div");
-    el.id = "toast";
-    el.className = "toast";
-    document.body.appendChild(el);
-  }
-  el.textContent = message;
-  el.classList.add("show");
-  clearTimeout(window.__toastTimer);
-  window.__toastTimer = setTimeout(() => el.classList.remove("show"), 4200);
+ let el = qs("#toast");
+ if (!el) {
+  el = document.createElement("div");
+  el.id = "toast";
+  el.className = "toast";
+  document.body.appendChild(el);
+ }
+ el.textContent = message;
+ el.classList.add("show");
+ clearTimeout(window.__toastTimer);
+ window.__toastTimer = setTimeout(() => el.classList.remove("show"), 4200);
 }
 
 async function getSession() {
-  const { data, error } = await sb.auth.getSession();
-  if (error) throw error;
-  return data.session;
+ const { data, error } = await sb.auth.getSession();
+ if (error) throw error;
+ return data.session;
 }
 
 async function waitForSession(retries = 8, delayMs = 180) {
-  for (let i = 0; i < retries; i += 1) {
-    const session = await getSession();
-    if (session?.user) return session;
-    await new Promise(resolve => setTimeout(resolve, delayMs));
-  }
-  return null;
+ for (let i = 0; i < retries; i += 1) {
+  const session = await getSession();
+  if (session?.user) return session;
+  await new Promise(resolve => setTimeout(resolve, delayMs));
+ }
+ return null;
 }
 
 async function signOut(redirectTo = "index.html") {
-  await sb.auth.signOut();
-  const next = typeof redirectTo === "string" ? redirectTo : "index.html";
-  location.href = next;
+ await sb.auth.signOut();
+ const next = typeof redirectTo === "string" ? redirectTo : "index.html";
+ location.href = next;
 }
 
 async function sendMagicLink(email, nextPath = "dashboard.html") {
-  const callback = new URL(authCallbackUrl());
-  callback.searchParams.set("next", nextPath || "dashboard.html");
+ const callback = new URL(authCallbackUrl());
+ callback.searchParams.set("next", nextPath || "dashboard.html");
 
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: callback.toString() }
-  });
+ const { error } = await sb.auth.signInWithOtp({
+  email,
+  options: { emailRedirectTo: callback.toString() }
+ });
 
-  if (error) throw error;
+ if (error) throw error;
 }
 
 async function signInWithPassword(email, password) {
-  const { data, error } = await sb.auth.signInWithPassword({
-    email,
-    password
-  });
+ const { data, error } = await sb.auth.signInWithPassword({
+  email,
+  password
+ });
 
-  if (error) throw error;
-  return data;
+ if (error) throw error;
+ return data;
 }
 
 async function getActiveTournament(slug = null) {
-  return getTournamentBySlug(slug || getSelectedTournamentSlug());
+ return getTournamentBySlug(slug || getSelectedTournamentSlug());
 }
 
 async function currentUserAccess() {
-  const session = await getSession();
-  const email = session?.user?.email;
-  if (!email) return { session, email: "", access: [] };
+ const session = await getSession();
+ const email = session?.user?.email;
+ if (!email) return { session, email: "", access: [] };
 
-  const { data, error } = await sb
-    .from("registered_access")
-    .select("*")
-    .eq("email", email.toLowerCase())
-    .in("status", ["registered", "approved", "active"]);
+ const { data, error } = await sb
+  .from("registered_access")
+  .select("*")
+  .eq("email", email.toLowerCase())
+  .in("status", ["registered", "approved", "active"]);
 
-  if (error) throw error;
-  return { session, email, access: data || [] };
+ if (error) throw error;
+ return { session, email, access: data || [] };
 }
 
 function requireConfig() {
-  if (!cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_ANON_KEY.includes("PASTE_")) {
-    const msg = "Missing Supabase anon key in assets/js/config.js";
-    console.warn(msg);
-    return false;
-  }
-  return true;
+ if (!cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_ANON_KEY.includes("PASTE_")) {
+  const msg = "Missing Supabase anon key in assets/js/config.js";
+  console.warn(msg);
+  return false;
+ }
+ return true;
 }
 
 function wireNavAuth() {
-  qsa("[data-signout]").forEach(btn => btn.addEventListener("click", signOut));
+ qsa("[data-signout]").forEach(btn => btn.addEventListener("click", signOut));
 }
 
 document.addEventListener("DOMContentLoaded", wireNavAuth);

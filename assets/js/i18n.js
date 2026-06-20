@@ -1,7 +1,7 @@
 /**
  * CODM Tournament OS — Lightweight UI Translation
  * Default language: English
- * Supported: English, Bahasa Malaysia, Filipino
+ * Supported: English, Bahasa Malaysia, Filipino, Mandarin Chinese
  *
  * This translates static UI copy and common dynamic UI labels.
  * User-generated content such as team names, announcement text, and results
@@ -9,7 +9,7 @@
  */
 (function () {
   const STORAGE_KEY = "codm_language";
-  const SUPPORTED = ["en", "ms", "fil"];
+  const SUPPORTED = ["en", "ms", "fil", "zh"];
   const DEFAULT_LANG = "en";
 
   const DICTIONARY = {
@@ -275,6 +275,142 @@
       "Add FAQ": "Magdagdag ng FAQ",
       "Submit Inquiry": "Isumite ang Inquiry",
       "Support": "Support"
+    },
+
+    zh: {
+      "Language": "语言",
+      "EN": "EN",
+      "MS": "MS",
+      "FIL": "FIL",
+      "ZH": "ZH",
+      "English": "英语",
+      "Bahasa Malaysia": "马来语",
+      "Filipino": "菲律宾语",
+      "Mandarin": "普通话",
+
+      "Announcements": "公告",
+      "Registration": "报名",
+      "Timeline": "时间线",
+      "Teams": "队伍",
+      "Schedule": "赛程",
+      "Results": "赛果",
+      "Rulebook": "规则手册",
+      "FAQ & Support": "常见问题与支持",
+      "View Public Site": "查看公开页面",
+      "Sign Out": "退出登录",
+      "Tournament": "赛事",
+
+      "Public Event Hub": "公开赛事中心",
+      "Announcements, schedule,": "公告、赛程、",
+      "rulebook, and results.": "规则手册与赛果。",
+      "Official Updates": "官方更新",
+      "Latest tournament notices from admins and organizers.": "来自管理员和主办方的最新赛事通知。",
+      "Join the Competition": "加入比赛",
+      "Event Registration": "赛事报名",
+      "Ready to compete? Open the official registration form and complete your team or player submission.": "准备好参赛了吗？打开官方报名表，完成队伍或选手提交。",
+      "Open Registration Form": "打开报名表",
+      "Registration is currently closed.": "报名目前已关闭。",
+      "Tournament Roadmap": "赛事路线图",
+      "Tournament Timeline": "赛事时间线",
+      "Admin-controlled dates and stage milestones for the selected event.": "所选赛事的日期与阶段节点由管理员控制。",
+      "Tournament Directory": "赛事目录",
+      "Participating Teams & Players": "参赛队伍与选手",
+      "Published teams and player rosters for the selected tournament.": "所选赛事已发布的队伍与选手名单。",
+      "Match Flow": "比赛流程",
+      "Match Schedule": "比赛赛程",
+      "Published matches, lobby times, and series windows.": "已发布的比赛、房间时间与系列赛时间段。",
+      "Published": "已发布",
+      "Match Results": "比赛赛果",
+      "Finalized scores and published standings entries.": "最终比分与已发布的排名记录。",
+      "Help Desk": "帮助中心",
+      "Check common questions first. If you still need help, submit an inquiry for the admin team.": "请先查看常见问题。如仍需帮助，请向管理员团队提交咨询。",
+      "Official Rules": "官方规则",
+      "Review the official tournament rules before match day.": "请在比赛日前查看官方赛事规则。",
+      "Full Rulebook Viewer": "完整规则手册查看器",
+
+      "Show": "显示",
+      "Hide": "隐藏",
+      "Reset": "重置",
+      "All Modes": "所有模式",
+      "Mode": "模式",
+      "Search": "搜索",
+      "Team, tag, or player...": "队伍、标签或选手...",
+      "No published participating teams are available for the selected tournament yet.": "所选赛事尚无已发布的参赛队伍。",
+      "No published timeline items are available for this tournament yet.": "该赛事尚无已发布的时间线项目。",
+      "No published matches are available for this tournament yet.": "该赛事尚无已发布的比赛。",
+      "No published results are available for this tournament yet.": "该赛事尚无已发布的赛果。",
+
+      "Roster": "名单",
+      "Roster pending": "名单待定",
+      "entry": "条记录",
+      "entries": "条记录",
+      "Date TBA": "日期待定",
+      "Milestone": "里程碑",
+      "Upcoming": "即将开始",
+      "Live": "直播中",
+      "Completed": "已完成",
+      "Postponed": "已延期",
+      "Cancelled": "已取消",
+
+      "Command Center": "指挥中心",
+      "Admin Console": "管理员控制台",
+      "Post announcements and monitor match data synced from Google Sheets.": "发布公告并监控从 Google Sheets 同步的比赛数据。",
+      "Managing Tournament": "正在管理赛事",
+      "Tournament Setup": "赛事设置",
+      "Sheet Sync": "表格同步",
+      "Match Preview": "比赛预览",
+      "FAQ": "常见问题",
+      "Inquiries": "咨询",
+      "Registration & Timeline": "报名与时间线",
+      "Open or close registration and publish the tournament schedule/timeline for the selected event.": "为所选赛事开启或关闭报名，并发布赛事赛程/时间线。",
+      "Tournament Control": "赛事控制",
+      "Registration Status": "报名状态",
+      "Open Registration": "开启报名",
+      "Close Registration": "关闭报名",
+      "Registration Form URL": "报名表链接",
+      "Rulebook URL": "规则手册链接",
+      "Save Registration Settings": "保存报名设置",
+      "View Registration Card": "查看报名卡片",
+      "Timeline Title": "时间线标题",
+      "Type": "类型",
+      "Status": "状态",
+      "Display Date Text": "显示日期文本",
+      "Start Date/Time": "开始日期/时间",
+      "End Date/Time": "结束日期/时间",
+      "Location / Platform": "地点 / 平台",
+      "Sort Order": "排序",
+      "Description": "描述",
+      "Save Timeline Item": "保存时间线项目",
+      "Cancel Edit": "取消编辑",
+      "Draft / Hidden": "草稿 / 隐藏",
+      "Actions": "操作",
+      "Edit": "编辑",
+      "Delete": "删除",
+      "Publish": "发布",
+
+      "Post Announcement": "发布公告",
+      "Title": "标题",
+      "Priority": "优先级",
+      "Info": "信息",
+      "Important": "重要",
+      "Urgent": "紧急",
+      "Message": "消息",
+      "Publish Announcement": "发布公告",
+      "Save Announcement": "保存公告",
+      "Editing announcement. Save changes or cancel to create a new post.": "正在编辑公告。保存更改，或取消以创建新公告。",
+      "Admin Only": "仅限管理员",
+      "Admin role required.": "需要管理员权限。",
+      "You are logged in, but this account is not marked as an admin in Supabase profiles.": "你已登录，但该账户未在 Supabase profiles 中标记为管理员。",
+      "Email": "电子邮箱",
+      "Password": "密码",
+      "Login": "登录",
+
+      "Question": "问题",
+      "Answer": "答案",
+      "Category": "类别",
+      "Add FAQ": "添加常见问题",
+      "Submit Inquiry": "提交咨询",
+      "Support": "支持"
     }
   };
 

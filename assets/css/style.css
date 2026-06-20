@@ -3517,11 +3517,12 @@ select option:disabled {
 
 /* ============================================================
    LANGUAGE SWITCHER
+   Compact abbreviation selector: EN / MS / FIL / ZH
    ============================================================ */
 .language-switcher {
   display: grid;
   gap: 4px;
-  min-width: 142px;
+  min-width: 84px;
 }
 
 .language-switcher label {
@@ -3542,7 +3543,7 @@ select option:disabled {
 
 @media (max-width: 980px) {
   .language-switcher {
-    min-width: 132px;
+    min-width: 78px;
   }
 }
 
@@ -3560,7 +3561,7 @@ select option:disabled {
 
 /* ============================================================
   HEADER COMPACT LANGUAGE + TABLET CROWDING FIX
-  Keeps the brand readable, makes language selector smaller, and
+  Keeps the brand readable, uses abbreviation language options, and
   moves the busy dashboard menu into a clean second row on iPad/
   narrow desktop windows.
   ============================================================ */
@@ -3622,9 +3623,9 @@ select option:disabled {
 }
 
 .nav .language-switcher {
- flex: 0 0 112px !important;
- width: 112px !important;
- min-width: 112px !important;
+ flex: 0 0 76px !important;
+ width: 76px !important;
+ min-width: 76px !important;
  gap: 3px !important;
 }
 
@@ -3644,6 +3645,12 @@ select option:disabled {
  line-height: 1.1 !important;
 }
 
+.nav .language-switcher select {
+ padding: 6px 20px 6px 8px !important;
+ text-align: center !important;
+ text-align-last: center !important;
+}
+
 .nav .tournament-switcher {
  flex: 0 1 220px !important;
  width: auto !important;
@@ -3658,7 +3665,7 @@ select option:disabled {
 @media (max-width: 1220px) and (min-width: 761px) {
  .dashboard-sticky-nav .nav-inner {
   display: grid !important;
-  grid-template-columns: auto 112px minmax(190px, 1fr) !important;
+  grid-template-columns: auto 76px minmax(190px, 1fr) !important;
   grid-template-areas:
    "brand lang tournament"
    "links links links" !important;
@@ -3706,7 +3713,7 @@ select option:disabled {
 
 @media (max-width: 940px) and (min-width: 761px) {
  .dashboard-sticky-nav .nav-inner {
-  grid-template-columns: minmax(0, 1fr) 112px !important;
+  grid-template-columns: minmax(0, 1fr) 76px !important;
   grid-template-areas:
    "brand lang"
    "tournament tournament"
@@ -3798,9 +3805,9 @@ select option:disabled {
 
  .nav .language-switcher {
   order: 3 !important;
-  flex: 0 0 112px !important;
-  width: 112px !important;
-  min-width: 112px !important;
+  flex: 0 0 76px !important;
+  width: 76px !important;
+  min-width: 76px !important;
  }
 
  .nav .tournament-switcher {
@@ -3827,9 +3834,9 @@ select option:disabled {
  }
 
  .nav .language-switcher {
-  flex-basis: 106px !important;
-  width: 106px !important;
-  min-width: 106px !important;
+  flex-basis: 72px !important;
+  width: 72px !important;
+  min-width: 72px !important;
  }
 
  .nav .language-switcher label,

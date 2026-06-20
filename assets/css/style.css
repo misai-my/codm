@@ -3557,3 +3557,283 @@ select option:disabled {
   }
 }
 
+
+/* ============================================================
+  HEADER COMPACT LANGUAGE + TABLET CROWDING FIX
+  Keeps the brand readable, makes language selector smaller, and
+  moves the busy dashboard menu into a clean second row on iPad/
+  narrow desktop windows.
+  ============================================================ */
+.nav .nav-inner {
+ display: flex !important;
+ flex-wrap: wrap !important;
+ align-items: center !important;
+ justify-content: flex-start !important;
+ gap: 10px !important;
+ padding-block: 8px !important;
+}
+
+.nav .brand,
+.nav .codm-premium-brand {
+ flex: 0 0 auto !important;
+ width: auto !important;
+ max-width: min(280px, 100%) !important;
+ min-width: 0 !important;
+ justify-content: flex-start !important;
+}
+
+.nav .brand-title {
+ white-space: nowrap !important;
+ overflow-wrap: normal !important;
+ word-break: normal !important;
+ font-size: 14px !important;
+ line-height: 1 !important;
+}
+
+.nav .brand-title small {
+ white-space: nowrap !important;
+ overflow-wrap: normal !important;
+ word-break: normal !important;
+}
+
+.nav .nav-links {
+ flex: 1 1 auto !important;
+ min-width: 260px !important;
+ display: flex !important;
+ flex-wrap: wrap !important;
+ align-items: center !important;
+ justify-content: center !important;
+ gap: 7px !important;
+ width: auto !important;
+ max-width: none !important;
+ overflow: visible !important;
+ margin: 0 !important;
+}
+
+.nav .nav-links .nav-link,
+.nav .nav-links .btn,
+.nav .nav-links button {
+ min-height: 34px !important;
+ padding: 8px 11px !important;
+ border-radius: 999px !important;
+ font-size: 12px !important;
+ line-height: 1 !important;
+ white-space: nowrap !important;
+}
+
+.nav .language-switcher {
+ flex: 0 0 112px !important;
+ width: 112px !important;
+ min-width: 112px !important;
+ gap: 3px !important;
+}
+
+.nav .language-switcher label,
+.nav .tournament-switcher label {
+ font-size: 8px !important;
+ letter-spacing: .10em !important;
+ line-height: 1 !important;
+}
+
+.nav .language-switcher select,
+.nav .tournament-switcher select {
+ min-height: 32px !important;
+ padding: 6px 28px 6px 8px !important;
+ border-radius: 10px !important;
+ font-size: 11px !important;
+ line-height: 1.1 !important;
+}
+
+.nav .tournament-switcher {
+ flex: 0 1 220px !important;
+ width: auto !important;
+ min-width: 190px !important;
+}
+
+.nav .dashboard-tournament-switcher {
+ margin-left: 0 !important;
+}
+
+/* Dashboard has the most buttons, so tablets/narrow desktops get a clean 2-row header. */
+@media (max-width: 1220px) and (min-width: 761px) {
+ .dashboard-sticky-nav .nav-inner {
+  display: grid !important;
+  grid-template-columns: auto 112px minmax(190px, 1fr) !important;
+  grid-template-areas:
+   "brand lang tournament"
+   "links links links" !important;
+  align-items: center !important;
+  gap: 8px 10px !important;
+ }
+
+ .dashboard-sticky-nav .brand,
+ .dashboard-sticky-nav .codm-premium-brand {
+  grid-area: brand !important;
+ }
+
+ .dashboard-sticky-nav .language-switcher {
+  grid-area: lang !important;
+  justify-self: end !important;
+ }
+
+ .dashboard-sticky-nav .dashboard-tournament-switcher {
+  grid-area: tournament !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  justify-self: stretch !important;
+ }
+
+ .dashboard-sticky-nav .nav-links {
+  grid-area: links !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+ }
+
+ .dashboard-sticky-nav .nav-links .nav-link,
+ .dashboard-sticky-nav .nav-links .btn,
+ .dashboard-sticky-nav .nav-links button {
+  width: 100% !important;
+  min-height: 31px !important;
+  padding: 7px 7px !important;
+  font-size: 10.5px !important;
+  justify-content: center !important;
+ }
+}
+
+@media (max-width: 940px) and (min-width: 761px) {
+ .dashboard-sticky-nav .nav-inner {
+  grid-template-columns: minmax(0, 1fr) 112px !important;
+  grid-template-areas:
+   "brand lang"
+   "tournament tournament"
+   "links links" !important;
+ }
+
+ .dashboard-sticky-nav .dashboard-tournament-switcher {
+  max-width: 100% !important;
+ }
+}
+
+/* General tablet fallback for non-dashboard pages. */
+@media (max-width: 980px) and (min-width: 761px) {
+ .nav:not(.dashboard-sticky-nav) .nav-inner {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-areas:
+   "brand language"
+   "links links" !important;
+ }
+
+ .nav:not(.dashboard-sticky-nav) .brand,
+ .nav:not(.dashboard-sticky-nav) .codm-premium-brand {
+  grid-area: brand !important;
+ }
+
+ .nav:not(.dashboard-sticky-nav) .language-switcher {
+  grid-area: language !important;
+  justify-self: end !important;
+ }
+
+ .nav:not(.dashboard-sticky-nav) .nav-links {
+  grid-area: links !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  justify-content: center !important;
+ }
+}
+
+/* Phones: preserve the compact button grid, but keep Language small beside Tournament. */
+@media (max-width: 760px) {
+ .nav .nav-inner {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding-block: 7px !important;
+ }
+
+ .nav .brand,
+ .nav .codm-premium-brand {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  justify-content: center !important;
+  gap: 8px !important;
+ }
+
+ .nav .brand-title {
+  font-size: 12px !important;
+  line-height: .95 !important;
+ }
+
+ .nav .brand-title small {
+  font-size: 6.8px !important;
+  letter-spacing: .10em !important;
+ }
+
+ .nav .nav-links {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  max-width: 430px !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  order: 2 !important;
+ }
+
+ .nav .nav-links .nav-link,
+ .nav .nav-links .btn,
+ .nav .nav-links button {
+  width: 100% !important;
+  min-height: 29px !important;
+  padding: 6px 6px !important;
+  font-size: 9px !important;
+ }
+
+ .nav .language-switcher {
+  order: 3 !important;
+  flex: 0 0 112px !important;
+  width: 112px !important;
+  min-width: 112px !important;
+ }
+
+ .nav .tournament-switcher {
+  order: 4 !important;
+  flex: 1 1 180px !important;
+  min-width: 0 !important;
+  max-width: 318px !important;
+ }
+
+ .nav .language-switcher select,
+ .nav .tournament-switcher select {
+  min-height: 30px !important;
+  font-size: 10.5px !important;
+ }
+}
+
+@media (max-width: 390px) {
+ .nav .brand-title {
+  font-size: 10.8px !important;
+ }
+
+ .nav .brand-title small {
+  font-size: 6px !important;
+ }
+
+ .nav .language-switcher {
+  flex-basis: 106px !important;
+  width: 106px !important;
+  min-width: 106px !important;
+ }
+
+ .nav .language-switcher label,
+ .nav .tournament-switcher label {
+  font-size: 7px !important;
+ }
+}

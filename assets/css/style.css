@@ -3429,3 +3429,53 @@ header.dashboard-sticky-nav,
   }
 }
 
+
+/* ============================================================
+   DROPDOWN CONTRAST FIX
+   Prevents white text on white native select menus.
+   ============================================================ */
+select,
+select option,
+select optgroup {
+  color: #f8fafc;
+  background-color: #0b1220;
+}
+
+select {
+  color-scheme: dark;
+}
+
+select option {
+  color: #f8fafc;
+  background-color: #0b1220;
+}
+
+select option:checked,
+select option:hover,
+select option:focus {
+  color: #ffffff;
+  background-color: #1e3a5f;
+}
+
+select:disabled,
+select option:disabled {
+  color: rgba(248, 250, 252, .45);
+  background-color: #111827;
+}
+
+.light select,
+.light select option,
+.light select optgroup,
+[data-theme="light"] select,
+[data-theme="light"] select option,
+[data-theme="light"] select optgroup {
+  color: #10233f;
+  background-color: #ffffff;
+}
+
+.light select option:checked,
+[data-theme="light"] select option:checked {
+  color: #ffffff;
+  background-color: #1e3a5f;
+}
+

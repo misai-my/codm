@@ -561,6 +561,38 @@ function hasFinalData(row) {
   String(row.status || "").toLowerCase() === "final";
 }
 
+
+function formatMultilineText(value) {
+ const text = String(value ?? "");
+ return portal.esc(text).replace(/\r\n|\r|\n/g, "<br>");
+}
+
+function formatLinkedMultilineText(value) {
+ const text = String(value ?? "");
+ const urlPattern = /((?:https?:\/\/|www\.)[^\s<>"']+)/gi;
+ let output = "";
+ let lastIndex = 0;
+
+ text.replace(urlPattern, (match, _unused, offset) => {
+  output += portal.esc(text.slice(lastIndex, offset));
+
+  let urlText = match;
+  let trailing = "";
+  while (/[.,!?;:]$/.test(urlText)) {
+   trailing = urlText.slice(-1) + trailing;
+   urlText = urlText.slice(0, -1);
+  }
+
+  const href = /^https?:\/\//i.test(urlText) ? urlText : `https://${urlText}`;
+  output += `<a href="${portal.esc(href)}" target="_blank" rel="noopener noreferrer">${portal.esc(urlText)}</a>${portal.esc(trailing)}`;
+  lastIndex = offset + match.length;
+  return match;
+ });
+
+ output += portal.esc(text.slice(lastIndex));
+ return output.replace(/\r\n|\r|\n/g, "<br>");
+}
+
 function renderAnnouncements(result) {
  const wrap = portal.qs("#announcementList");
 
@@ -584,7 +616,7 @@ function renderAnnouncements(result) {
     </div>
     <span class="pill">${item.published_at ? new Date(item.published_at).toLocaleString() : "Posted"}</span>
    </div>
-   <p>${portal.esc(item.body)}</p>
+   <p class="rich-text">${formatMultilineText(item.body)}</p>
   </article>
  `).join("");
 }
@@ -1190,7 +1222,7 @@ function renderFaqList() {
     <span>${portal.esc(row.question)}</span>
     <span class="pill">${portal.esc(row.category || "General")}</span>
    </summary>
-   <p>${portal.esc(row.answer)}</p>
+   <p class="rich-text">${formatLinkedMultilineText(row.answer)}</p>
   </details>
  `).join("");
 }
@@ -1210,8 +1242,8 @@ function renderPublicInquiries() {
     <span>${portal.esc(row.subject)}</span>
     <span class="pill">${portal.esc(row.category || "Support")}</span>
    </summary>
-   <p><strong>Question:</strong> ${portal.esc(row.message)}</p>
-   <p><strong>Answer:</strong> ${portal.esc(row.published_answer || row.admin_note || "Answered by admin.")}</p>
+   <p class="rich-text"><strong>Question:</strong><br>${formatLinkedMultilineText(row.message)}</p>
+   <p class="rich-text"><strong>Answer:</strong><br>${formatLinkedMultilineText(row.published_answer || row.admin_note || "Answered by admin.")}</p>
   </details>
  `).join("");
 }

@@ -4031,3 +4031,16 @@ select option:disabled {
   justify-content: flex-start;
  }
 }
+
+.rich-text {
+ white-space: normal;
+ line-height: 1.65;
+}
+
+.rich-text a {
+ color: var(--accent, #d4af37);
+ font-weight: 800;
+ text-decoration: underline;
+ text-underline-offset: 3px;
+ word-break: break-word;
+}

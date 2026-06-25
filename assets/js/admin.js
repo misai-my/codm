@@ -731,6 +731,11 @@ function fillAnnouncementForm(row) {
  });
 }
 
+
+function adminFormatMultilineText(value) {
+ return portal.esc(String(value ?? "")).replace(/\r\n|\r|\n/g, "<br>");
+}
+
 function renderAnnouncementsTable(rows) {
  const table = portal.qs("#announcementsTable");
  if (!table) return;
@@ -740,7 +745,7 @@ function renderAnnouncementsTable(rows) {
    <td>${portal.esc(row.priority || "Info")}</td>
    <td>
     <strong>${portal.esc(row.title)}</strong>
-    <div>${portal.esc(row.body || "")}</div>
+    <div class="rich-text">${adminFormatMultilineText(row.body || "")}</div>
     ${row.published_at ? `<small>${new Date(row.published_at).toLocaleString()}</small>` : ""}
    </td>
    <td>${row.is_published ? "Published" : "Draft"}</td>
@@ -937,7 +942,7 @@ function renderFaqAdminTable() {
  table.innerHTML = faqAdminRows.map(row => `
   <tr>
    <td>${portal.esc(row.category || "General")}</td>
-   <td><strong>${portal.esc(row.question)}</strong><div>${portal.esc(row.answer || "")}</div></td>
+   <td><strong>${portal.esc(row.question)}</strong><div class="rich-text">${adminFormatMultilineText(row.answer || "")}</div></td>
    <td>${row.is_published ? "Published" : "Unpublished"}</td>
    <td>
     <div class="table-actions">

@@ -1094,13 +1094,38 @@ function renderRulebook() {
 }
 
 
+function faqCandidateSlugs() {
+ const selected = tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+ return [...new Set([
+  selected,
+  cfg.DEFAULT_TOURNAMENT_SLUG,
+  "community-gladiators-2026-season-2",
+  "main-event",
+  "codm-v1"
+ ].filter(Boolean))];
+}
+
+function sortFaqRowsBySlugPriority(rows, slugs) {
+ return [...(rows || [])].sort((a, b) => {
+  const aSlug = slugs.indexOf(a.tournament_slug);
+  const bSlug = slugs.indexOf(b.tournament_slug);
+  const aPriority = aSlug === -1 ? 999 : aSlug;
+  const bPriority = bSlug === -1 ? 999 : bSlug;
+  if (aPriority !== bPriority) return aPriority - bPriority;
+  const orderA = Number(a.priority_order ?? 100);
+  const orderB = Number(b.priority_order ?? 100);
+  if (orderA !== orderB) return orderA - orderB;
+  return String(b.created_at || "").localeCompare(String(a.created_at || ""));
+ });
+}
+
 async function loadFaqItems() {
- const slug = tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+ const slugs = faqCandidateSlugs();
 
  const { data, error } = await sb
   .from("faq_items")
   .select("*")
-  .eq("tournament_slug", slug)
+  .in("tournament_slug", slugs)
   .eq("is_published", true)
   .order("priority_order", { ascending: true })
   .order("created_at", { ascending: false });
@@ -1110,16 +1135,16 @@ async function loadFaqItems() {
   throw error;
  }
 
- return { rows: data || [], missingTable: false };
+ return { rows: sortFaqRowsBySlugPriority(data || [], slugs), missingTable: false };
 }
 
 async function loadPublicInquiries() {
- const slug = tournament?.slug || portal.getSelectedTournamentSlug(cfg.DEFAULT_TOURNAMENT_SLUG);
+ const slugs = faqCandidateSlugs();
 
  const { data, error } = await sb
   .from("support_inquiries")
   .select("*")
-  .eq("tournament_slug", slug)
+  .in("tournament_slug", slugs)
   .eq("is_published", true)
   .order("created_at", { ascending: false })
   .limit(20);
@@ -1129,7 +1154,7 @@ async function loadPublicInquiries() {
   throw error;
  }
 
- return { rows: data || [], missingTable: false };
+ return { rows: sortFaqRowsBySlugPriority(data || [], slugs), missingTable: false };
 }
 
 function populateFaqFilters() {

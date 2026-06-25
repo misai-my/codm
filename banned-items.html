@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8"/>
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+ <title>Banned Items · CODM Tournament OS</title>
+ <link rel="stylesheet" href="assets/css/style.css?v=banned-items-v1"/>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/favicon-192x192.png?v=favicon-yellow-v1">
+  <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=favicon-yellow-v1">
+  <link rel="manifest" href="assets/favicons/site.webmanifest?v=favicon-yellow-v1">
+  <meta name="theme-color" content="#05070d">
+ </head>
+<body>
+<header class="nav">
+ <div class="container nav-inner">
+  <a class="brand codm-premium-brand" href="index.html" data-tournament-link="index.html">
+   <span class="brand-mark logo-image" style="width:44px;height:44px;min-width:44px;max-width:44px;min-height:44px;max-height:44px;flex:0 0 44px;overflow:hidden;display:grid;place-items:center;padding:6px;border-radius:14px;box-sizing:border-box;">
+    <img src="assets/img/codm-logo.png" width="32" height="32" alt="CODM Tournament OS logo" style="width:32px;height:32px;max-width:32px;max-height:32px;object-fit:contain;display:block;position:static;"/>
+   </span>
+   <span class="brand-title">CODM TOURNAMENT OS<small>ELITE COMPETITION PLATFORM</small></span>
+  </a>
+  <nav class="nav-links">
+   <a class="nav-link" href="dashboard.html#announcements" data-tournament-link="dashboard.html#announcements">Announcements</a>
+   <a class="nav-link" href="dashboard.html#schedule" data-tournament-link="dashboard.html#schedule">Schedule</a>
+   <a class="nav-link" href="dashboard.html#results" data-tournament-link="dashboard.html#results">Results</a>
+   <a class="nav-link" href="rulebook.html" data-tournament-link="rulebook.html">Rulebook</a>
+   <a class="nav-link active" href="banned-items.html" data-tournament-link="banned-items.html">Banned Items</a>
+  </nav>
+  <div class="language-switcher">
+   <label for="languageSelect">Language</label>
+   <select id="languageSelect" data-language-select aria-label="Language">
+    <option value="en">EN</option>
+    <option value="ms">MS</option>
+    <option value="fil">FIL</option>
+    <option value="zh">ZH</option>
+   </select>
+  </div>
+ </div>
+</header>
+
+<main>
+ <section class="hero banned-hero">
+  <div class="container hero-grid">
+   <div>
+    <div class="eyebrow">Competitive Rules</div>
+    <h1 class="h1"><span class="gradient-text">Banned Item List</span><br/>BR and Multiplayer restrictions.</h1>
+    <p class="lead">Search and filter the restricted items by mode and category before match day.</p>
+    <div class="hero-actions">
+     <a class="btn btn-primary" href="#bannedItemsRoot">View List</a>
+     <a class="btn" href="rulebook.html" data-tournament-link="rulebook.html">Open Rulebook</a>
+    </div>
+   </div>
+
+   <div class="hero-card banned-summary-card">
+    <div class="stat-card"><strong>BR</strong><span>Classes, vehicles, and items</span></div>
+    <div class="stat-card"><strong>MP</strong><span>Weapons, attachments, utilities, and perks</span></div>
+    <div class="stat-card"><strong>OS</strong><span>Allowed Operator Skills listed separately</span></div>
+   </div>
+  </div>
+ </section>
+
+ <section class="section banned-list-section">
+  <div class="container">
+   <div class="card banned-filter-card">
+    <div class="section-head">
+     <div>
+      <div class="eyebrow">Search &amp; Categories</div>
+      <h2>Find Restricted Items</h2>
+      <p>Use search for exact item names, or filter by mode and category.</p>
+     </div>
+     <span class="pill pill-gold" id="bannedResultCount">Loading...</span>
+    </div>
+
+    <div class="filter-panel banned-filter-panel">
+     <div class="field filter-search">
+      <label for="bannedSearch">Search</label>
+      <input id="bannedSearch" type="search" placeholder="Search item, weapon, attachment, perk..." autocomplete="off"/>
+     </div>
+     <div class="field">
+      <label for="bannedModeFilter">Mode</label>
+      <select id="bannedModeFilter"><option value="">All Modes</option></select>
+     </div>
+     <div class="field">
+      <label for="bannedCategoryFilter">Category</label>
+      <select id="bannedCategoryFilter"><option value="">All Categories</option></select>
+     </div>
+     <button class="btn btn-small filter-reset" id="bannedFilterReset" type="button">Reset</button>
+    </div>
+   </div>
+
+   <div id="bannedItemsRoot" class="banned-items-root"></div>
+  </div>
+ </section>
+</main>
+
+<footer class="footer">
+ <div class="container">CODM Tournament OS · Banned Item List</div>
+</footer>
+
+<div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
+<script src="assets/js/app.js?v=mt-public-visibility-v4"></script>
+<script src="assets/js/i18n.js?v=i18n-v2"></script>
+<script src="assets/js/banned-items.js?v=banned-items-v1"></script>
+</body>
+</html>

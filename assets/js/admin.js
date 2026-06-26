@@ -12,6 +12,7 @@ let adminTournaments = [];
 let adminTimelineRows = [];
 let tournamentSettingsWired = false;
 let timelineFormWired = false;
+let tournamentDirectoryWired = false;
 
 
 function adminTournamentSlug() {
@@ -54,6 +55,7 @@ async function switchAdminTournament(slug) {
 
  renderAdminTournamentSelector();
  renderTournamentSettings();
+ renderTournamentDirectory();
  renderTimelineTable();
  renderAdminMatchPreviews();
  await loadAdminData();
@@ -137,6 +139,202 @@ function dateTimeLabelGmt8(value) {
  return parts.time ? `${parts.date} ${parts.time} GMT+8` : `${parts.date} GMT+8`;
 }
 
+
+function tournamentBool(row, key, fallback = true) {
+ return row?.[key] === undefined || row?.[key] === null ? fallback : row[key] !== false;
+}
+
+function slugifyTournament(value) {
+ return portal.text(value)
+  .toLowerCase()
+  .replace(/&/g, " and ")
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-+|-+$/g, "")
+  .slice(0, 120);
+}
+
+function showTournamentDirectoryStatus(message, kind = "info") {
+ const status = portal.qs("#tournamentDirectoryStatus");
+ if (!status) return;
+ status.className = `notice section-tight ${kind === "success" ? "notice-success" : kind === "warning" ? "notice-warning" : ""}`;
+ status.textContent = message;
+ status.classList.remove("hidden");
+}
+
+function renderTournamentDirectory() {
+ const tbody = portal.qs("#tournamentDirectoryTable");
+ if (!tbody) return;
+
+ const rows = [...(adminTournaments || [])].sort((a, b) => {
+  const titleA = String(a.title || a.slug || "");
+  const titleB = String(b.title || b.slug || "");
+  return titleA.localeCompare(titleB);
+ });
+
+ tbody.innerHTML = rows.map(row => {
+  const slug = row.slug || "";
+  const active = tournamentBool(row, "event_hub_enabled", true);
+  const isPublic = row.show_in_public_selector !== false;
+  const registrationOpen = row.registration_open !== false;
+  const isSelected = slug === adminTournamentSlug();
+  return `
+   <tr data-tournament-row="${portal.esc(slug)}">
+    <td>
+     <strong>${portal.esc(row.title || slug)}</strong>
+     <div>${portal.esc(slug)}${isSelected ? " · Managing now" : ""}</div>
+    </td>
+    <td>
+     <select data-tournament-active="${portal.esc(slug)}" aria-label="Active state for ${portal.esc(row.title || slug)}">
+      <option value="true" ${active ? "selected" : ""}>Active</option>
+      <option value="false" ${!active ? "selected" : ""}>Inactive</option>
+     </select>
+    </td>
+    <td>
+     <select data-tournament-public="${portal.esc(slug)}" aria-label="Public selector state for ${portal.esc(row.title || slug)}">
+      <option value="true" ${isPublic ? "selected" : ""}>Show</option>
+      <option value="false" ${!isPublic ? "selected" : ""}>Hide</option>
+     </select>
+    </td>
+    <td>
+     <select data-tournament-registration="${portal.esc(slug)}" aria-label="Registration state for ${portal.esc(row.title || slug)}">
+      <option value="true" ${registrationOpen ? "selected" : ""}>Open</option>
+      <option value="false" ${!registrationOpen ? "selected" : ""}>Closed</option>
+     </select>
+    </td>
+    <td>
+     <div class="actions" style="gap:6px;flex-wrap:wrap;">
+      <button class="btn btn-small btn-primary" type="button" data-tournament-save="${portal.esc(slug)}">Save</button>
+      <button class="btn btn-small" type="button" data-tournament-manage="${portal.esc(slug)}">Manage</button>
+     </div>
+    </td>
+   </tr>
+  `;
+ }).join("") || `<tr><td colspan="5">No tournaments found.</td></tr>`;
+}
+
+async function refreshTournamentDirectory(selectedSlug = adminTournamentSlug()) {
+ adminTournaments = await portal.listTournaments({ publicOnly: false });
+ activeTournament = adminTournaments.find(row => row.slug === selectedSlug) || activeTournament;
+ renderAdminTournamentSelector();
+ renderTournamentDirectory();
+}
+
+async function createTournament(event) {
+ event.preventDefault();
+ const title = portal.text(portal.qs("#newTournamentTitle")?.value);
+ const slug = slugifyTournament(portal.qs("#newTournamentSlug")?.value || title);
+
+ if (!title || !slug) {
+  showTournamentDirectoryStatus("Tournament title and slug are required.", "warning");
+  return;
+ }
+
+ const existing = adminTournaments.some(row => String(row.slug || "").toLowerCase() === slug.toLowerCase());
+ if (existing) {
+  showTournamentDirectoryStatus("A tournament with this slug already exists.", "warning");
+  return;
+ }
+
+ const payload = {
+  title,
+  slug,
+  event_hub_enabled: portal.qs("#newTournamentActive")?.value === "true",
+  show_in_public_selector: portal.qs("#newTournamentPublic")?.value === "true",
+  registration_open: portal.qs("#newTournamentRegistrationOpen")?.value === "true",
+  registration_form_url: portal.text(portal.qs("#newTournamentRegistrationUrl")?.value),
+  rulebook_doc_url: portal.text(portal.qs("#newTournamentRulebookUrl")?.value)
+ };
+
+ const { data, error } = await sb
+  .from("tournaments")
+  .insert(payload)
+  .select("*")
+  .maybeSingle();
+
+ if (error) throw error;
+
+ portal.qs("#tournamentCreateForm")?.reset();
+ await refreshTournamentDirectory(data?.slug || slug);
+ showTournamentDirectoryStatus("Tournament added. It is now available in the admin selector.", "success");
+ portal.toast("Tournament added.");
+}
+
+async function saveTournamentDirectoryRow(slug) {
+ const activeValue = portal.qs(`[data-tournament-active="${CSS.escape(slug)}"]`)?.value === "true";
+ const publicValue = portal.qs(`[data-tournament-public="${CSS.escape(slug)}"]`)?.value === "true";
+ const registrationValue = portal.qs(`[data-tournament-registration="${CSS.escape(slug)}"]`)?.value === "true";
+
+ const payload = {
+  event_hub_enabled: activeValue,
+  show_in_public_selector: publicValue,
+  registration_open: registrationValue
+ };
+
+ const { data, error } = await sb
+  .from("tournaments")
+  .update(payload)
+  .eq("slug", slug)
+  .select("*")
+  .maybeSingle();
+
+ if (error) throw error;
+
+ if (activeTournament?.slug === slug) activeTournament = data || { ...activeTournament, ...payload };
+ await refreshTournamentDirectory(adminTournamentSlug());
+ renderTournamentSettings();
+ showTournamentDirectoryStatus("Tournament visibility settings saved.", "success");
+ portal.toast("Tournament visibility saved.");
+}
+
+function wireTournamentDirectory() {
+ if (tournamentDirectoryWired) return;
+ tournamentDirectoryWired = true;
+
+ const titleInput = portal.qs("#newTournamentTitle");
+ const slugInput = portal.qs("#newTournamentSlug");
+ if (titleInput && slugInput) {
+  titleInput.addEventListener("input", () => {
+   if (slugInput.dataset.manual === "true") return;
+   slugInput.value = slugifyTournament(titleInput.value);
+  });
+  slugInput.addEventListener("input", () => {
+   slugInput.dataset.manual = "true";
+   slugInput.value = slugifyTournament(slugInput.value);
+  });
+ }
+
+ portal.qs("#tournamentCreateForm")?.addEventListener("submit", async event => {
+  try {
+   await createTournament(event);
+  } catch (err) {
+   console.error(err);
+   showTournamentDirectoryStatus(err.message || "Could not add tournament.", "warning");
+   portal.toast(err.message || "Could not add tournament.");
+  }
+ });
+
+ portal.qs("#tournamentDirectoryTable")?.addEventListener("click", async event => {
+  const saveBtn = event.target.closest("[data-tournament-save]");
+  const manageBtn = event.target.closest("[data-tournament-manage]");
+
+  try {
+   if (saveBtn) {
+    await saveTournamentDirectoryRow(saveBtn.dataset.tournamentSave);
+    return;
+   }
+   if (manageBtn) {
+    await switchAdminTournament(manageBtn.dataset.tournamentManage);
+    location.hash = "#tournamentSetupAdmin";
+    portal.toast("Tournament selected for management.");
+   }
+  } catch (err) {
+   console.error(err);
+   showTournamentDirectoryStatus(err.message || "Could not update tournament.", "warning");
+   portal.toast(err.message || "Could not update tournament.");
+  }
+ });
+}
+
 function renderTournamentSettings() {
  const openSelect = portal.qs("#adminRegistrationOpen");
  const formUrl = portal.qs("#adminRegistrationUrl");
@@ -180,6 +378,7 @@ async function saveTournamentRegistrationSettings(event) {
 
  renderAdminTournamentSelector();
  renderTournamentSettings();
+ renderTournamentDirectory();
  portal.updateTournamentLinks(document, adminTournamentSlug());
  portal.toast(payload.registration_open ? "Registration opened." : "Registration closed.");
 }
@@ -885,7 +1084,9 @@ async function bootAdminConsole() {
  adminTournaments = await portal.listTournaments({ publicOnly: false });
  await loadTournament();
  renderAdminTournamentSelector();
+ renderTournamentDirectory();
  wireAdminTournamentSelector();
+ wireTournamentDirectory();
  await loadAdminData();
  await loadFaqAndSupportAdmin();
  wireTournamentRegistrationForm();

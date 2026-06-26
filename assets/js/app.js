@@ -62,7 +62,7 @@ async function listTournaments(options = {}) {
  }
 
  return [...(data || [])]
-  .filter(row => row.event_hub_enabled !== false)
+  .filter(row => !publicOnly || row.event_hub_enabled !== false)
   .filter(row => !publicOnly || row.show_in_public_selector !== false)
   .sort((a, b) => {
    const titleA = String(a.title || a.slug || "");

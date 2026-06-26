@@ -94,6 +94,7 @@
 
     <div class="admin-tabs">
      <a class="admin-tab" href="#tournamentSetupAdmin" title="Tournament Setup">Tournament Setup</a>
+     <a class="admin-tab" href="#tournamentDirectoryAdmin" title="Tournament Directory">Tournament Directory</a>
      <a class="admin-tab" href="#announcementsAdmin" title="Announcements">Announcements</a>
      <a class="admin-tab" href="#sheetSyncAdmin" title="Sheet Sync">Sheet Sync</a>
      <a class="admin-tab" href="#matchPreviewAdmin" title="Match Preview">Match Preview</a>
@@ -104,6 +105,7 @@
     <section class="admin-grid">
      <aside class="admin-side-menu card">
       <a href="#tournamentSetupAdmin">Tournament Setup</a>
+      <a href="#tournamentDirectoryAdmin">Tournament Directory</a>
       <a href="#announcementsAdmin">Announcements</a>
       <a href="#sheetSyncAdmin">Sheet Sync</a>
       <a href="#schedulePreview">Schedule Preview</a>
@@ -234,6 +236,81 @@
         </table>
        </div>
       </section>
+
+
+      <section class="card" id="tournamentDirectoryAdmin">
+       <div class="section-head">
+        <div>
+         <div class="eyebrow">Event Visibility</div>
+         <h2>Tournament Directory</h2>
+         <p>Create new tournaments and control which tournaments are active on the site and visible in the public selector.</p>
+        </div>
+       </div>
+
+       <div class="notice">
+        <strong>Active</strong> means the tournament can be used by the public event hub. <strong>Public Selector</strong> means it appears in the dashboard/rulebook tournament dropdown.
+       </div>
+
+       <form id="tournamentCreateForm" class="form section-tight">
+        <h3>Add New Tournament</h3>
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="newTournamentTitle">Tournament Title</label>
+          <input id="newTournamentTitle" maxlength="160" placeholder="Community Gladiators 2026 Season 3" required/>
+         </div>
+         <div class="field">
+          <label for="newTournamentSlug">Tournament Slug</label>
+          <input id="newTournamentSlug" maxlength="120" placeholder="community-gladiators-2026-season-3" required/>
+         </div>
+        </div>
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="newTournamentActive">Active on Site</label>
+          <select id="newTournamentActive">
+           <option value="true">Active</option>
+           <option value="false">Inactive / Hidden</option>
+          </select>
+         </div>
+         <div class="field">
+          <label for="newTournamentPublic">Public Selector</label>
+          <select id="newTournamentPublic">
+           <option value="true">Show in Public Selector</option>
+           <option value="false">Hide from Public Selector</option>
+          </select>
+         </div>
+        </div>
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="newTournamentRegistrationOpen">Registration</label>
+          <select id="newTournamentRegistrationOpen">
+           <option value="false">Closed</option>
+           <option value="true">Open</option>
+          </select>
+         </div>
+        </div>
+        <div class="field">
+         <label for="newTournamentRegistrationUrl">Registration Form URL</label>
+         <input id="newTournamentRegistrationUrl" type="url" placeholder="https://docs.google.com/forms/..."/>
+        </div>
+        <div class="field">
+         <label for="newTournamentRulebookUrl">Rulebook URL</label>
+         <input id="newTournamentRulebookUrl" type="url" placeholder="https://docs.google.com/document/..."/>
+        </div>
+        <div class="actions">
+         <button class="btn btn-primary" type="submit">Add Tournament</button>
+        </div>
+        <div id="tournamentDirectoryStatus" class="notice section-tight hidden"></div>
+       </form>
+
+       <h3 class="section-tight">Existing Tournaments</h3>
+       <div class="admin-table-wrap section-tight">
+        <table>
+         <thead><tr><th>Tournament</th><th>Active</th><th>Public Selector</th><th>Registration</th><th>Actions</th></tr></thead>
+         <tbody id="tournamentDirectoryTable"></tbody>
+        </table>
+       </div>
+      </section>
+
 
 <section class="card" id="announcementsAdmin">
        <div class="section-head">
@@ -490,8 +567,8 @@
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
-<script src="assets/js/app.js?v=mt-public-visibility-v4"></script>
+<script src="assets/js/app.js?v=tournament-directory-v1"></script>
  <script src="assets/js/i18n.js?v=i18n-v2"></script>
-<script src="assets/js/admin.js?v=announcement-edit-v12"></script>
+<script src="assets/js/admin.js?v=tournament-directory-v1"></script>
 </body>
 </html>

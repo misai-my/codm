@@ -577,7 +577,9 @@ function storedDateTimeParts(value) {
  const raw = String(value).trim();
  if (!raw) return null;
 
- // Sheet exports are treated as GMT+8 match times. Do not shift them based on the viewer browser timezone.
+ // Sheet exports are treated as GMT+8 display times. Do not shift them based on
+ // the viewer browser timezone. This accepts both Supabase ISO-looking output
+ // and Google Sheets text such as 6/25/2026 6:00 PM.
  const cleaned = raw
   .replace("T", " ")
   .replace(/\.\d+/, "")
@@ -585,18 +587,29 @@ function storedDateTimeParts(value) {
   .replace(/[+-]\d{2}:?\d{2}$/, "")
   .trim();
 
- const match = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+ let match = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?/i);
+ if (match) {
+  let hour = match[4] !== undefined ? Number(match[4]) : null;
+  const meridiem = match[7] ? String(match[7]).toUpperCase() : "";
+  if (hour !== null && meridiem === "PM" && hour < 12) hour += 12;
+  if (hour !== null && meridiem === "AM" && hour === 12) hour = 0;
+  return {
+   date: `${match[1]}-${String(match[2]).padStart(2, "0")}-${String(match[3]).padStart(2, "0")}`,
+   time: hour !== null && match[5] !== undefined ? `${String(hour).padStart(2, "0")}:${String(match[5]).padStart(2, "0")}` : ""
+  };
+ }
+
+ match = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?/i);
  if (!match) return null;
 
- const year = match[1];
- const month = String(match[2]).padStart(2, "0");
- const day = String(match[3]).padStart(2, "0");
- const hour = match[4] !== undefined ? String(match[4]).padStart(2, "0") : "";
- const minute = match[5] !== undefined ? String(match[5]).padStart(2, "0") : "";
+ let hour = match[4] !== undefined ? Number(match[4]) : null;
+ const meridiem = match[7] ? String(match[7]).toUpperCase() : "";
+ if (hour !== null && meridiem === "PM" && hour < 12) hour += 12;
+ if (hour !== null && meridiem === "AM" && hour === 12) hour = 0;
 
  return {
-  date: `${year}-${month}-${day}`,
-  time: hour && minute ? `${hour}:${minute}` : ""
+  date: `${match[3]}-${String(match[1]).padStart(2, "0")}-${String(match[2]).padStart(2, "0")}`,
+  time: hour !== null && match[5] !== undefined ? `${String(hour).padStart(2, "0")}:${String(match[5]).padStart(2, "0")}` : ""
  };
 }
 

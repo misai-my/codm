@@ -77,26 +77,64 @@ function wireAdminTournamentSelector() {
 }
 
 
-function toDateTimeLocal(value) {
- if (!value) return "";
- const date = new Date(value);
- if (Number.isNaN(date.getTime())) return "";
+function storedDateTimeParts(value) {
+ if (!value) return null;
+ const raw = String(value).trim();
+ if (!raw) return null;
 
- const pad = number => String(number).padStart(2, "0");
- return [
-  date.getFullYear(),
-  pad(date.getMonth() + 1),
-  pad(date.getDate())
- ].join("-") + "T" + [
-  pad(date.getHours()),
-  pad(date.getMinutes())
- ].join(":");
+ // Admin-entered dates and synced sheet dates are treated as GMT+8 display times.
+ // Do not parse with new Date()/toISOString() because that shifts the time based on
+ // Apps Script, Supabase, or browser timezone.
+ const cleaned = raw
+  .replace("T", " ")
+  .replace(/\.\d+/, "")
+  .replace(/Z$/i, "")
+  .replace(/[+-]\d{2}:?\d{2}$/, "")
+  .trim();
+
+ let match = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?/i);
+ if (match) {
+  let hour = match[4] !== undefined ? Number(match[4]) : null;
+  const meridiem = match[7] ? String(match[7]).toUpperCase() : "";
+  if (hour !== null && meridiem === "PM" && hour < 12) hour += 12;
+  if (hour !== null && meridiem === "AM" && hour === 12) hour = 0;
+  return {
+   date: `${match[1]}-${String(match[2]).padStart(2, "0")}-${String(match[3]).padStart(2, "0")}`,
+   time: hour !== null && match[5] !== undefined ? `${String(hour).padStart(2, "0")}:${String(match[5]).padStart(2, "0")}` : ""
+  };
+ }
+
+ match = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?/i);
+ if (!match) return null;
+
+ let hour = match[4] !== undefined ? Number(match[4]) : null;
+ const meridiem = match[7] ? String(match[7]).toUpperCase() : "";
+ if (hour !== null && meridiem === "PM" && hour < 12) hour += 12;
+ if (hour !== null && meridiem === "AM" && hour === 12) hour = 0;
+
+ return {
+  date: `${match[3]}-${String(match[1]).padStart(2, "0")}-${String(match[2]).padStart(2, "0")}`,
+  time: hour !== null && match[5] !== undefined ? `${String(hour).padStart(2, "0")}:${String(match[5]).padStart(2, "0")}` : ""
+ };
 }
 
-function toIsoOrNull(value) {
+function toDateTimeLocal(value) {
+ const parts = storedDateTimeParts(value);
+ if (!parts?.date) return "";
+ return `${parts.date}T${parts.time || "00:00"}`;
+}
+
+function toGmt8StorageDateTime(value) {
  if (!value) return null;
- const date = new Date(value);
- return Number.isNaN(date.getTime()) ? null : date.toISOString();
+ const parts = storedDateTimeParts(value);
+ if (!parts?.date) return portal.text(value) || null;
+ return `${parts.date} ${parts.time || "00:00"}:00`;
+}
+
+function dateTimeLabelGmt8(value) {
+ const parts = storedDateTimeParts(value);
+ if (!parts?.date) return value ? String(value) : "TBA";
+ return parts.time ? `${parts.date} ${parts.time} GMT+8` : `${parts.date} GMT+8`;
 }
 
 function renderTournamentSettings() {
@@ -204,8 +242,8 @@ function timelinePayloadFromForm() {
   event_type: portal.text(portal.qs("#timelineType")?.value) || "General",
   event_status: portal.text(portal.qs("#timelineStatus")?.value) || "Upcoming",
   display_date_text: portal.text(portal.qs("#timelineDisplayDate")?.value),
-  start_at: toIsoOrNull(portal.qs("#timelineStartAt")?.value),
-  end_at: toIsoOrNull(portal.qs("#timelineEndAt")?.value),
+  start_at: toGmt8StorageDateTime(portal.qs("#timelineStartAt")?.value),
+  end_at: toGmt8StorageDateTime(portal.qs("#timelineEndAt")?.value),
   location: portal.text(portal.qs("#timelineLocation")?.value),
   sort_order: Number(portal.qs("#timelineSortOrder")?.value || 100),
   description: portal.text(portal.qs("#timelineDescription")?.value),
@@ -267,9 +305,9 @@ function editTimelineItem(row) {
 function timelineDateLabel(row) {
  if (row.display_date_text) return row.display_date_text;
  if (row.start_at && row.end_at) {
-  return `${new Date(row.start_at).toLocaleString()} – ${new Date(row.end_at).toLocaleString()}`;
+  return `${dateTimeLabelGmt8(row.start_at)} – ${dateTimeLabelGmt8(row.end_at)}`;
  }
- if (row.start_at) return new Date(row.start_at).toLocaleString();
+ if (row.start_at) return dateTimeLabelGmt8(row.start_at);
  return "TBA";
 }
 
@@ -814,7 +852,7 @@ function renderScheduleTable(rows) {
   <tr>
    <td>${portal.esc(modeLabel(row.mode))}</td>
    <td><strong>${portal.esc(row.match_title || row.stage || "Match")}</strong><div>${portal.esc(row.map_name || "")}</div></td>
-   <td>${row.scheduled_at ? new Date(row.scheduled_at).toLocaleString() : "TBD"}</td>
+   <td>${row.scheduled_at ? dateTimeLabelGmt8(row.scheduled_at) : "TBD"}</td>
    <td>${portal.esc(row.status || "Scheduled")}</td>
   </tr>
  `).join("") || `<tr><td colspan="4">No synced schedule rows.</td></tr>`;

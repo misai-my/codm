@@ -4512,6 +4512,7 @@ select option:disabled {
 .dashboard-collapsible-body .results-list,
 .dashboard-collapsible-body .participating-teams-grid,
 .dashboard-collapsible-body .tournament-timeline-list,
+.dashboard-collapsible-body .prize-pool-display,
 .dashboard-collapsible-body .result-summary-card {
  box-sizing: border-box;
  max-width: 100%;
@@ -4526,6 +4527,7 @@ select option:disabled {
 .dashboard-collapsible-body .match-results-table-wrap,
 .dashboard-collapsible-body .br-results-table-wrap,
 .dashboard-collapsible-body .result-summary-table-wrap,
+.dashboard-collapsible-body .prize-breakdown-table-wrap,
 .dashboard-collapsible-body .table-wrap,
 .dashboard-collapsible-body .admin-table-wrap {
  max-width: 100%;
@@ -4550,5 +4552,103 @@ select option:disabled {
 @media (max-width: 560px) {
  .dashboard-collapsible-body {
   padding-right: 8px;
+ }
+}
+
+
+/* ============================================================
+  PRIZE POOL DISPLAY
+  ============================================================ */
+.prize-pool-display {
+ display: grid;
+ gap: 14px;
+}
+
+.prize-pool-hero-card {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 18px;
+ padding: 18px;
+ border: 1px solid rgba(255, 255, 255, .12);
+ border-radius: 20px;
+ background: linear-gradient(135deg, rgba(255, 199, 44, .14), rgba(255, 255, 255, .04));
+}
+
+.prize-pool-hero-card h3 {
+ margin: 4px 0 0;
+ font-size: clamp(20px, 3vw, 32px);
+}
+
+.prize-pool-hero-card p {
+ margin: 8px 0 0;
+ color: var(--muted);
+}
+
+.prize-pool-total {
+ min-width: 180px;
+ padding: 14px 16px;
+ border-radius: 18px;
+ background: rgba(0, 0, 0, .26);
+ border: 1px solid rgba(255, 255, 255, .12);
+ text-align: right;
+}
+
+.prize-pool-total span {
+ display: block;
+ color: var(--muted2);
+ font-size: 11px;
+ text-transform: uppercase;
+ letter-spacing: .12em;
+}
+
+.prize-pool-total strong {
+ display: block;
+ margin-top: 4px;
+ font-size: clamp(22px, 4vw, 38px);
+ color: var(--gold);
+}
+
+.prize-breakdown-table-wrap {
+ overflow-x: auto;
+ border-radius: 18px;
+ border: 1px solid rgba(255, 255, 255, .10);
+}
+
+.prize-breakdown-table {
+ width: 100%;
+ border-collapse: collapse;
+ min-width: 420px;
+}
+
+.prize-breakdown-table th,
+.prize-breakdown-table td {
+ padding: 12px 14px;
+ border-bottom: 1px solid rgba(255, 255, 255, .08);
+ text-align: left;
+}
+
+.prize-breakdown-table th {
+ color: var(--muted2);
+ font-size: 11px;
+ letter-spacing: .12em;
+ text-transform: uppercase;
+ background: rgba(255, 255, 255, .04);
+}
+
+.prize-breakdown-table td:last-child {
+ text-align: right;
+ font-weight: 800;
+ color: var(--text);
+}
+
+@media (max-width: 720px) {
+ .prize-pool-hero-card {
+  align-items: stretch;
+  flex-direction: column;
+ }
+ .prize-pool-total {
+  width: 100%;
+  text-align: left;
  }
 }

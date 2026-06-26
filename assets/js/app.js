@@ -95,7 +95,13 @@ function tournamentFallback(slug = getSelectedTournamentSlug()) {
   title: fallback.title || cfg.SITE_NAME || "CODM Tournament OS",
   registration_form_url: fallback.registration_form_url || "",
   rulebook_url: fallback.rulebook_url || cfg.RULEBOOK_URL || "",
-  rulebook_doc_url: fallback.rulebook_url || cfg.RULEBOOK_URL || ""
+  rulebook_doc_url: fallback.rulebook_url || cfg.RULEBOOK_URL || "",
+  prize_pool_published: false,
+  prize_pool_title: "Tournament Prize Pool",
+  prize_pool_subtitle: "",
+  prize_pool_total: "",
+  prize_pool_breakdown: "",
+  prize_pool_note: ""
  };
 }
 

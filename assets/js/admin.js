@@ -13,6 +13,7 @@ let adminTimelineRows = [];
 let tournamentSettingsWired = false;
 let timelineFormWired = false;
 let tournamentDirectoryWired = false;
+let prizePoolFormWired = false;
 
 
 function adminTournamentSlug() {
@@ -56,6 +57,7 @@ async function switchAdminTournament(slug) {
  renderAdminTournamentSelector();
  renderTournamentSettings();
  renderTournamentDirectory();
+ renderPrizePoolSettings();
  renderTimelineTable();
  renderAdminMatchPreviews();
  await loadAdminData();
@@ -335,6 +337,86 @@ function wireTournamentDirectory() {
  });
 }
 
+
+function showPrizePoolStatus(message, kind = "info") {
+ const status = portal.qs("#prizePoolStatus");
+ if (!status) return;
+ status.className = `notice section-tight ${kind === "success" ? "notice-success" : kind === "warning" ? "notice-warning" : ""}`;
+ status.textContent = message;
+ status.classList.remove("hidden");
+}
+
+function renderPrizePoolSettings() {
+ const published = portal.qs("#prizePoolPublished");
+ const title = portal.qs("#prizePoolTitle");
+ const subtitle = portal.qs("#prizePoolSubtitle");
+ const total = portal.qs("#prizePoolTotal");
+ const breakdown = portal.qs("#prizePoolBreakdown");
+ const note = portal.qs("#prizePoolNote");
+ const status = portal.qs("#prizePoolStatus");
+
+ if (published) published.value = activeTournament?.prize_pool_published === false ? "false" : "true";
+ if (title) title.value = activeTournament?.prize_pool_title || "Tournament Prize Pool";
+ if (subtitle) subtitle.value = activeTournament?.prize_pool_subtitle || "";
+ if (total) total.value = activeTournament?.prize_pool_total || "";
+ if (breakdown) breakdown.value = activeTournament?.prize_pool_breakdown || "";
+ if (note) note.value = activeTournament?.prize_pool_note || "";
+
+ if (status) {
+  const hasPrize = Boolean(activeTournament?.prize_pool_total || activeTournament?.prize_pool_breakdown);
+  const isPublished = activeTournament?.prize_pool_published !== false;
+  status.className = `notice section-tight ${hasPrize && isPublished ? "notice-success" : "notice-warning"}`;
+  status.textContent = hasPrize
+   ? `Prize pool is currently ${isPublished ? "visible" : "hidden"} on the public dashboard.`
+   : "Prize pool details are not configured yet.";
+  status.classList.remove("hidden");
+ }
+}
+
+async function savePrizePoolSettings(event) {
+ event.preventDefault();
+
+ const payload = {
+  prize_pool_published: portal.qs("#prizePoolPublished")?.value === "true",
+  prize_pool_title: portal.text(portal.qs("#prizePoolTitle")?.value) || "Tournament Prize Pool",
+  prize_pool_subtitle: portal.text(portal.qs("#prizePoolSubtitle")?.value),
+  prize_pool_total: portal.text(portal.qs("#prizePoolTotal")?.value),
+  prize_pool_breakdown: portal.text(portal.qs("#prizePoolBreakdown")?.value),
+  prize_pool_note: portal.text(portal.qs("#prizePoolNote")?.value)
+ };
+
+ const { data, error } = await sb
+  .from("tournaments")
+  .update(payload)
+  .eq("slug", adminTournamentSlug())
+  .select("*")
+  .maybeSingle();
+
+ if (error) throw error;
+
+ activeTournament = data || { ...activeTournament, ...payload };
+ adminTournaments = adminTournaments.map(row => row.slug === activeTournament.slug ? activeTournament : row);
+ renderPrizePoolSettings();
+ renderAdminTournamentSelector();
+ showPrizePoolStatus("Prize pool settings saved.", "success");
+ portal.toast("Prize pool saved.");
+}
+
+function wirePrizePoolForm() {
+ if (prizePoolFormWired) return;
+ prizePoolFormWired = true;
+
+ portal.qs("#prizePoolForm")?.addEventListener("submit", async event => {
+  try {
+   await savePrizePoolSettings(event);
+  } catch (err) {
+   console.error(err);
+   showPrizePoolStatus(err.message || "Could not save prize pool settings.", "warning");
+   portal.toast(err.message || "Could not save prize pool settings.");
+  }
+ });
+}
+
 function renderTournamentSettings() {
  const openSelect = portal.qs("#adminRegistrationOpen");
  const formUrl = portal.qs("#adminRegistrationUrl");
@@ -379,6 +461,7 @@ async function saveTournamentRegistrationSettings(event) {
  renderAdminTournamentSelector();
  renderTournamentSettings();
  renderTournamentDirectory();
+ renderPrizePoolSettings();
  portal.updateTournamentLinks(document, adminTournamentSlug());
  portal.toast(payload.registration_open ? "Registration opened." : "Registration closed.");
 }
@@ -1085,12 +1168,14 @@ async function bootAdminConsole() {
  await loadTournament();
  renderAdminTournamentSelector();
  renderTournamentDirectory();
+ renderPrizePoolSettings();
  wireAdminTournamentSelector();
  wireTournamentDirectory();
  await loadAdminData();
  await loadFaqAndSupportAdmin();
  wireTournamentRegistrationForm();
  wireTimelineForm();
+ wirePrizePoolForm();
  wireAnnouncementForm();
 }
 

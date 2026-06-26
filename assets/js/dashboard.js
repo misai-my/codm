@@ -66,6 +66,67 @@ function syncDashboardTournamentUi() {
  }
 }
 
+
+function splitPrizeBreakdownLine(line) {
+ const raw = portal.text(line);
+ if (!raw) return null;
+ const match = raw.match(/^(.+?)\s*(?:\||—|–|-|:)\s*(.+)$/);
+ if (!match) return { label: raw, value: "" };
+ return { label: portal.text(match[1]), value: portal.text(match[2]) };
+}
+
+function renderPrizePool() {
+ const wrap = portal.qs("#prizePoolDisplay");
+ if (!wrap) return;
+
+ const published = tournament?.prize_pool_published !== false;
+ const total = portal.text(tournament?.prize_pool_total);
+ const breakdownText = String(tournament?.prize_pool_breakdown || "").trim();
+ const hasPrize = Boolean(total || breakdownText);
+
+ if (!published || !hasPrize) {
+  wrap.innerHTML = `<div class="notice notice-info">Prize pool details are not available yet.</div>`;
+  return;
+ }
+
+ const title = portal.text(tournament?.prize_pool_title) || "Tournament Prize Pool";
+ const subtitle = portal.text(tournament?.prize_pool_subtitle);
+ const note = portal.text(tournament?.prize_pool_note);
+ const rows = breakdownText
+  .split(/\r?\n/)
+  .map(splitPrizeBreakdownLine)
+  .filter(Boolean);
+
+ const table = rows.length ? `
+  <div class="prize-breakdown-table-wrap">
+   <table class="prize-breakdown-table">
+    <thead><tr><th>Placement / Award</th><th>Prize</th></tr></thead>
+    <tbody>
+     ${rows.map(row => `
+      <tr>
+       <td>${portal.esc(row.label)}</td>
+       <td>${row.value ? portal.esc(row.value) : "—"}</td>
+      </tr>
+     `).join("")}
+    </tbody>
+   </table>
+  </div>
+ ` : "";
+
+ wrap.innerHTML = `
+  <div class="prize-pool-hero-card">
+   <div>
+    <div class="eyebrow">Prize Pool</div>
+    <h3>${portal.esc(title)}</h3>
+    ${subtitle ? `<p>${portal.esc(subtitle)}</p>` : ""}
+   </div>
+   ${total ? `<div class="prize-pool-total"><span>Total</span><strong>${portal.esc(total)}</strong></div>` : ""}
+  </div>
+  ${table}
+  ${note ? `<div class="notice section-tight">${portal.esc(note).replace(/\r\n|\r|\n/g, "<br>")}</div>` : ""}
+ `;
+}
+
 async function selectDashboardTournament(slug) {
  const selected = dashboardTournaments.find(row => row.slug === slug);
  portal.setSelectedTournamentSlug(slug, true);
@@ -1825,6 +1886,7 @@ async function renderSupportSection() {
 async function renderDashboardData() {
  portal.qs("#portalMeta").textContent = `${tournament?.title || "CODM Tournament OS"} · Public event information hub`;
  syncDashboardTournamentUi();
+ renderPrizePool();
 
  renderRulebook();
 

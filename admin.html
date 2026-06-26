@@ -4,7 +4,7 @@
  <meta charset="utf-8"/>
  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
  <title>Admin · CODM Tournament OS</title>
- <link rel="stylesheet" href="assets/css/style.css?v=header-compact-v3"/>
+ <link rel="stylesheet" href="assets/css/style.css?v=prize-pool-v1"/>
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/favicon-192x192.png?v=favicon-yellow-v1">
@@ -95,6 +95,7 @@
     <div class="admin-tabs">
      <a class="admin-tab" href="#tournamentSetupAdmin" title="Tournament Setup">Tournament Setup</a>
      <a class="admin-tab" href="#tournamentDirectoryAdmin" title="Tournament Directory">Tournament Directory</a>
+     <a class="admin-tab" href="#prizePoolAdmin" title="Prize Pool">Prize Pool</a>
      <a class="admin-tab" href="#announcementsAdmin" title="Announcements">Announcements</a>
      <a class="admin-tab" href="#sheetSyncAdmin" title="Sheet Sync">Sheet Sync</a>
      <a class="admin-tab" href="#matchPreviewAdmin" title="Match Preview">Match Preview</a>
@@ -106,6 +107,7 @@
      <aside class="admin-side-menu card">
       <a href="#tournamentSetupAdmin">Tournament Setup</a>
       <a href="#tournamentDirectoryAdmin">Tournament Directory</a>
+      <a href="#prizePoolAdmin">Prize Pool</a>
       <a href="#announcementsAdmin">Announcements</a>
       <a href="#sheetSyncAdmin">Sheet Sync</a>
       <a href="#schedulePreview">Schedule Preview</a>
@@ -235,6 +237,61 @@
          <tbody id="timelineTable"></tbody>
         </table>
        </div>
+      </section>
+
+
+      <section class="card" id="prizePoolAdmin">
+       <div class="section-head">
+        <div>
+         <div class="eyebrow">Public Event Info</div>
+         <h2>Prize Pool & Breakdown</h2>
+         <p>Set the prize pool details shown on the public dashboard for the selected tournament.</p>
+        </div>
+       </div>
+
+       <form id="prizePoolForm" class="form">
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="prizePoolPublished">Public Display</label>
+          <select id="prizePoolPublished">
+           <option value="true">Show Prize Pool</option>
+           <option value="false">Hide Prize Pool</option>
+          </select>
+         </div>
+         <div class="field">
+          <label for="prizePoolTotal">Prize Pool Total</label>
+          <input id="prizePoolTotal" maxlength="120" placeholder="₱50,000 / $1,000 / Prize Pool TBA"/>
+         </div>
+        </div>
+
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="prizePoolTitle">Display Title</label>
+          <input id="prizePoolTitle" maxlength="140" placeholder="Tournament Prize Pool"/>
+         </div>
+         <div class="field">
+          <label for="prizePoolSubtitle">Subtitle optional</label>
+          <input id="prizePoolSubtitle" maxlength="180" placeholder="Cash prizes and awards for the selected event"/>
+         </div>
+        </div>
+
+        <div class="field">
+         <label for="prizePoolBreakdown">Prize Breakdown</label>
+         <textarea id="prizePoolBreakdown" rows="8" placeholder="Champion - ₱25,000&#10;2nd Place - ₱15,000&#10;3rd Place - ₱10,000"></textarea>
+         <p class="muted">Enter one prize per line. Use “-”, “:”, or “|” to split the placement and prize value.</p>
+        </div>
+
+        <div class="field">
+         <label for="prizePoolNote">Prize Note optional</label>
+         <textarea id="prizePoolNote" rows="3" placeholder="Prize pool and distribution may be updated by the organizer."></textarea>
+        </div>
+
+        <div class="actions">
+         <button class="btn btn-primary" type="submit">Save Prize Pool</button>
+         <a class="btn" href="dashboard.html#prize" data-tournament-link="dashboard.html#prize" target="_blank" rel="noopener">View Public Prize Pool</a>
+        </div>
+        <div id="prizePoolStatus" class="notice section-tight hidden"></div>
+       </form>
       </section>
 
 
@@ -567,8 +624,8 @@
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
-<script src="assets/js/app.js?v=tournament-directory-v1"></script>
+<script src="assets/js/app.js?v=prize-pool-v1"></script>
  <script src="assets/js/i18n.js?v=i18n-v2"></script>
-<script src="assets/js/admin.js?v=tournament-directory-v1"></script>
+<script src="assets/js/admin.js?v=prize-pool-v1"></script>
 </body>
 </html>

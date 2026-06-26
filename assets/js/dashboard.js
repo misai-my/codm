@@ -324,9 +324,37 @@ function teamMonogram(value) {
  return (words.slice(0, 2).map(word => word[0]).join("") || "TM").toUpperCase();
 }
 
+function googleDriveImageUrl(value) {
+ const raw = portal.text(value).trim();
+ if (!raw) return "";
+
+ let decoded = raw;
+ try {
+  decoded = decodeURIComponent(raw);
+ } catch (error) {
+  decoded = raw;
+ }
+
+ const fileMatch = decoded.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+ const idMatch = decoded.match(/[?&]id=([a-zA-Z0-9_-]+)/i);
+ const foldersMatch = decoded.match(/drive\.google\.com\/drive\/folders\/([a-zA-Z0-9_-]+)/i);
+ const fileId = fileMatch?.[1] || idMatch?.[1];
+
+ if (fileId && /(?:drive|docs)\.google\.com/i.test(decoded)) {
+  return `https://drive.google.com/thumbnail?id=${encodeURIComponent(fileId)}&sz=w400`;
+ }
+
+ if (foldersMatch) {
+  return "";
+ }
+
+ return raw;
+}
+
 function teamLogoMarkup(row) {
  const label = portal.text(row?.team_name || row?.team_tag || "Team");
- const url = portal.text(row?.team_logo_url);
+ const rawUrl = portal.text(row?.team_logo_url);
+ const url = googleDriveImageUrl(rawUrl);
 
  if (!url) {
   return `<div class="team-directory-logo team-directory-monogram" aria-hidden="true">${portal.esc(teamMonogram(label))}</div>`;
@@ -336,8 +364,10 @@ function teamLogoMarkup(row) {
   <div class="team-directory-logo">
    <img
     src="${portal.esc(url)}"
-    alt=""
+    alt="${portal.esc(label)} logo"
+    title="${portal.esc(label)}"
     loading="lazy"
+    referrerpolicy="no-referrer"
     onerror="this.style.display='none';this.parentElement.classList.add('team-directory-monogram');this.parentElement.textContent='${portal.esc(teamMonogram(label))}'"
    />
   </div>

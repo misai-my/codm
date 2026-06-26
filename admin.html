@@ -11,7 +11,27 @@
   <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=favicon-yellow-v1">
   <link rel="manifest" href="assets/favicons/site.webmanifest?v=favicon-yellow-v1">
   <meta name="theme-color" content="#05070d">
- </head>
+ 
+ <style>
+  .admin-guide-float-btn{position:fixed;right:18px;bottom:18px;z-index:1100;box-shadow:0 12px 30px rgba(0,0,0,.35);}
+  .admin-guide-modal{position:fixed;right:24px;bottom:76px;width:min(760px,calc(100vw - 32px));max-height:min(78vh,760px);z-index:1200;background:rgba(9,13,24,.98);border:1px solid rgba(255,255,255,.16);border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden;display:none;}
+  .admin-guide-modal.open{display:block;}
+  .admin-guide-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.12);cursor:move;background:linear-gradient(135deg,rgba(255,193,7,.16),rgba(255,255,255,.04));user-select:none;}
+  .admin-guide-head strong{display:block;font-size:14px;letter-spacing:.04em;text-transform:uppercase;}
+  .admin-guide-head small{display:block;color:rgba(255,255,255,.66);font-size:11px;margin-top:2px;}
+  .admin-guide-actions{display:flex;gap:8px;align-items:center;}
+  .admin-guide-body{padding:16px 18px;overflow:auto;max-height:calc(min(78vh,760px) - 58px);scrollbar-gutter:stable;}
+  .admin-guide-body h1,.admin-guide-body h2,.admin-guide-body h3{margin:14px 0 8px;}
+  .admin-guide-body h1{font-size:22px;}
+  .admin-guide-body h2{font-size:18px;}
+  .admin-guide-body h3{font-size:15px;}
+  .admin-guide-body p,.admin-guide-body li{color:rgba(255,255,255,.82);line-height:1.55;}
+  .admin-guide-body ul,.admin-guide-body ol{padding-left:22px;}
+  .admin-guide-body code{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:1px 5px;}
+  .admin-guide-body a{color:#ffd34d;text-decoration:underline;}
+  @media(max-width:720px){.admin-guide-modal{right:10px;left:10px;bottom:70px;width:auto;max-height:78vh}.admin-guide-float-btn{right:12px;bottom:12px}.admin-guide-body{padding:14px}}
+ </style>
+</head>
 <body>
 <header class="nav admin-nav">
  <div class="container nav-inner">
@@ -89,6 +109,10 @@
       <label for="adminTournamentSelect">Managing Tournament</label>
       <select id="adminTournamentSelect" aria-label="Select tournament"></select>
       <span id="adminTournamentStatus">Loading tournament...</span>
+
+     <div class="actions" style="margin-top:12px;justify-content:flex-end;">
+      <button class="btn btn-small" type="button" id="adminGuideOpenTop">Admin User Guide</button>
+     </div>
      </div>
     </div>
 
@@ -632,7 +656,105 @@
  </section>
 </main>
 
+
+<button class="btn btn-primary btn-small admin-guide-float-btn hidden" type="button" id="adminGuideOpenFloat">Admin Guide</button>
+<div class="admin-guide-modal" id="adminGuideModal" role="dialog" aria-modal="false" aria-labelledby="adminGuideTitle">
+ <div class="admin-guide-head" id="adminGuideDragHandle">
+  <div>
+   <strong id="adminGuideTitle">Admin User Guide</strong>
+   <small>Source: README_ADMIN_USER_GUIDE.md · drag this panel anywhere</small>
+  </div>
+  <div class="admin-guide-actions">
+   <button class="btn btn-small" type="button" id="adminGuideReload">Reload</button>
+   <button class="btn btn-danger btn-small" type="button" id="adminGuideClose">Close</button>
+  </div>
+ </div>
+ <div class="admin-guide-body" id="adminGuideBody">Loading guide...</div>
+</div>
+
 <div id="toast" class="toast"></div>
+<script>
+(function(){
+  const GUIDE_FILE = 'README_ADMIN_USER_GUIDE.md';
+  const modal = document.getElementById('adminGuideModal');
+  const body = document.getElementById('adminGuideBody');
+  const handle = document.getElementById('adminGuideDragHandle');
+  const openTop = document.getElementById('adminGuideOpenTop');
+  const openFloat = document.getElementById('adminGuideOpenFloat');
+  const closeBtn = document.getElementById('adminGuideClose');
+  const reloadBtn = document.getElementById('adminGuideReload');
+  if(!modal || !body || !handle) return;
+
+  function escapeHtml(value){
+    return String(value || '').replace(/[&<>"']/g, function(ch){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]);
+    });
+  }
+  function inlineMd(value){
+    return escapeHtml(value)
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  }
+  function markdownToHtml(md){
+    const lines = String(md || '').replace(/\r\n/g,'\n').split('\n');
+    let html = '', inList = false;
+    function closeList(){ if(inList){ html += '</ul>'; inList = false; } }
+    lines.forEach(function(line){
+      const trimmed = line.trim();
+      if(!trimmed){ closeList(); html += '<br/>'; return; }
+      if(/^###\s+/.test(trimmed)){ closeList(); html += '<h3>'+inlineMd(trimmed.replace(/^###\s+/,''))+'</h3>'; return; }
+      if(/^##\s+/.test(trimmed)){ closeList(); html += '<h2>'+inlineMd(trimmed.replace(/^##\s+/,''))+'</h2>'; return; }
+      if(/^#\s+/.test(trimmed)){ closeList(); html += '<h1>'+inlineMd(trimmed.replace(/^#\s+/,''))+'</h1>'; return; }
+      if(/^[-*]\s+/.test(trimmed)){ if(!inList){ html += '<ul>'; inList = true; } html += '<li>'+inlineMd(trimmed.replace(/^[-*]\s+/,''))+'</li>'; return; }
+      closeList(); html += '<p>'+inlineMd(trimmed)+'</p>';
+    });
+    closeList();
+    return html;
+  }
+  async function loadGuide(){
+    body.innerHTML = '<p>Loading guide...</p>';
+    try{
+      const res = await fetch(GUIDE_FILE + '?v=' + Date.now(), {cache:'no-store'});
+      if(!res.ok) throw new Error('Could not load ' + GUIDE_FILE);
+      const md = await res.text();
+      body.innerHTML = markdownToHtml(md);
+    }catch(err){
+      body.innerHTML = '<h2>Admin User Guide</h2><p>Could not load <code>'+escapeHtml(GUIDE_FILE)+'</code>. Make sure the markdown file is uploaded beside <code>admin.html</code>.</p>';
+    }
+  }
+  function openGuide(){
+    modal.classList.add('open');
+    if(openFloat) openFloat.classList.remove('hidden');
+    if(!modal.dataset.loaded){ modal.dataset.loaded = 'true'; loadGuide(); }
+  }
+  function closeGuide(){ modal.classList.remove('open'); if(openFloat) openFloat.classList.remove('hidden'); }
+  if(openTop) openTop.addEventListener('click', openGuide);
+  if(openFloat){ openFloat.classList.remove('hidden'); openFloat.addEventListener('click', openGuide); }
+  if(closeBtn) closeBtn.addEventListener('click', closeGuide);
+  if(reloadBtn) reloadBtn.addEventListener('click', loadGuide);
+
+  let dragging = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
+  handle.addEventListener('pointerdown', function(e){
+    if(e.target.closest('button')) return;
+    dragging = true;
+    const rect = modal.getBoundingClientRect();
+    startX = e.clientX; startY = e.clientY; startLeft = rect.left; startTop = rect.top;
+    modal.style.left = rect.left + 'px'; modal.style.top = rect.top + 'px'; modal.style.right = 'auto'; modal.style.bottom = 'auto';
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener('pointermove', function(e){
+    if(!dragging) return;
+    const w = modal.offsetWidth, h = modal.offsetHeight;
+    const nextLeft = Math.max(8, Math.min(window.innerWidth - w - 8, startLeft + e.clientX - startX));
+    const nextTop = Math.max(8, Math.min(window.innerHeight - h - 8, startTop + e.clientY - startY));
+    modal.style.left = nextLeft + 'px'; modal.style.top = nextTop + 'px';
+  });
+  handle.addEventListener('pointerup', function(){ dragging = false; });
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
 <script src="assets/js/app.js?v=prize-pool-v1"></script>

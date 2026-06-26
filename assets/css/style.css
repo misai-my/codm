@@ -3157,6 +3157,17 @@ header.dashboard-sticky-nav,
 
 .dashboard-collapsible-body {
  min-width: 0;
+ max-height: clamp(620px, 78vh, 920px);
+ overflow-y: auto;
+ overflow-x: hidden;
+ overscroll-behavior: contain;
+ padding-right: 6px;
+ scrollbar-gutter: stable;
+}
+
+.dashboard-collapsible-body > .rulebook-frame,
+.dashboard-collapsible-body > iframe#rulebookFrame {
+ max-height: calc(clamp(620px, 78vh, 920px) - 12px);
 }
 
 .dashboard-collapsible.is-collapsed .dashboard-collapsible-body,

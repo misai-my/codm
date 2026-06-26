@@ -831,21 +831,65 @@ function addMpStandingEntry(entries, name, wins, losses, ties, pointDiff) {
  entry.pointDiff += pointDiff;
 }
 
+function mpMapOutcome(group) {
+ const row = group.find(item => String(item.side || "").toUpperCase() === "A") || group[0];
+ if (!row) return null;
+
+ const nameA = mpSideName(group, "A", row.team_a || "Player / Team A");
+ const nameB = mpSideName(group, "B", row.team_b || "Player / Team B");
+ const scoreA = sideScoreFromGroup(group, "A");
+ const scoreB = sideScoreFromGroup(group, "B");
+
+ let winA = 0;
+ let winB = 0;
+ let tie = 0;
+
+ if (scoreA !== scoreB) {
+  winA = scoreA > scoreB ? 1 : 0;
+  winB = scoreB > scoreA ? 1 : 0;
+ } else {
+  const winner = group.find(item => String(item.result || "").toUpperCase() === "W");
+  const winnerSide = String(winner?.side || "").toUpperCase();
+  if (winnerSide === "A") winA = 1;
+  if (winnerSide === "B") winB = 1;
+  if (!winnerSide) tie = 1;
+ }
+
+ return { nameA, nameB, winA, winB, tie };
+}
+
 function buildMpStandings(rows) {
  const mpRows = rows.filter(row => String(row.mode).startsWith("MP_") && hasFinalData(row));
- const mapGroups = groupRows(mpRows, row =>
-  [row.mode, row.stage, row.day_no, row.bracket, row.series_no, row.match_no, row.match_title, row.map_order, row.game_mode, row.map_name, row.team_a, row.team_b].join("|")
+
+ // Result Summary is series-based, not round/map-based.
+ // Each BO1/BO3/BO5 series counts as one Win/Loss/Tie in the summary.
+ const seriesGroups = groupRows(mpRows, row =>
+  [row.mode, row.stage, row.day_no, row.bracket, row.series_no, row.match_no, row.match_title, row.team_a, row.team_b].join("|")
  );
  const entries = new Map();
 
- mapGroups.forEach(group => {
-  const row = group.find(item => String(item.side || "").toUpperCase() === "A") || group[0];
+ seriesGroups.forEach(seriesGroup => {
+  const row = seriesGroup.find(item => String(item.side || "").toUpperCase() === "A") || seriesGroup[0];
   if (!row) return;
 
-  const nameA = mpSideName(group, "A", row.team_a || "Player / Team A");
-  const nameB = mpSideName(group, "B", row.team_b || "Player / Team B");
-  const scoreA = sideScoreFromGroup(group, "A");
-  const scoreB = sideScoreFromGroup(group, "B");
+  const nameA = mpSideName(seriesGroup, "A", row.team_a || "Player / Team A");
+  const nameB = mpSideName(seriesGroup, "B", row.team_b || "Player / Team B");
+
+  const mapGroups = groupRows(seriesGroup, item =>
+   [item.map_order, item.game_mode, item.map_name, item.team_a, item.team_b].join("|")
+  );
+
+  let mapWinsA = 0;
+  let mapWinsB = 0;
+  let mapTies = 0;
+
+  mapGroups.forEach(mapGroup => {
+   const outcome = mpMapOutcome(mapGroup);
+   if (!outcome) return;
+   mapWinsA += outcome.winA;
+   mapWinsB += outcome.winB;
+   mapTies += outcome.tie;
+  });
 
   let winA = 0;
   let winB = 0;
@@ -854,28 +898,35 @@ function buildMpStandings(rows) {
   let tieA = 0;
   let tieB = 0;
 
-  if (scoreA !== scoreB) {
-   winA = scoreA > scoreB ? 1 : 0;
-   winB = scoreB > scoreA ? 1 : 0;
-   lossA = scoreA < scoreB ? 1 : 0;
-   lossB = scoreB < scoreA ? 1 : 0;
+  if (mapWinsA > mapWinsB) {
+   winA = 1;
+   lossB = 1;
+  } else if (mapWinsB > mapWinsA) {
+   winB = 1;
+   lossA = 1;
   } else {
-   const winner = group.find(item => String(item.result || "").toUpperCase() === "W");
-   const winnerSide = String(winner?.side || "").toUpperCase();
-   if (winnerSide === "A") { winA = 1; lossB = 1; }
-   if (winnerSide === "B") { winB = 1; lossA = 1; }
-   if (!winnerSide) { tieA = 1; tieB = 1; }
+   const explicitWinner = seriesGroup.find(item => numericValue(item.series_win) > 0 || String(item.result || "").toUpperCase() === "W");
+   const winnerSide = String(explicitWinner?.side || "").toUpperCase();
+   if (winnerSide === "A") {
+    winA = 1;
+    lossB = 1;
+   } else if (winnerSide === "B") {
+    winB = 1;
+    lossA = 1;
+   } else {
+    tieA = 1;
+    tieB = 1;
+   }
   }
 
-  addMpStandingEntry(entries, nameA, winA, lossA, tieA, scoreA - scoreB);
-  addMpStandingEntry(entries, nameB, winB, lossB, tieB, scoreB - scoreA);
+  addMpStandingEntry(entries, nameA, winA, lossA, tieA, 0);
+  addMpStandingEntry(entries, nameB, winB, lossB, tieB, 0);
  });
 
  return [...entries.values()].sort((a, b) =>
   b.wins - a.wins ||
   a.losses - b.losses ||
   b.ties - a.ties ||
-  b.pointDiff - a.pointDiff ||
   a.name.localeCompare(b.name)
  );
 }

@@ -1380,8 +1380,16 @@ function uniqueSortedMapped(rows, getter) {
   .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
 }
 
+function isMpMatchMode(mode) {
+ return String(mode || "").startsWith("MP_");
+}
+
 function roundFilterValue(row) {
- return row.round_no ?? "";
+ // Sheet-aligned mapping:
+ // MP_1V1 / MP_TEAM_5V5 use Series No as the main grouped filter.
+ // BR modes keep Round No as the grouped filter.
+ if (isMpMatchMode(row.mode)) return row.series_no ?? row.round_no ?? "";
+ return row.round_no ?? row.series_no ?? "";
 }
 
 function matchFilterValue(row) {
@@ -1389,7 +1397,7 @@ function matchFilterValue(row) {
 }
 
 function roundFilterLabel(value) {
- return String(value).match(/^\d+$/) ? `Round ${value}` : value;
+ return String(value).match(/^\d+$/) ? `Series / Round ${value}` : value;
 }
 
 function matchFilterLabel(value) {
@@ -1448,7 +1456,7 @@ function populateDashboardFilters(rows) {
   setSelectOptions(`${prefix}StageFilter`, stages, "All Stages");
   setSelectOptions(`${prefix}StatusFilter`, statuses, "All Status");
   setSelectOptions(`${prefix}DayFilter`, days, "All Days", value => `Day ${value}`);
-  setSelectOptions(`${prefix}RoundFilter`, rounds, "All Rounds", roundFilterLabel);
+  setSelectOptions(`${prefix}RoundFilter`, rounds, "All Series / Rounds", roundFilterLabel);
   setSelectOptions(`${prefix}MatchFilter`, matches, "All Matches", matchFilterLabel);
  });
 }

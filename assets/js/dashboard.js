@@ -92,6 +92,8 @@ function renderPrizePool() {
  const title = portal.text(tournament?.prize_pool_title) || "Tournament Prize Pool";
  const subtitle = portal.text(tournament?.prize_pool_subtitle);
  const note = portal.text(tournament?.prize_pool_note);
+ const placementHeader = portal.text(tournament?.prize_pool_placement_header) || "Placement / Award";
+ const prizeHeader = portal.text(tournament?.prize_pool_prize_header) || "Prize";
  const rows = breakdownText
   .split(/\r?\n/)
   .map(splitPrizeBreakdownLine)
@@ -100,7 +102,7 @@ function renderPrizePool() {
  const table = rows.length ? `
   <div class="prize-breakdown-table-wrap">
    <table class="prize-breakdown-table">
-    <thead><tr><th>Placement / Award</th><th>Prize</th></tr></thead>
+    <thead><tr><th>${portal.esc(placementHeader)}</th><th>${portal.esc(prizeHeader)}</th></tr></thead>
     <tbody>
      ${rows.map(row => `
       <tr>

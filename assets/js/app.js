@@ -101,6 +101,8 @@ function tournamentFallback(slug = getSelectedTournamentSlug()) {
   prize_pool_subtitle: "",
   prize_pool_total: "",
   prize_pool_breakdown: "",
+  prize_pool_placement_header: "Placement / Award",
+  prize_pool_prize_header: "Prize",
   prize_pool_note: ""
  };
 }

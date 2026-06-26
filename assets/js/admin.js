@@ -352,6 +352,8 @@ function renderPrizePoolSettings() {
  const subtitle = portal.qs("#prizePoolSubtitle");
  const total = portal.qs("#prizePoolTotal");
  const breakdown = portal.qs("#prizePoolBreakdown");
+ const placementHeader = portal.qs("#prizePoolPlacementHeader");
+ const prizeHeader = portal.qs("#prizePoolPrizeHeader");
  const note = portal.qs("#prizePoolNote");
  const status = portal.qs("#prizePoolStatus");
 
@@ -360,6 +362,8 @@ function renderPrizePoolSettings() {
  if (subtitle) subtitle.value = activeTournament?.prize_pool_subtitle || "";
  if (total) total.value = activeTournament?.prize_pool_total || "";
  if (breakdown) breakdown.value = activeTournament?.prize_pool_breakdown || "";
+ if (placementHeader) placementHeader.value = activeTournament?.prize_pool_placement_header || "Placement / Award";
+ if (prizeHeader) prizeHeader.value = activeTournament?.prize_pool_prize_header || "Prize";
  if (note) note.value = activeTournament?.prize_pool_note || "";
 
  if (status) {
@@ -382,6 +386,8 @@ async function savePrizePoolSettings(event) {
   prize_pool_subtitle: portal.text(portal.qs("#prizePoolSubtitle")?.value),
   prize_pool_total: portal.text(portal.qs("#prizePoolTotal")?.value),
   prize_pool_breakdown: portal.text(portal.qs("#prizePoolBreakdown")?.value),
+  prize_pool_placement_header: portal.text(portal.qs("#prizePoolPlacementHeader")?.value) || "Placement / Award",
+  prize_pool_prize_header: portal.text(portal.qs("#prizePoolPrizeHeader")?.value) || "Prize",
   prize_pool_note: portal.text(portal.qs("#prizePoolNote")?.value)
  };
 

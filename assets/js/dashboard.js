@@ -735,39 +735,30 @@ function mpResultCards(rows) {
   }
 
   const winner = group.find(r => String(r.result).toUpperCase() === "W");
+  const mapBits = [row.game_mode, row.map_name].filter(Boolean).join(" · ");
+  const metaBits = [row.stage, row.day_no ? `Day ${row.day_no}` : "", row.bracket].filter(Boolean).join(" · ");
 
   return `
-   <article class="result-card mp-result-card">
-    <div class="result-top">
-     <div class="result-heading">
-      <div class="result-pills">
+   <article class="result-card mp-result-card mp-result-compact-card">
+    <div class="mp-compact-result-row">
+     <div class="mp-compact-main">
+      <div class="mp-compact-tags">
        <span class="pill pill-gold">${portal.esc(modeLabel(row.mode))}</span>
-       <span class="pill">${portal.esc(row.game_mode || "Map")}</span>
+       ${mapBits ? `<span class="pill">${portal.esc(mapBits)}</span>` : ""}
+       <span class="pill pill-green">${portal.esc(row.status || "Final")}</span>
       </div>
       <h3>${portal.esc(title)}</h3>
-      <p>${portal.esc(row.map_name || "")}</p>
+      ${metaBits ? `<p>${portal.esc(metaBits)}</p>` : ""}
      </div>
-     <span class="pill pill-green">${portal.esc(row.status || "Final")}</span>
+
+     <div class="mp-compact-scoreline" aria-label="Final score">
+      <strong class="mp-compact-team">${portal.esc(teamA)}</strong>
+      <span class="mp-compact-score">${portal.esc(scoreA ?? "-")} <i>:</i> ${portal.esc(scoreB ?? "-")}</span>
+      <strong class="mp-compact-team mp-compact-team-right">${portal.esc(teamB)}</strong>
+     </div>
+
+     ${winner ? `<div class="mp-compact-winner"><span>Winner</span><strong>${portal.esc(winner.participant_name || "")}</strong></div>` : ""}
     </div>
-
-    <div class="mp-scoreboard">
-     <div class="mp-team mp-team-a">
-      <span class="mp-team-label">Team / Player A</span>
-      <strong>${portal.esc(teamA)}</strong>
-     </div>
-
-     <div class="mp-score-box">
-      <span class="mp-score-label">Final Score</span>
-      <span class="score">${portal.esc(scoreA ?? "-")} <i>:</i> ${portal.esc(scoreB ?? "-")}</span>
-     </div>
-
-     <div class="mp-team mp-team-b">
-      <span class="mp-team-label">Team / Player B</span>
-      <strong>${portal.esc(teamB)}</strong>
-     </div>
-    </div>
-
-    ${winner ? `<div class="mp-winner"><span>Winner</span><strong>${portal.esc(winner.participant_name || "")}</strong></div>` : ""}
    </article>
   `;
  });
@@ -888,7 +879,7 @@ function buildBrStandings(rows) {
 function brResultCards(rows) {
  const brRows = rows.filter(row => String(row.mode).startsWith("BR_") && hasFinalData(row));
 
- // Aggregate each mode/stage/bracket into standings.
+ // Aggregate each mode/stage/bracket into a true standings table.
  // When a Day filter is used, the filtered rows naturally become that matchday's standings.
  const brGroups = groupRows(brRows, row =>
   [row.mode, row.stage || "Stage", row.bracket || ""].join("|")
@@ -911,7 +902,7 @@ function brResultCards(rows) {
   ].filter(Boolean).join(" · ");
 
   return `
-   <article class="result-card br-standings-card">
+   <article class="result-card br-standings-card br-table-card">
     <div class="result-top">
      <div>
       <span class="pill pill-gold">${portal.esc(modeLabel(row.mode))}</span>
@@ -919,37 +910,38 @@ function brResultCards(rows) {
       <h3>${portal.esc(title)}</h3>
       <p>${portal.esc(subLabel)}</p>
      </div>
-     <span class="pill pill-green">Standings</span>
+     <span class="pill pill-green">Standings Table</span>
     </div>
 
-    <div class="br-standings-header" aria-hidden="true">
-     <span>Rank</span>
-     <span>Team / Player</span>
-     <div class="br-header-metrics">
-      <span>Victory</span>
-      <span>Placement Pts</span>
-      <span>Elimination Pts</span>
-      <span>Total Pts</span>
-     </div>
-    </div>
-
-    <div class="br-leaderboard">
-     ${standings.map((entry, index) => `
-      <div class="br-row br-standings-row">
-       <span class="rank">#${index + 1}</span>
-       <strong>${portal.esc(entry.name)}${entry.tag ? ` <small>${portal.esc(entry.tag)}</small>` : ""}</strong>
-       <div class="br-metrics">
-        <span data-label="Victory"><small>Victory</small><b>${portal.esc(entry.victories)}</b></span>
-        <span data-label="Placement Pts"><small>Placement Pts</small><b>${portal.esc(entry.placementPoints)}</b></span>
-        <span data-label="Elimination Pts"><small>Elimination Pts</small><b>${portal.esc(entry.eliminationPoints)}</b></span>
-        <span data-label="Total Pts"><small>Total Pts</small><b>${portal.esc(entry.totalPoints)}</b></span>
-       </div>
-      </div>
-     `).join("")}
+    <div class="br-results-table-wrap">
+     <table class="br-results-table">
+      <thead>
+       <tr>
+        <th>Rank</th>
+        <th>Team / Player</th>
+        <th>Victory</th>
+        <th>Placement Pts</th>
+        <th>Elimination Pts</th>
+        <th>Total Pts</th>
+       </tr>
+      </thead>
+      <tbody>
+       ${standings.map((entry, index) => `
+        <tr>
+         <td class="br-rank">#${index + 1}</td>
+         <td class="br-entry"><strong>${portal.esc(entry.name)}</strong>${entry.tag ? ` <small>${portal.esc(entry.tag)}</small>` : ""}</td>
+         <td>${portal.esc(entry.victories)}</td>
+         <td>${portal.esc(entry.placementPoints)}</td>
+         <td>${portal.esc(entry.eliminationPoints)}</td>
+         <td class="br-total"><strong>${portal.esc(entry.totalPoints)}</strong></td>
+        </tr>
+       `).join("")}
+      </tbody>
+     </table>
     </div>
 
     <p class="br-tiebreak-note">
-     Tiebreak order: Total Victory → Total Elimination Points → Last Round Survival Rank.
+     Tiebreak order: Total Points → Total Victory → Total Elimination Points → Last Round Survival Rank.
     </p>
    </article>
   `;

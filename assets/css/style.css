@@ -4490,3 +4490,65 @@ select option:disabled {
  line-height: 1.45;
  font-style: italic;
 }
+
+/* ============================================================
+  DASHBOARD SECTION VIEWER SCROLLBAR FIT FIX
+  Keeps inner section details visible after adding the section height limit.
+  ============================================================ */
+.dashboard-collapsible-body {
+ box-sizing: border-box;
+ width: 100%;
+ max-width: 100%;
+ padding: 0 14px 14px 2px;
+ overflow-y: auto;
+ overflow-x: auto;
+ scrollbar-gutter: stable both-edges;
+}
+
+.dashboard-collapsible-body > *,
+.dashboard-collapsible-body .filter-panel,
+.dashboard-collapsible-body .team-directory-filters,
+.dashboard-collapsible-body .schedule-list,
+.dashboard-collapsible-body .results-list,
+.dashboard-collapsible-body .participating-teams-grid,
+.dashboard-collapsible-body .tournament-timeline-list,
+.dashboard-collapsible-body .result-summary-card {
+ box-sizing: border-box;
+ max-width: 100%;
+}
+
+.dashboard-collapsible-body .filter-panel,
+.dashboard-collapsible-body .team-directory-filters {
+ width: 100%;
+ margin-right: 0;
+}
+
+.dashboard-collapsible-body .match-results-table-wrap,
+.dashboard-collapsible-body .br-results-table-wrap,
+.dashboard-collapsible-body .result-summary-table-wrap,
+.dashboard-collapsible-body .table-wrap,
+.dashboard-collapsible-body .admin-table-wrap {
+ max-width: 100%;
+ overflow-x: auto;
+}
+
+.dashboard-collapsible-body > .rulebook-frame,
+.dashboard-collapsible-body > iframe#rulebookFrame {
+ width: 100%;
+ max-width: 100%;
+ box-sizing: border-box;
+}
+
+@media (max-width: 980px) {
+ .dashboard-collapsible-body {
+  padding-right: 12px;
+  padding-left: 0;
+  scrollbar-gutter: stable;
+ }
+}
+
+@media (max-width: 560px) {
+ .dashboard-collapsible-body {
+  padding-right: 8px;
+ }
+}

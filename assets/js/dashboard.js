@@ -799,13 +799,14 @@ function sideScoreFromGroup(group, side) {
  return numericValue(reference.opponent_score);
 }
 
-function addMpStandingEntry(entries, name, wins, losses, pointDiff) {
+function addMpStandingEntry(entries, name, wins, losses, ties, pointDiff) {
  const key = String(name || "Entry").trim().toLowerCase();
  if (!entries.has(key)) {
   entries.set(key, {
    name: name || "Entry",
    wins: 0,
    losses: 0,
+   ties: 0,
    pointDiff: 0
   });
  }
@@ -813,6 +814,7 @@ function addMpStandingEntry(entries, name, wins, losses, pointDiff) {
  const entry = entries.get(key);
  entry.wins += wins;
  entry.losses += losses;
+ entry.ties += ties;
  entry.pointDiff += pointDiff;
 }
 
@@ -836,6 +838,8 @@ function buildMpStandings(rows) {
   let winB = 0;
   let lossA = 0;
   let lossB = 0;
+  let tieA = 0;
+  let tieB = 0;
 
   if (scoreA !== scoreB) {
    winA = scoreA > scoreB ? 1 : 0;
@@ -847,15 +851,17 @@ function buildMpStandings(rows) {
    const winnerSide = String(winner?.side || "").toUpperCase();
    if (winnerSide === "A") { winA = 1; lossB = 1; }
    if (winnerSide === "B") { winB = 1; lossA = 1; }
+   if (!winnerSide) { tieA = 1; tieB = 1; }
   }
 
-  addMpStandingEntry(entries, nameA, winA, lossA, scoreA - scoreB);
-  addMpStandingEntry(entries, nameB, winB, lossB, scoreB - scoreA);
+  addMpStandingEntry(entries, nameA, winA, lossA, tieA, scoreA - scoreB);
+  addMpStandingEntry(entries, nameB, winB, lossB, tieB, scoreB - scoreA);
  });
 
  return [...entries.values()].sort((a, b) =>
   b.wins - a.wins ||
   a.losses - b.losses ||
+  b.ties - a.ties ||
   b.pointDiff - a.pointDiff ||
   a.name.localeCompare(b.name)
  );
@@ -1175,7 +1181,7 @@ function buildMpSummaryTable(modeRows) {
        <th>Player / Team Name</th>
        <th>Wins</th>
        <th>Loss</th>
-       <th>Point Diff (+/-)</th>
+       <th>Tie</th>
       </tr>
      </thead>
      <tbody>
@@ -1184,7 +1190,7 @@ function buildMpSummaryTable(modeRows) {
         <td class="result-entry"><strong>${portal.esc(entry.name)}</strong></td>
         <td>${portal.esc(entry.wins)}</td>
         <td>${portal.esc(entry.losses)}</td>
-        <td class="result-diff ${resultDiffClass(entry.pointDiff)}"><strong>${entry.pointDiff > 0 ? "+" : ""}${portal.esc(entry.pointDiff)}</strong></td>
+        <td>${portal.esc(entry.ties || 0)}</td>
        </tr>
       `).join("")}
      </tbody>
@@ -1259,6 +1265,7 @@ function buildResultSummaryHtml(rows) {
    <div class="result-summary-table-stack">
     ${summaryTables}
    </div>
+   <p class="result-summary-footnote">Result summary is for reference only. It may or may not be used for player/team ranking.</p>
   </section>
  `;
 }

@@ -4469,3 +4469,13 @@ select option:disabled {
 .br-summary-table {
  min-width: 720px;
 }
+
+.result-summary-footnote {
+ margin: 12px 0 0;
+ padding-top: 10px;
+ border-top: 1px solid rgba(255,255,255,.08);
+ color: var(--muted2);
+ font-size: 11px;
+ line-height: 1.45;
+ font-style: italic;
+}

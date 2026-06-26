@@ -988,6 +988,27 @@ function uniqueSorted(rows, field) {
   .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
 }
 
+function uniqueSortedMapped(rows, getter) {
+ return [...new Set(rows.map(getter).filter(value => value !== null && value !== undefined && String(value).trim() !== ""))]
+  .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
+}
+
+function roundFilterValue(row) {
+ return row.round_no ?? "";
+}
+
+function matchFilterValue(row) {
+ return row.match_no ?? row.match_title ?? "";
+}
+
+function roundFilterLabel(value) {
+ return String(value).match(/^\d+$/) ? `Round ${value}` : value;
+}
+
+function matchFilterLabel(value) {
+ return String(value).match(/^\d+$/) ? `Match ${value}` : value;
+}
+
 function setSelectOptions(selectId, values, allLabel, labeler = value => value) {
  const select = portal.qs(`#${selectId}`);
  if (!select) return;
@@ -1011,6 +1032,9 @@ function rowSearchText(row) {
   row.stage,
   row.status,
   row.bracket,
+  row.round_no ? `Round ${row.round_no}` : "",
+  row.match_no ? `Match ${row.match_no}` : "",
+  row.series_no ? `Series ${row.series_no}` : "",
   row.match_title,
   row.game_mode,
   row.map_name,
@@ -1029,12 +1053,16 @@ function populateDashboardFilters(rows) {
  const stages = uniqueSorted(rows, "stage");
  const statuses = uniqueSorted(rows, "status");
  const days = uniqueSorted(rows, "day_no");
+ const rounds = uniqueSortedMapped(rows, roundFilterValue);
+ const matches = uniqueSortedMapped(rows, matchFilterValue);
 
  ["schedule", "results"].forEach(prefix => {
   setSelectOptions(`${prefix}ModeFilter`, modes, "All Modes", modeLabel);
   setSelectOptions(`${prefix}StageFilter`, stages, "All Stages");
   setSelectOptions(`${prefix}StatusFilter`, statuses, "All Status");
   setSelectOptions(`${prefix}DayFilter`, days, "All Days", value => `Day ${value}`);
+  setSelectOptions(`${prefix}RoundFilter`, rounds, "All Rounds", roundFilterLabel);
+  setSelectOptions(`${prefix}MatchFilter`, matches, "All Matches", matchFilterLabel);
  });
 }
 
@@ -1044,6 +1072,8 @@ function currentDashboardFilter(prefix) {
   stage: portal.qs(`#${prefix}StageFilter`)?.value || "",
   status: portal.qs(`#${prefix}StatusFilter`)?.value || "",
   day: portal.qs(`#${prefix}DayFilter`)?.value || "",
+  round: portal.qs(`#${prefix}RoundFilter`)?.value || "",
+  match: portal.qs(`#${prefix}MatchFilter`)?.value || "",
   search: (portal.qs(`#${prefix}SearchFilter`)?.value || "").trim().toLowerCase()
  };
 }
@@ -1056,6 +1086,8 @@ function applyDashboardFilter(rows, prefix) {
   if (filter.stage && String(row.stage || "") !== filter.stage) return false;
   if (filter.status && String(row.status || "") !== filter.status) return false;
   if (filter.day && String(row.day_no ?? "") !== filter.day) return false;
+  if (filter.round && String(roundFilterValue(row)) !== filter.round) return false;
+  if (filter.match && String(matchFilterValue(row)) !== filter.match) return false;
   if (filter.search && !rowSearchText(row).includes(filter.search)) return false;
   return true;
  });
@@ -1073,7 +1105,7 @@ function renderDashboardMatchViews() {
 }
 
 function resetDashboardFilter(prefix) {
- [`${prefix}ModeFilter`, `${prefix}StageFilter`, `${prefix}StatusFilter`, `${prefix}DayFilter`].forEach(id => {
+ [`${prefix}ModeFilter`, `${prefix}StageFilter`, `${prefix}StatusFilter`, `${prefix}DayFilter`, `${prefix}RoundFilter`, `${prefix}MatchFilter`].forEach(id => {
   const el = portal.qs(`#${id}`);
   if (el) el.value = "";
  });
@@ -1089,7 +1121,7 @@ function wireDashboardFilters() {
  dashboardFiltersWired = true;
 
  ["schedule", "results"].forEach(prefix => {
-  [`${prefix}ModeFilter`, `${prefix}StageFilter`, `${prefix}StatusFilter`, `${prefix}DayFilter`, `${prefix}SearchFilter`].forEach(id => {
+  [`${prefix}ModeFilter`, `${prefix}StageFilter`, `${prefix}StatusFilter`, `${prefix}DayFilter`, `${prefix}RoundFilter`, `${prefix}MatchFilter`, `${prefix}SearchFilter`].forEach(id => {
    const el = portal.qs(`#${id}`);
    if (!el) return;
    el.addEventListener(el.tagName === "INPUT" ? "input" : "change", renderDashboardMatchViews);

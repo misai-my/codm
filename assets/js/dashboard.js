@@ -978,6 +978,128 @@ function brResultCards(rows) {
  });
 }
 
+function mpResultSummary(rows) {
+ const mpRows = rows.filter(row => String(row.mode).startsWith("MP_") && hasFinalData(row));
+ const mapGroups = groupRows(mpRows, row =>
+  [row.mode, row.stage, row.day_no, row.bracket, row.series_no, row.match_no, row.match_title, row.map_order, row.game_mode, row.map_name, row.team_a, row.team_b].join("|")
+ );
+ const seriesGroups = groupRows(mpRows, row =>
+  [row.mode, row.stage, row.day_no, row.bracket, row.series_no, row.match_no, row.match_title, row.team_a, row.team_b].join("|")
+ );
+ const winners = new Map();
+ mapGroups.forEach(group => {
+  const winner = group.find(r => String(r.result).toUpperCase() === "W");
+  const name = winner?.participant_name || winner?.team_a || winner?.team_b || "";
+  if (!name) return;
+  winners.set(name, (winners.get(name) || 0) + 1);
+ });
+ const topWinner = [...winners.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0];
+
+ return {
+  rows: mpRows.length,
+  maps: mapGroups.length,
+  series: seriesGroups.length,
+  topWinnerName: topWinner?.[0] || "",
+  topWinnerMaps: topWinner?.[1] || 0
+ };
+}
+
+function brResultSummary(rows) {
+ const brRows = rows.filter(row => String(row.mode).startsWith("BR_") && hasFinalData(row));
+ const brGroups = groupRows(brRows, row =>
+  [row.mode, row.stage || "Stage", row.bracket || ""].join("|")
+ );
+
+ const leaders = brGroups.map(group => {
+  const row = group[0];
+  const standings = buildBrStandings(group);
+  const leader = standings[0];
+  if (!leader) return null;
+  return {
+   mode: modeLabel(row.mode),
+   stage: row.stage || "Stage",
+   name: leader.name,
+   tag: leader.tag,
+   totalPoints: leader.totalPoints
+  };
+ }).filter(Boolean);
+
+ const entries = new Set(brRows.map(row => row.participant_tag || row.participant_name).filter(Boolean));
+ const roundKeys = new Set(brRows.map(brRoundKey).filter(Boolean));
+
+ return {
+  rows: brRows.length,
+  tables: brGroups.length,
+  entries: entries.size,
+  rounds: roundKeys.size,
+  leaders
+ };
+}
+
+function buildResultSummaryHtml(rows) {
+ const finalRows = rows.filter(row => hasFinalData(row));
+ if (!finalRows.length) return "";
+
+ const mp = mpResultSummary(finalRows);
+ const br = brResultSummary(finalRows);
+ const modes = [...new Set(finalRows.map(row => row.mode).filter(Boolean))].sort((a, b) => modeOrder(a) - modeOrder(b));
+
+ const modeChips = modes.map(mode => {
+  const modeRows = finalRows.filter(row => row.mode === mode);
+  const isBr = String(mode).startsWith("BR_");
+  const label = isBr
+   ? `${modeRows.length} row${modeRows.length === 1 ? "" : "s"}`
+   : `${mpResultSummary(modeRows).maps} map${mpResultSummary(modeRows).maps === 1 ? "" : "s"}`;
+  return `<span class="result-summary-chip"><strong>${portal.esc(modeLabel(mode))}</strong>${portal.esc(label)}</span>`;
+ }).join("");
+
+ const mpWinnerText = mp.topWinnerName
+  ? `${mp.topWinnerName} · ${mp.topWinnerMaps} map win${mp.topWinnerMaps === 1 ? "" : "s"}`
+  : "No MP winners yet";
+
+ const brLeaderText = br.leaders.length
+  ? br.leaders.slice(0, 3).map(item => `${item.mode}: ${item.name}${item.tag ? " (" + item.tag + ")" : ""} · ${item.totalPoints} pts`).join(" • ")
+  : "No BR leader yet";
+
+ return `
+  <section class="result-summary-card" aria-label="Match result summary">
+   <div class="result-summary-head">
+    <div>
+     <span class="eyebrow">Overview</span>
+     <h3>Match Result Summary</h3>
+     <p>Updates based on the selected Match Results filters.</p>
+    </div>
+    <span class="pill pill-green">${portal.esc(finalRows.length)} final row${finalRows.length === 1 ? "" : "s"}</span>
+   </div>
+
+   <div class="result-summary-grid">
+    <div class="result-summary-stat">
+     <span>MP Maps</span>
+     <strong>${portal.esc(mp.maps)}</strong>
+     <small>${portal.esc(mp.series)} series / match group${mp.series === 1 ? "" : "s"}</small>
+    </div>
+    <div class="result-summary-stat">
+     <span>Top MP Winner</span>
+     <strong>${portal.esc(mp.topWinnerName || "—")}</strong>
+     <small>${portal.esc(mpWinnerText)}</small>
+    </div>
+    <div class="result-summary-stat">
+     <span>BR Tables</span>
+     <strong>${portal.esc(br.tables)}</strong>
+     <small>${portal.esc(br.entries)} entries · ${portal.esc(br.rounds)} round${br.rounds === 1 ? "" : "s"}</small>
+    </div>
+    <div class="result-summary-stat">
+     <span>BR Leader</span>
+     <strong>${portal.esc(br.leaders[0]?.name || "—")}</strong>
+     <small>${portal.esc(brLeaderText)}</small>
+    </div>
+   </div>
+
+   ${modeChips ? `<div class="result-summary-chips">${modeChips}</div>` : ""}
+  </section>
+ `;
+}
+
 function renderResults(matchResult) {
  const wrap = portal.qs("#resultsList");
  const errorNotice = matchErrorNotice(matchResult);
@@ -995,8 +1117,9 @@ function renderResults(matchResult) {
  }
 
  const modes = [...new Set(rows.map(row => row.mode).filter(Boolean))].sort((a, b) => modeOrder(a) - modeOrder(b));
+ const summaryHtml = buildResultSummaryHtml(rows);
 
- wrap.innerHTML = modes.map(mode => {
+ wrap.innerHTML = summaryHtml + modes.map(mode => {
   const modeRows = rows.filter(row => row.mode === mode);
   const cards = [...mpResultCards(modeRows), ...brResultCards(modeRows)];
 

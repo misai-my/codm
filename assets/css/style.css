@@ -4253,3 +4253,120 @@ select option:disabled {
   order: -1;
  }
 }
+
+/* ============================================================
+  MATCH RESULT SUMMARY
+  ============================================================ */
+.result-summary-card {
+ padding: 16px;
+ margin-bottom: 16px;
+ border-radius: 22px;
+ border: 1px solid rgba(248,209,92,.16);
+ background:
+  radial-gradient(circle at top left, rgba(248,209,92,.13), transparent 34%),
+  linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.02));
+ box-shadow: 0 18px 42px rgba(0,0,0,.20);
+}
+
+.result-summary-head {
+ display: flex;
+ justify-content: space-between;
+ gap: 14px;
+ align-items: flex-start;
+ margin-bottom: 14px;
+}
+
+.result-summary-head h3 {
+ margin: 2px 0 3px;
+ font-size: 18px;
+ line-height: 1.15;
+}
+
+.result-summary-head p {
+ margin: 0;
+ color: var(--muted2);
+ font-size: 12px;
+}
+
+.result-summary-grid {
+ display: grid;
+ grid-template-columns: repeat(4, minmax(0, 1fr));
+ gap: 10px;
+}
+
+.result-summary-stat {
+ min-width: 0;
+ padding: 12px;
+ border-radius: 16px;
+ border: 1px solid rgba(255,255,255,.08);
+ background: rgba(0,0,0,.18);
+}
+
+.result-summary-stat span {
+ display: block;
+ color: var(--muted2);
+ font-size: 10px;
+ font-weight: 950;
+ letter-spacing: .07em;
+ text-transform: uppercase;
+}
+
+.result-summary-stat strong {
+ display: block;
+ margin-top: 4px;
+ color: var(--gold);
+ font-size: 20px;
+ line-height: 1.1;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+}
+
+.result-summary-stat small {
+ display: block;
+ margin-top: 5px;
+ color: var(--muted2);
+ font-size: 11px;
+ line-height: 1.35;
+ overflow-wrap: anywhere;
+}
+
+.result-summary-chips {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 8px;
+ margin-top: 12px;
+}
+
+.result-summary-chip {
+ display: inline-flex;
+ align-items: center;
+ gap: 7px;
+ padding: 7px 10px;
+ border-radius: 999px;
+ border: 1px solid rgba(255,255,255,.08);
+ background: rgba(255,255,255,.04);
+ color: var(--muted2);
+ font-size: 11px;
+ font-weight: 800;
+}
+
+.result-summary-chip strong {
+ color: var(--text);
+}
+
+@media (max-width: 980px) {
+ .result-summary-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+ }
+}
+
+@media (max-width: 560px) {
+ .result-summary-head {
+  flex-direction: column;
+ }
+
+ .result-summary-grid {
+  grid-template-columns: 1fr;
+ }
+}

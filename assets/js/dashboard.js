@@ -572,14 +572,46 @@ function firstFilled(rows, fields) {
  return "";
 }
 
+function storedDateTimeParts(value) {
+ if (!value) return null;
+ const raw = String(value).trim();
+ if (!raw) return null;
+
+ // Sheet exports are treated as GMT+8 match times. Do not shift them based on the viewer browser timezone.
+ const cleaned = raw
+  .replace("T", " ")
+  .replace(/\.\d+/, "")
+  .replace(/Z$/i, "")
+  .replace(/[+-]\d{2}:?\d{2}$/, "")
+  .trim();
+
+ const match = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+ if (!match) return null;
+
+ const year = match[1];
+ const month = String(match[2]).padStart(2, "0");
+ const day = String(match[3]).padStart(2, "0");
+ const hour = match[4] !== undefined ? String(match[4]).padStart(2, "0") : "";
+ const minute = match[5] !== undefined ? String(match[5]).padStart(2, "0") : "";
+
+ return {
+  date: `${year}-${month}-${day}`,
+  time: hour && minute ? `${hour}:${minute}` : ""
+ };
+}
+
 function dateLabel(value) {
  if (!value) return "TBD";
- return new Date(value).toLocaleDateString();
+ const parts = storedDateTimeParts(value);
+ if (parts?.date) return parts.date;
+ return String(value);
 }
 
 function timeLabel(value) {
  if (!value) return "Time TBD";
- return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+ const parts = storedDateTimeParts(value);
+ if (parts?.time) return `${parts.time} GMT+8`;
+ return "GMT+8";
 }
 
 function hasFinalData(row) {
@@ -741,6 +773,92 @@ function renderSchedule(matchResult) {
    </div>
   `;
  }).join("");
+}
+
+function mpDisplayName(value, fallback) {
+ const text = String(value || "").trim();
+ return text || fallback || "Entry";
+}
+
+function mpSideName(group, side, fallback) {
+ const target = String(side || "").toUpperCase();
+ const sideRow = group.find(row => String(row.side || "").toUpperCase() === target);
+ if (sideRow) return mpDisplayName(sideRow.participant_name || sideRow.participant_tag, fallback);
+ return mpDisplayName(fallback);
+}
+
+function sideScoreFromGroup(group, side) {
+ const target = String(side || "").toUpperCase();
+ const sideRow = group.find(row => String(row.side || "").toUpperCase() === target);
+ if (sideRow && sideRow.score !== null && sideRow.score !== undefined && sideRow.score !== "") return numericValue(sideRow.score);
+
+ const reference = group.find(row => String(row.side || "").toUpperCase() === "A") || group[0];
+ if (!reference) return 0;
+
+ if (target === "A") return numericValue(reference.score);
+ return numericValue(reference.opponent_score);
+}
+
+function addMpStandingEntry(entries, name, wins, losses, pointDiff) {
+ const key = String(name || "Entry").trim().toLowerCase();
+ if (!entries.has(key)) {
+  entries.set(key, {
+   name: name || "Entry",
+   wins: 0,
+   losses: 0,
+   pointDiff: 0
+  });
+ }
+
+ const entry = entries.get(key);
+ entry.wins += wins;
+ entry.losses += losses;
+ entry.pointDiff += pointDiff;
+}
+
+function buildMpStandings(rows) {
+ const mpRows = rows.filter(row => String(row.mode).startsWith("MP_") && hasFinalData(row));
+ const mapGroups = groupRows(mpRows, row =>
+  [row.mode, row.stage, row.day_no, row.bracket, row.series_no, row.match_no, row.match_title, row.map_order, row.game_mode, row.map_name, row.team_a, row.team_b].join("|")
+ );
+ const entries = new Map();
+
+ mapGroups.forEach(group => {
+  const row = group.find(item => String(item.side || "").toUpperCase() === "A") || group[0];
+  if (!row) return;
+
+  const nameA = mpSideName(group, "A", row.team_a || "Player / Team A");
+  const nameB = mpSideName(group, "B", row.team_b || "Player / Team B");
+  const scoreA = sideScoreFromGroup(group, "A");
+  const scoreB = sideScoreFromGroup(group, "B");
+
+  let winA = 0;
+  let winB = 0;
+  let lossA = 0;
+  let lossB = 0;
+
+  if (scoreA !== scoreB) {
+   winA = scoreA > scoreB ? 1 : 0;
+   winB = scoreB > scoreA ? 1 : 0;
+   lossA = scoreA < scoreB ? 1 : 0;
+   lossB = scoreB < scoreA ? 1 : 0;
+  } else {
+   const winner = group.find(item => String(item.result || "").toUpperCase() === "W");
+   const winnerSide = String(winner?.side || "").toUpperCase();
+   if (winnerSide === "A") { winA = 1; lossB = 1; }
+   if (winnerSide === "B") { winB = 1; lossA = 1; }
+  }
+
+  addMpStandingEntry(entries, nameA, winA, lossA, scoreA - scoreB);
+  addMpStandingEntry(entries, nameB, winB, lossB, scoreB - scoreA);
+ });
+
+ return [...entries.values()].sort((a, b) =>
+  b.wins - a.wins ||
+  a.losses - b.losses ||
+  b.pointDiff - a.pointDiff ||
+  a.name.localeCompare(b.name)
+ );
 }
 
 function mpResultCards(rows) {
@@ -1036,30 +1154,97 @@ function brResultSummary(rows) {
  };
 }
 
+function resultDiffClass(value) {
+ return value > 0 ? "is-positive" : value < 0 ? "is-negative" : "";
+}
+
+function buildMpSummaryTable(modeRows) {
+ const standings = buildMpStandings(modeRows);
+ if (!standings.length) return "";
+ const mode = modeRows[0]?.mode || "";
+ return `
+  <div class="result-summary-table-block">
+   <div class="result-summary-table-title">
+    <h4>${portal.esc(modeLabel(mode))}</h4>
+    <span class="pill">${portal.esc(standings.length)} entries</span>
+   </div>
+   <div class="match-results-table-wrap result-summary-table-wrap">
+    <table class="match-results-table result-summary-table">
+     <thead>
+      <tr>
+       <th>Player / Team Name</th>
+       <th>Wins</th>
+       <th>Loss</th>
+       <th>Point Diff (+/-)</th>
+      </tr>
+     </thead>
+     <tbody>
+      ${standings.map(entry => `
+       <tr>
+        <td class="result-entry"><strong>${portal.esc(entry.name)}</strong></td>
+        <td>${portal.esc(entry.wins)}</td>
+        <td>${portal.esc(entry.losses)}</td>
+        <td class="result-diff ${resultDiffClass(entry.pointDiff)}"><strong>${entry.pointDiff > 0 ? "+" : ""}${portal.esc(entry.pointDiff)}</strong></td>
+       </tr>
+      `).join("")}
+     </tbody>
+    </table>
+   </div>
+  </div>
+ `;
+}
+
+function buildBrSummaryTable(modeRows) {
+ const standings = buildBrStandings(modeRows);
+ if (!standings.length) return "";
+ const mode = modeRows[0]?.mode || "";
+ return `
+  <div class="result-summary-table-block">
+   <div class="result-summary-table-title">
+    <h4>${portal.esc(modeLabel(mode))}</h4>
+    <span class="pill">${portal.esc(standings.length)} entries</span>
+   </div>
+   <div class="match-results-table-wrap result-summary-table-wrap">
+    <table class="match-results-table result-summary-table br-summary-table">
+     <thead>
+      <tr>
+       <th>Rank</th>
+       <th>Team / Player</th>
+       <th>Victory</th>
+       <th>Placement Pts</th>
+       <th>Elimination Pts</th>
+       <th>Total Pts</th>
+      </tr>
+     </thead>
+     <tbody>
+      ${standings.map((entry, index) => `
+       <tr>
+        <td class="br-rank">#${index + 1}</td>
+        <td class="result-entry"><strong>${portal.esc(entry.name)}</strong>${entry.tag ? ` <small>${portal.esc(entry.tag)}</small>` : ""}</td>
+        <td>${portal.esc(entry.victories)}</td>
+        <td>${portal.esc(entry.placementPoints)}</td>
+        <td>${portal.esc(entry.eliminationPoints)}</td>
+        <td class="br-total"><strong>${portal.esc(entry.totalPoints)}</strong></td>
+       </tr>
+      `).join("")}
+     </tbody>
+    </table>
+   </div>
+  </div>
+ `;
+}
+
 function buildResultSummaryHtml(rows) {
  const finalRows = rows.filter(row => hasFinalData(row));
  if (!finalRows.length) return "";
 
- const mp = mpResultSummary(finalRows);
- const br = brResultSummary(finalRows);
  const modes = [...new Set(finalRows.map(row => row.mode).filter(Boolean))].sort((a, b) => modeOrder(a) - modeOrder(b));
-
- const modeChips = modes.map(mode => {
+ const summaryTables = modes.map(mode => {
   const modeRows = finalRows.filter(row => row.mode === mode);
-  const isBr = String(mode).startsWith("BR_");
-  const label = isBr
-   ? `${modeRows.length} row${modeRows.length === 1 ? "" : "s"}`
-   : `${mpResultSummary(modeRows).maps} map${mpResultSummary(modeRows).maps === 1 ? "" : "s"}`;
-  return `<span class="result-summary-chip"><strong>${portal.esc(modeLabel(mode))}</strong>${portal.esc(label)}</span>`;
- }).join("");
+  return String(mode).startsWith("BR_") ? buildBrSummaryTable(modeRows) : buildMpSummaryTable(modeRows);
+ }).filter(Boolean).join("");
 
- const mpWinnerText = mp.topWinnerName
-  ? `${mp.topWinnerName} · ${mp.topWinnerMaps} map win${mp.topWinnerMaps === 1 ? "" : "s"}`
-  : "No MP winners yet";
-
- const brLeaderText = br.leaders.length
-  ? br.leaders.slice(0, 3).map(item => `${item.mode}: ${item.name}${item.tag ? " (" + item.tag + ")" : ""} · ${item.totalPoints} pts`).join(" • ")
-  : "No BR leader yet";
+ if (!summaryTables) return "";
 
  return `
   <section class="result-summary-card" aria-label="Match result summary">
@@ -1067,35 +1252,13 @@ function buildResultSummaryHtml(rows) {
     <div>
      <span class="eyebrow">Overview</span>
      <h3>Match Result Summary</h3>
-     <p>Updates based on the selected Match Results filters.</p>
+     <p>Aggregated table based on the selected Match Results filters.</p>
     </div>
     <span class="pill pill-green">${portal.esc(finalRows.length)} final row${finalRows.length === 1 ? "" : "s"}</span>
    </div>
-
-   <div class="result-summary-grid">
-    <div class="result-summary-stat">
-     <span>MP Maps</span>
-     <strong>${portal.esc(mp.maps)}</strong>
-     <small>${portal.esc(mp.series)} series / match group${mp.series === 1 ? "" : "s"}</small>
-    </div>
-    <div class="result-summary-stat">
-     <span>Top MP Winner</span>
-     <strong>${portal.esc(mp.topWinnerName || "—")}</strong>
-     <small>${portal.esc(mpWinnerText)}</small>
-    </div>
-    <div class="result-summary-stat">
-     <span>BR Tables</span>
-     <strong>${portal.esc(br.tables)}</strong>
-     <small>${portal.esc(br.entries)} entries · ${portal.esc(br.rounds)} round${br.rounds === 1 ? "" : "s"}</small>
-    </div>
-    <div class="result-summary-stat">
-     <span>BR Leader</span>
-     <strong>${portal.esc(br.leaders[0]?.name || "—")}</strong>
-     <small>${portal.esc(brLeaderText)}</small>
-    </div>
+   <div class="result-summary-table-stack">
+    ${summaryTables}
    </div>
-
-   ${modeChips ? `<div class="result-summary-chips">${modeChips}</div>` : ""}
   </section>
  `;
 }

@@ -4254,6 +4254,69 @@ select option:disabled {
  }
 }
 
+
+/* Shared compact Match Results table format */
+.mp-table-card {
+ overflow: hidden;
+}
+
+.match-results-table-wrap {
+ width: 100%;
+ overflow-x: auto;
+ margin-top: 12px;
+ border-radius: 16px;
+ border: 1px solid rgba(255,255,255,.08);
+ background: rgba(0,0,0,.16);
+}
+
+.match-results-table {
+ width: 100%;
+ min-width: 560px;
+ border-collapse: collapse;
+}
+
+.match-results-table th,
+.match-results-table td {
+ padding: 10px 12px;
+ border-bottom: 1px solid rgba(255,255,255,.07);
+ text-align: center;
+ vertical-align: middle;
+}
+
+.match-results-table th {
+ color: var(--muted2);
+ font-size: 10px;
+ font-weight: 950;
+ letter-spacing: .07em;
+ text-transform: uppercase;
+ background: rgba(255,255,255,.035);
+}
+
+.match-results-table tbody tr:last-child td {
+ border-bottom: 0;
+}
+
+.match-results-table .result-entry {
+ text-align: left;
+ min-width: 210px;
+}
+
+.match-results-table .result-entry strong {
+ overflow-wrap: anywhere;
+}
+
+.match-results-table .result-diff strong {
+ color: var(--gold);
+}
+
+.match-results-table .result-diff.is-positive strong {
+ color: var(--green);
+}
+
+.match-results-table .result-diff.is-negative strong {
+ color: var(--red);
+}
+
 /* ============================================================
   MATCH RESULT SUMMARY
   ============================================================ */
@@ -4369,4 +4432,40 @@ select option:disabled {
  .result-summary-grid {
   grid-template-columns: 1fr;
  }
+}
+
+/* Match Result Summary table view */
+.result-summary-table-stack {
+ display: grid;
+ gap: 14px;
+}
+
+.result-summary-table-block {
+ min-width: 0;
+}
+
+.result-summary-table-title {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ gap: 10px;
+ margin: 0 0 8px;
+}
+
+.result-summary-table-title h4 {
+ margin: 0;
+ font-size: 14px;
+ line-height: 1.2;
+}
+
+.result-summary-table-wrap {
+ margin-top: 0;
+}
+
+.result-summary-table {
+ min-width: 520px;
+}
+
+.br-summary-table {
+ min-width: 720px;
 }

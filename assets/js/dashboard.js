@@ -129,6 +129,42 @@ function renderPrizePool() {
  `;
 }
 
+
+function renderCommunication() {
+ const wrap = portal.qs("#communicationDisplay");
+ if (!wrap) return;
+
+ const published = tournament?.communication_published !== false;
+ const discordUrl = portal.text(tournament?.communication_discord_url || tournament?.discord_invite_url);
+ const title = portal.text(tournament?.communication_title) || "Tournament Communication";
+ const subtitle = portal.text(tournament?.communication_subtitle) || "Join the tournament server for match reminders, support, and coordination updates.";
+ const buttonLabel = portal.text(tournament?.communication_discord_button_label) || "Join our Discord server";
+ const note = portal.text(tournament?.communication_note);
+
+ if (!published || !discordUrl) {
+  wrap.innerHTML = `<div class="notice notice-info">Communication link is not available yet.</div>`;
+  return;
+ }
+
+ wrap.innerHTML = `
+  <div class="communication-card">
+   <div class="communication-brand-block">
+    <img class="communication-discord-logo" src="assets/img/discord-logo-blurple.svg" alt="Discord" loading="lazy"/>
+   </div>
+   <div class="communication-copy">
+    <div class="eyebrow">Discord Server</div>
+    <h3>${portal.esc(title)}</h3>
+    <p>${portal.esc(subtitle)}</p>
+    ${note ? `<div class="communication-note">${portal.esc(note).replace(/\r\n|\r|\n/g, "<br>")}</div>` : ""}
+    <p class="communication-disclaimer">Discord is a trademark of Discord Inc. This link is provided for tournament communication and does not imply Discord sponsorship.</p>
+   </div>
+   <div class="communication-actions">
+    <a class="btn btn-primary communication-discord-button" href="${portal.esc(discordUrl)}" target="_blank" rel="noopener noreferrer">${portal.esc(buttonLabel)}</a>
+   </div>
+  </div>
+ `;
+}
+
 async function selectDashboardTournament(slug) {
  const selected = dashboardTournaments.find(row => row.slug === slug);
  portal.setSelectedTournamentSlug(slug, true);
@@ -1889,6 +1925,7 @@ async function renderDashboardData() {
  portal.qs("#portalMeta").textContent = `${tournament?.title || "CODM Tournament OS"} · Public event information hub`;
  syncDashboardTournamentUi();
  renderPrizePool();
+ renderCommunication();
 
  renderRulebook();
 

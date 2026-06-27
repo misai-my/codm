@@ -14,6 +14,7 @@ let tournamentSettingsWired = false;
 let timelineFormWired = false;
 let tournamentDirectoryWired = false;
 let prizePoolFormWired = false;
+let communicationFormWired = false;
 
 
 function adminTournamentSlug() {
@@ -58,6 +59,7 @@ async function switchAdminTournament(slug) {
  renderTournamentSettings();
  renderTournamentDirectory();
  renderPrizePoolSettings();
+ renderCommunicationSettings();
  renderTimelineTable();
  renderAdminMatchPreviews();
  await loadAdminData();
@@ -403,6 +405,7 @@ async function savePrizePoolSettings(event) {
  activeTournament = data || { ...activeTournament, ...payload };
  adminTournaments = adminTournaments.map(row => row.slug === activeTournament.slug ? activeTournament : row);
  renderPrizePoolSettings();
+ renderCommunicationSettings();
  renderAdminTournamentSelector();
  showPrizePoolStatus("Prize pool settings saved.", "success");
  portal.toast("Prize pool saved.");
@@ -419,6 +422,86 @@ function wirePrizePoolForm() {
    console.error(err);
    showPrizePoolStatus(err.message || "Could not save prize pool settings.", "warning");
    portal.toast(err.message || "Could not save prize pool settings.");
+  }
+ });
+}
+
+
+function showCommunicationStatus(message, kind = "info") {
+ const status = portal.qs("#communicationStatus");
+ if (!status) return;
+ status.className = `notice section-tight ${kind === "success" ? "notice-success" : kind === "warning" ? "notice-warning" : ""}`;
+ status.textContent = message;
+ status.classList.remove("hidden");
+}
+
+function renderCommunicationSettings() {
+ const published = portal.qs("#communicationPublished");
+ const title = portal.qs("#communicationTitle");
+ const subtitle = portal.qs("#communicationSubtitle");
+ const url = portal.qs("#discordInviteUrl");
+ const buttonLabel = portal.qs("#discordButtonLabel");
+ const note = portal.qs("#communicationNote");
+ const status = portal.qs("#communicationStatus");
+
+ if (published) published.value = activeTournament?.communication_published === false ? "false" : "true";
+ if (title) title.value = activeTournament?.communication_title || "Tournament Communication";
+ if (subtitle) subtitle.value = activeTournament?.communication_subtitle || "Join the tournament server for match reminders, support, and coordination updates.";
+ if (url) url.value = activeTournament?.communication_discord_url || activeTournament?.discord_invite_url || "";
+ if (buttonLabel) buttonLabel.value = activeTournament?.communication_discord_button_label || "Join our Discord server";
+ if (note) note.value = activeTournament?.communication_note || "";
+
+ if (status) {
+  const hasUrl = Boolean(activeTournament?.communication_discord_url || activeTournament?.discord_invite_url);
+  const isPublished = activeTournament?.communication_published !== false;
+  status.className = `notice section-tight ${hasUrl && isPublished ? "notice-success" : "notice-warning"}`;
+  status.textContent = hasUrl
+   ? `Communication section is currently ${isPublished ? "visible" : "hidden"} on the public dashboard.`
+   : "Communication link is not configured yet.";
+  status.classList.remove("hidden");
+ }
+}
+
+async function saveCommunicationSettings(event) {
+ event.preventDefault();
+
+ const payload = {
+  communication_published: portal.qs("#communicationPublished")?.value === "true",
+  communication_title: portal.text(portal.qs("#communicationTitle")?.value) || "Tournament Communication",
+  communication_subtitle: portal.text(portal.qs("#communicationSubtitle")?.value),
+  communication_discord_url: portal.text(portal.qs("#discordInviteUrl")?.value),
+  communication_discord_button_label: portal.text(portal.qs("#discordButtonLabel")?.value) || "Join our Discord server",
+  communication_note: portal.text(portal.qs("#communicationNote")?.value)
+ };
+
+ const { data, error } = await sb
+  .from("tournaments")
+  .update(payload)
+  .eq("slug", adminTournamentSlug())
+  .select("*")
+  .maybeSingle();
+
+ if (error) throw error;
+
+ activeTournament = data || { ...activeTournament, ...payload };
+ adminTournaments = adminTournaments.map(row => row.slug === activeTournament.slug ? activeTournament : row);
+ renderCommunicationSettings();
+ renderAdminTournamentSelector();
+ showCommunicationStatus("Communication settings saved.", "success");
+ portal.toast("Communication saved.");
+}
+
+function wireCommunicationForm() {
+ if (communicationFormWired) return;
+ communicationFormWired = true;
+
+ portal.qs("#communicationForm")?.addEventListener("submit", async event => {
+  try {
+   await saveCommunicationSettings(event);
+  } catch (err) {
+   console.error(err);
+   showCommunicationStatus(err.message || "Could not save communication settings.", "warning");
+   portal.toast(err.message || "Could not save communication settings.");
   }
  });
 }
@@ -468,6 +551,7 @@ async function saveTournamentRegistrationSettings(event) {
  renderTournamentSettings();
  renderTournamentDirectory();
  renderPrizePoolSettings();
+ renderCommunicationSettings();
  portal.updateTournamentLinks(document, adminTournamentSlug());
  portal.toast(payload.registration_open ? "Registration opened." : "Registration closed.");
 }
@@ -1175,6 +1259,7 @@ async function bootAdminConsole() {
  renderAdminTournamentSelector();
  renderTournamentDirectory();
  renderPrizePoolSettings();
+ renderCommunicationSettings();
  wireAdminTournamentSelector();
  wireTournamentDirectory();
  await loadAdminData();
@@ -1182,6 +1267,7 @@ async function bootAdminConsole() {
  wireTournamentRegistrationForm();
  wireTimelineForm();
  wirePrizePoolForm();
+ wireCommunicationForm();
  wireAnnouncementForm();
 }
 

@@ -4792,3 +4792,98 @@ select option:disabled {
   font-size: 14px !important;
  }
 }
+
+/* ============================================================
+   COMMUNICATION / DISCORD SECTION
+   Uses Discord's official Blurple logo asset without recoloring.
+   ============================================================ */
+.communication-display {
+ display: grid;
+ gap: 14px;
+}
+
+.communication-card {
+ display: grid;
+ grid-template-columns: minmax(160px, 260px) minmax(0, 1fr) auto;
+ align-items: center;
+ gap: clamp(16px, 3vw, 28px);
+ padding: clamp(18px, 3vw, 28px);
+ border: 1px solid rgba(88, 101, 242, .42);
+ border-radius: 24px;
+ background:
+  radial-gradient(circle at 12% 20%, rgba(88, 101, 242, .24), transparent 34%),
+  linear-gradient(145deg, rgba(88, 101, 242, .14), rgba(255, 255, 255, .035));
+ box-shadow: 0 24px 60px rgba(0, 0, 0, .24);
+ overflow: hidden;
+}
+
+.communication-brand-block {
+ min-height: 96px;
+ display: grid;
+ place-items: center;
+ padding: 16px;
+ border-radius: 20px;
+ background: rgba(0, 0, 0, .22);
+ border: 1px solid rgba(255, 255, 255, .10);
+}
+
+.communication-discord-logo {
+ display: block;
+ width: min(100%, 210px);
+ height: auto;
+ object-fit: contain;
+}
+
+.communication-copy h3 {
+ margin: 6px 0 8px;
+ font-size: clamp(22px, 3vw, 34px);
+ letter-spacing: -.03em;
+}
+
+.communication-copy p {
+ margin: 0;
+ color: var(--muted);
+}
+
+.communication-note {
+ margin-top: 12px;
+ padding: 10px 12px;
+ border-radius: 14px;
+ background: rgba(255, 255, 255, .055);
+ border: 1px solid rgba(255, 255, 255, .10);
+ color: rgba(244, 248, 255, .90);
+}
+
+.communication-disclaimer {
+ margin-top: 12px !important;
+ font-size: 12px;
+ color: rgba(165, 176, 199, .78) !important;
+}
+
+.communication-actions {
+ display: grid;
+ justify-items: end;
+ gap: 10px;
+ min-width: 190px;
+}
+
+.communication-discord-button {
+ background: #5865F2 !important;
+ border-color: rgba(88, 101, 242, .72) !important;
+ color: #fff !important;
+ box-shadow: 0 16px 32px rgba(88, 101, 242, .28) !important;
+}
+
+@media (max-width: 900px) {
+ .communication-card {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+ }
+ .communication-actions {
+  justify-items: stretch;
+  min-width: 0;
+ }
+ .communication-brand-block {
+  min-height: 86px;
+ }
+}

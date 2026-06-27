@@ -4,7 +4,7 @@
  <meta charset="utf-8"/>
  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
  <title>Admin · CODM Tournament OS</title>
- <link rel="stylesheet" href="assets/css/style.css?v=prize-pool-v1"/>
+ <link rel="stylesheet" href="assets/css/style.css?v=communication-discord-v1"/>
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/favicon-192x192.png?v=favicon-yellow-v1">
@@ -120,6 +120,7 @@
      <a class="admin-tab" href="#tournamentSetupAdmin" title="Tournament Setup">Tournament Setup</a>
      <a class="admin-tab" href="#tournamentDirectoryAdmin" title="Tournament Directory">Tournament Directory</a>
      <a class="admin-tab" href="#prizePoolAdmin" title="Prize Pool">Prize Pool</a>
+     <a class="admin-tab" href="#communicationAdmin" title="Communication">Communication</a>
      <a class="admin-tab" href="#announcementsAdmin" title="Announcements">Announcements</a>
      <a class="admin-tab" href="#sheetSyncAdmin" title="Sheet Sync">Sheet Sync</a>
      <a class="admin-tab" href="#matchPreviewAdmin" title="Match Preview">Match Preview</a>
@@ -132,6 +133,7 @@
       <a href="#tournamentSetupAdmin">Tournament Setup</a>
       <a href="#tournamentDirectoryAdmin">Tournament Directory</a>
       <a href="#prizePoolAdmin">Prize Pool</a>
+      <a href="#communicationAdmin">Communication</a>
       <a href="#announcementsAdmin">Announcements</a>
       <a href="#sheetSyncAdmin">Sheet Sync</a>
       <a href="#schedulePreview">Schedule Preview</a>
@@ -326,6 +328,64 @@
          <a class="btn" href="dashboard.html#prize" data-tournament-link="dashboard.html#prize" target="_blank" rel="noopener">View Public Prize Pool</a>
         </div>
         <div id="prizePoolStatus" class="notice section-tight hidden"></div>
+       </form>
+      </section>
+
+
+      <section class="card" id="communicationAdmin">
+       <div class="section-head">
+        <div>
+         <div class="eyebrow">Public Event Info</div>
+         <h2>Communication</h2>
+         <p>Set the Discord communication link shown on the public dashboard for the selected tournament.</p>
+        </div>
+       </div>
+
+       <div class="notice">
+        Use the official Discord wordmark only as provided. Do not recolor, distort, or make the tournament look sponsored by Discord.
+       </div>
+
+       <form id="communicationForm" class="form section-tight">
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="communicationPublished">Public Display</label>
+          <select id="communicationPublished">
+           <option value="true">Show Communication Section</option>
+           <option value="false">Hide Communication Section</option>
+          </select>
+         </div>
+         <div class="field">
+          <label for="discordInviteUrl">Discord Invite Link</label>
+          <input id="discordInviteUrl" type="url" maxlength="500" placeholder="https://discord.gg/your-invite"/>
+         </div>
+        </div>
+
+        <div class="grid grid-two">
+         <div class="field">
+          <label for="communicationTitle">Display Title</label>
+          <input id="communicationTitle" maxlength="140" placeholder="Tournament Communication"/>
+         </div>
+         <div class="field">
+          <label for="discordButtonLabel">Button Label</label>
+          <input id="discordButtonLabel" maxlength="80" placeholder="Join our Discord server"/>
+         </div>
+        </div>
+
+        <div class="field">
+         <label for="communicationSubtitle">Subtitle optional</label>
+         <input id="communicationSubtitle" maxlength="220" placeholder="Join the tournament server for match reminders, support, and coordination updates."/>
+        </div>
+
+        <div class="field">
+         <label for="communicationNote">Note optional</label>
+         <textarea id="communicationNote" rows="3" maxlength="1000" placeholder="This community server is managed by the tournament organizers."></textarea>
+        </div>
+
+        <div class="actions">
+         <button class="btn btn-primary" type="submit">Save Communication</button>
+         <a class="btn" href="dashboard.html#communication" data-tournament-link="dashboard.html#communication" target="_blank" rel="noopener">View Public Communication</a>
+        </div>
+        <div id="communicationStatus" class="notice section-tight hidden"></div>
        </form>
       </section>
 
@@ -757,8 +817,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/config.js?v=mt-public-visibility-v4"></script>
-<script src="assets/js/app.js?v=prize-pool-v1"></script>
+<script src="assets/js/app.js?v=communication-discord-v1"></script>
  <script src="assets/js/i18n.js?v=i18n-v2"></script>
-<script src="assets/js/admin.js?v=prize-pool-v1"></script>
+<script src="assets/js/admin.js?v=communication-discord-v1"></script>
 </body>
 </html>

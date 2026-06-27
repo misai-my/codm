@@ -103,7 +103,13 @@ function tournamentFallback(slug = getSelectedTournamentSlug()) {
   prize_pool_breakdown: "",
   prize_pool_placement_header: "Placement / Award",
   prize_pool_prize_header: "Prize",
-  prize_pool_note: ""
+  prize_pool_note: "",
+  communication_published: false,
+  communication_title: "Tournament Communication",
+  communication_subtitle: "Join the tournament server for match reminders, support, and coordination updates.",
+  communication_discord_url: "",
+  communication_discord_button_label: "Join our Discord server",
+  communication_note: ""
  };
 }
 

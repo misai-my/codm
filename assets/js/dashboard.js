@@ -1091,8 +1091,26 @@ function mpResultCards(rows) {
 }
 
 function numericValue(value) {
+ if (value === true) return 1;
+ if (value === false) return 0;
+ const text = String(value ?? "").trim().toLowerCase();
+ if (["true", "yes", "y", "w", "win", "winner", "booyah", "victory"].includes(text)) return 1;
+ if (["false", "no", "n", "l", "loss"].includes(text)) return 0;
  const number = Number(value);
  return Number.isFinite(number) ? number : 0;
+}
+
+function brEntryIdentity(row) {
+ const name = String(row.participant_name || "").trim();
+ const tag = String(row.participant_tag || "").trim();
+ const fallback = String(row.slot || row.id || row.source_row || "").trim();
+ const keyName = name.toLowerCase();
+ const keyTag = tag.toLowerCase();
+
+ // BR Squad can have repeated tags across different entries. Use tag + name together
+ // so teams with the same short tag do not get merged into one standing row.
+ const key = [keyTag || "no-tag", keyName || fallback || "no-name"].join("|");
+ return { key, name: name || tag || "Entry", tag };
 }
 
 function brRoundKey(row) {
@@ -1156,14 +1174,14 @@ function buildBrStandings(rows) {
  const entries = new Map();
 
  rows.forEach(row => {
-  const key = String(row.participant_tag || row.participant_name || row.slot || row.id || "").trim();
-  if (!key) return;
+  const identity = brEntryIdentity(row);
+  if (!identity.key) return;
 
-  if (!entries.has(key)) {
-   entries.set(key, {
-    key,
-    name: row.participant_name || "Entry",
-    tag: row.participant_tag || "",
+  if (!entries.has(identity.key)) {
+   entries.set(identity.key, {
+    key: identity.key,
+    name: identity.name || "Entry",
+    tag: identity.tag || "",
     victories: 0,
     placementPoints: 0,
     eliminationPoints: 0,
@@ -1172,31 +1190,56 @@ function buildBrStandings(rows) {
    });
   }
 
-  const entry = entries.get(key);
-  entry.victories += numericValue(row.victory);
-  entry.placementPoints += numericValue(row.placement_points);
-  entry.eliminationPoints += numericValue(row.elimination_points);
-
-  const rowTotal = row.total_points === null || row.total_points === undefined || row.total_points === ""
-   ? numericValue(row.placement_points) + numericValue(row.elimination_points)
-   : numericValue(row.total_points);
-
-  entry.totalPoints += rowTotal;
-
+  const entry = entries.get(identity.key);
   const roundKey = brRoundKey(row);
-  const currentRound = entry.rounds.get(roundKey);
-
-  // Keep the best available placement for duplicate source rows in the same round.
   const placement = row.placement === null || row.placement === undefined || row.placement === ""
    ? 9999
    : numericValue(row.placement);
 
-  if (!currentRound || placement < currentRound.placement) {
+  if (!entry.rounds.has(roundKey)) {
    entry.rounds.set(roundKey, {
-    placement,
-    order: brRoundOrder(row)
+    placement: 9999,
+    order: brRoundOrder(row),
+    victories: 0,
+    placementPoints: 0,
+    eliminationPoints: 0,
+    explicitTotal: null,
+    sourceRows: 0
    });
   }
+
+  const round = entry.rounds.get(roundKey);
+  round.sourceRows += 1;
+  round.placement = Math.min(round.placement, placement);
+  round.order = Math.max(round.order, brRoundOrder(row));
+  round.victories = Math.max(round.victories, numericValue(row.victory));
+
+  // Placement and Victory are round-level values. If a BR Squad is accidentally
+  // represented by multiple rows in the same round, do not multiply them.
+  round.placementPoints = Math.max(round.placementPoints, numericValue(row.placement_points));
+
+  // Eliminations can be entered as a team total in one row or as split rows; sum them.
+  round.eliminationPoints += numericValue(row.elimination_points);
+
+  if (row.total_points !== null && row.total_points !== undefined && row.total_points !== "") {
+   round.explicitTotal = Math.max(round.explicitTotal ?? 0, numericValue(row.total_points));
+  }
+ });
+
+ entries.forEach(entry => {
+  entry.rounds.forEach(round => {
+   entry.victories += round.victories;
+   entry.placementPoints += round.placementPoints;
+   entry.eliminationPoints += round.eliminationPoints;
+
+   const computedTotal = round.placementPoints + round.eliminationPoints;
+   // Trust the sheet Total Pts when there is one source row. For multiple BR Squad
+   // rows in the same round, calculate from placement + elimination to avoid
+   // multiplying a repeated team total.
+   entry.totalPoints += round.sourceRows === 1 && round.explicitTotal !== null
+    ? round.explicitTotal
+    : computedTotal;
+  });
  });
 
  return [...entries.values()].sort(compareBrStandings);

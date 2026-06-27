@@ -3042,6 +3042,62 @@ header.dashboard-sticky-nav,
   rgba(6, 10, 20, .42);
 }
 
+
+.team-directory-card.is-eliminated {
+ opacity: .58;
+ filter: grayscale(.88);
+ background:
+  radial-gradient(circle at 90% 6%, rgba(239, 68, 68, .12), transparent 38%),
+  rgba(10, 12, 18, .56);
+ border-color: rgba(239, 68, 68, .24);
+}
+
+.team-directory-card.is-eliminated .team-directory-name strong,
+.team-directory-card.is-eliminated .team-roster span {
+ color: rgba(229, 231, 235, .72);
+}
+
+.team-directory-logo {
+ position: relative;
+}
+
+.team-directory-card.is-eliminated .team-directory-logo::after {
+ content: "";
+ position: absolute;
+ left: -16%;
+ top: 50%;
+ width: 132%;
+ height: 4px;
+ border-radius: 999px;
+ background: rgba(239, 68, 68, .95);
+ box-shadow: 0 0 10px rgba(239, 68, 68, .6);
+ transform: translateY(-50%) rotate(-38deg);
+ pointer-events: none;
+}
+
+.team-status-line {
+ display: flex;
+ align-items: center;
+ flex-wrap: wrap;
+ gap: 6px;
+ min-height: 16px;
+}
+
+.team-status-line em {
+ display: inline-flex;
+ align-items: center;
+ border: 1px solid rgba(239, 68, 68, .45);
+ border-radius: 999px;
+ padding: 2px 7px;
+ color: #fecaca;
+ background: rgba(127, 29, 29, .34);
+ font-size: 9px;
+ font-style: normal;
+ font-weight: 950;
+ letter-spacing: .12em;
+ text-transform: uppercase;
+}
+
 .team-directory-card-head {
  display: flex;
  align-items: center;

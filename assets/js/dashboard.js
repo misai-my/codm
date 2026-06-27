@@ -386,6 +386,10 @@ function teamSearchText(row) {
  ].filter(Boolean).join(" ").toLowerCase();
 }
 
+function isTeamEliminated(row) {
+ return row?.is_eliminated === true || String(row?.is_eliminated || "").toLowerCase() === "true";
+}
+
 function populateTeamDirectoryFilters(rows) {
  const modeSelect = portal.qs("#teamsModeFilter");
  if (!modeSelect) return;
@@ -500,7 +504,11 @@ function renderParticipatingTeams(result) {
   [...rows].sort((a, b) => {
    const modeDiff = modeOrder(a.mode) - modeOrder(b.mode);
    if (modeDiff !== 0) return modeDiff;
-   return portal.text(a.team_name).localeCompare(portal.text(b.team_name));
+
+   const eliminatedDiff = Number(isTeamEliminated(a)) - Number(isTeamEliminated(b));
+   if (eliminatedDiff !== 0) return eliminatedDiff;
+
+   return portal.text(a.team_name || a.team_tag).localeCompare(portal.text(b.team_name || b.team_tag));
   }),
   row => row.mode || "Other"
  );
@@ -520,14 +528,15 @@ function renderParticipatingTeams(result) {
       const roster = safeTeamRoster(row)
        .sort((a, b) => Number(a?.order || 0) - Number(b?.order || 0))
        .filter(player => portal.text(player?.name));
+      const eliminated = isTeamEliminated(row);
 
       return `
-       <article class="team-directory-card">
+       <article class="team-directory-card ${eliminated ? "is-eliminated" : "is-active"}">
         <div class="team-directory-card-head">
          ${teamLogoMarkup(row)}
          <div class="team-directory-name">
           <strong>${portal.esc(row.team_name || row.team_tag || "Team")}</strong>
-          ${row.team_tag ? `<span>${portal.esc(row.team_tag)}</span>` : ""}
+          <span class="team-status-line">${row.team_tag ? portal.esc(row.team_tag) : ""}${eliminated ? `<em>Eliminated</em>` : ""}</span>
          </div>
         </div>
 

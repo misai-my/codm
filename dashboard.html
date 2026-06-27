@@ -42,11 +42,6 @@
     <option value="zh">ZH</option>
    </select>
   </div>
-
-  <div class="tournament-switcher dashboard-tournament-switcher">
-   <label for="dashboardTournamentSelect">Tournament</label>
-   <select id="dashboardTournamentSelect" aria-label="Select tournament"></select>
-  </div>
  </div>
 </header>
 
@@ -66,6 +61,18 @@
  <section class="section">
   <div class="container public-hub-content">
    <div class="panel-stack">
+    <section class="card dashboard-tournament-selector-card" id="tournamentSelectorPanel" aria-label="Tournament selector">
+     <div class="dashboard-tournament-selector-copy">
+      <div class="eyebrow">Tournament View</div>
+      <h2>Select Tournament</h2>
+      <p>Choose which public tournament details to view across announcements, schedule, teams, results, rulebook, and prize pool.</p>
+     </div>
+     <div class="tournament-switcher dashboard-tournament-switcher dashboard-main-tournament-switcher">
+      <label for="dashboardTournamentSelect">Tournament</label>
+      <select id="dashboardTournamentSelect" aria-label="Select tournament"></select>
+     </div>
+    </section>
+
     <section class="card" id="announcements">
      <div class="section-head">
       <div>

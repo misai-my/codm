@@ -4652,3 +4652,58 @@ select option:disabled {
   text-align: left;
  }
 }
+
+/* ============================================================
+   DASHBOARD TOURNAMENT SELECTOR SIZE TUNE
+   Makes the public dashboard selector easier to read without
+   crowding the compact header layout.
+   ============================================================ */
+.dashboard-sticky-nav .dashboard-tournament-switcher {
+ flex: 0 1 300px !important;
+ min-width: 240px !important;
+}
+
+.dashboard-sticky-nav .dashboard-tournament-switcher select {
+ min-height: 36px !important;
+ padding: 8px 34px 8px 12px !important;
+ font-size: 12.5px !important;
+ border-radius: 12px !important;
+}
+
+@media (max-width: 1220px) and (min-width: 761px) {
+ .dashboard-sticky-nav .nav-inner {
+  grid-template-columns: auto 76px minmax(260px, 1fr) !important;
+ }
+
+ .dashboard-sticky-nav .dashboard-tournament-switcher {
+  min-width: 0 !important;
+ }
+
+ .dashboard-sticky-nav .dashboard-tournament-switcher select {
+  min-height: 35px !important;
+  font-size: 12px !important;
+ }
+}
+
+@media (max-width: 940px) and (min-width: 761px) {
+ .dashboard-sticky-nav .nav-inner {
+  grid-template-columns: minmax(0, 1fr) 76px !important;
+ }
+
+ .dashboard-sticky-nav .dashboard-tournament-switcher {
+  width: 100% !important;
+  max-width: none !important;
+ }
+}
+
+@media (max-width: 760px) {
+ .dashboard-sticky-nav .dashboard-tournament-switcher {
+  flex: 1 1 230px !important;
+  max-width: 360px !important;
+ }
+
+ .dashboard-sticky-nav .dashboard-tournament-switcher select {
+  min-height: 34px !important;
+  font-size: 11.5px !important;
+ }
+}

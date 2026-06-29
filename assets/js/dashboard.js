@@ -279,15 +279,31 @@ async function loadTournamentTimeline() {
  }
 }
 
+function timelineDateTimeText(value) {
+ if (!value) return "";
+ const date = dateLabel(value);
+ const time = timeLabel(value);
+ if (date && time && time !== "GMT+8") return `${date} · ${time}`;
+ if (date) return `${date} · GMT+8`;
+ return String(value);
+}
+
 function timelineDateText(row) {
  if (row?.display_date_text) return row.display_date_text;
 
+ const startDate = dateLabel(row?.start_at);
+ const endDate = dateLabel(row?.end_at);
+
  if (row?.start_at && row?.end_at) {
-  return `${dateLabel(row.start_at)} · ${timeLabel(row.start_at)}–${timeLabel(row.end_at)}`;
+  if (startDate && endDate && startDate !== endDate) {
+   return `${timelineDateTimeText(row.start_at)} – ${timelineDateTimeText(row.end_at)}`;
+  }
+
+  return `${startDate} · ${timeLabel(row.start_at)}–${timeLabel(row.end_at)}`;
  }
 
  if (row?.start_at) {
-  return `${dateLabel(row.start_at)} · ${timeLabel(row.start_at)}`;
+  return timelineDateTimeText(row.start_at);
  }
 
  return "Date TBA";

@@ -30,6 +30,21 @@
   .admin-guide-body code{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:1px 5px;}
   .admin-guide-body a{color:#ffd34d;text-decoration:underline;}
   @media(max-width:720px){.admin-guide-modal{right:10px;left:10px;bottom:70px;width:auto;max-height:78vh}.admin-guide-float-btn{right:12px;bottom:12px}.admin-guide-body{padding:14px}}
+
+  /* Admin section order + collapsible cards */
+  .admin-collapsible{overflow:hidden;}
+  .admin-collapsible>.section-head{align-items:flex-start;gap:14px;cursor:pointer;}
+  .admin-collapsible>.section-head>div:first-child{min-width:0;}
+  .admin-section-toggle{min-width:82px;white-space:nowrap;align-self:flex-start;}
+  .admin-collapsible-body{padding-top:2px;}
+  .admin-collapsible.is-collapsed .admin-collapsible-body{display:none;}
+  .admin-collapsible.is-collapsed{padding-bottom:18px;}
+  .admin-collapsible.is-collapsed>.section-head{margin-bottom:0;}
+  .admin-collapsible.is-collapsed>.section-head p{margin-bottom:0;}
+  .admin-section-chevron{display:inline-block;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:8px;margin-bottom:3px;transition:transform .18s ease;}
+  .admin-collapsible:not(.is-collapsed) .admin-section-chevron{transform:rotate(225deg);margin-bottom:-2px;}
+  .admin-side-menu a.is-active,.admin-tabs .admin-tab.is-active{border-color:rgba(255,211,77,.65);color:#ffd34d;background:rgba(255,211,77,.08);}
+  @media(max-width:720px){.admin-collapsible>.section-head{flex-direction:column}.admin-section-toggle{width:100%;}}
  </style>
 </head>
 <body>
@@ -117,27 +132,28 @@
     </div>
 
     <div class="admin-tabs">
-     <a class="admin-tab" href="#tournamentSetupAdmin" title="Tournament Setup">Tournament Setup</a>
      <a class="admin-tab" href="#tournamentDirectoryAdmin" title="Tournament Directory">Tournament Directory</a>
-     <a class="admin-tab" href="#prizePoolAdmin" title="Prize Pool">Prize Pool</a>
-     <a class="admin-tab" href="#communicationAdmin" title="Communication">Communication</a>
      <a class="admin-tab" href="#announcementsAdmin" title="Announcements">Announcements</a>
+     <a class="admin-tab" href="#tournamentSetupAdmin" title="Registration & Timeline">Registration & Timeline</a>
+     <a class="admin-tab" href="#prizePoolAdmin" title="Prize Pool">Prize Pool</a>
      <a class="admin-tab" href="#sheetSyncAdmin" title="Sheet Sync">Sheet Sync</a>
-     <a class="admin-tab" href="#matchPreviewAdmin" title="Match Preview">Match Preview</a>
+     <a class="admin-tab" href="#matchPreviewAdmin" title="Schedule & Results Preview">Schedule & Results Preview</a>
+     <a class="admin-tab" href="#communicationAdmin" title="Communication">Communication</a>
      <a class="admin-tab" href="#faqAdmin" title="FAQ">FAQ</a>
-     <a class="admin-tab" href="#inquiriesAdmin" title="Inquiries">Inquiries</a>
+     <a class="admin-tab" href="#inquiriesAdmin" title="Support Inquiries">Support Inquiries</a>
     </div>
 
     <section class="admin-grid">
      <aside class="admin-side-menu card">
-      <a href="#tournamentSetupAdmin">Tournament Setup</a>
       <a href="#tournamentDirectoryAdmin">Tournament Directory</a>
-      <a href="#prizePoolAdmin">Prize Pool</a>
-      <a href="#communicationAdmin">Communication</a>
       <a href="#announcementsAdmin">Announcements</a>
+      <a href="#tournamentSetupAdmin">Registration & Timeline</a>
+      <a href="#prizePoolAdmin">Prize Pool</a>
       <a href="#sheetSyncAdmin">Sheet Sync</a>
-      <a href="#schedulePreview">Schedule Preview</a>
-      <a href="#resultsPreview">Results Preview</a>
+      <a href="#matchPreviewAdmin">Schedule & Results Preview</a>
+      <a href="#communicationAdmin">Communication</a>
+      <a href="#faqAdmin">FAQ Management</a>
+      <a href="#inquiriesAdmin">Support Inquiries</a>
      </aside>
 
      <div class="admin-stack">
@@ -820,5 +836,137 @@
 <script src="assets/js/app.js?v=communication-discord-v1"></script>
  <script src="assets/js/i18n.js?v=i18n-v2"></script>
 <script src="assets/js/admin.js?v=communication-discord-v1"></script>
+
+<script>
+(function(){
+  const ADMIN_SECTION_ORDER = [
+    'tournamentDirectoryAdmin',
+    'announcementsAdmin',
+    'tournamentSetupAdmin',
+    'prizePoolAdmin',
+    'sheetSyncAdmin',
+    'matchPreviewAdmin',
+    'communicationAdmin',
+    'faqAdmin',
+    'inquiriesAdmin'
+  ];
+  const ADMIN_SECTION_LABELS = {
+    tournamentDirectoryAdmin: 'Tournament Directory',
+    announcementsAdmin: 'Announcements',
+    tournamentSetupAdmin: 'Registration & Timeline',
+    prizePoolAdmin: 'Prize Pool',
+    sheetSyncAdmin: 'Sheet Sync',
+    matchPreviewAdmin: 'Schedule & Results Preview',
+    communicationAdmin: 'Communication',
+    faqAdmin: 'FAQ Management',
+    inquiriesAdmin: 'Support Inquiries'
+  };
+
+  function closestSectionFromHash(hash){
+    if(!hash) return null;
+    const raw = String(hash).replace(/^#/, '');
+    if(ADMIN_SECTION_ORDER.includes(raw)) return document.getElementById(raw);
+    const target = document.getElementById(raw);
+    return target ? target.closest('.admin-collapsible') : null;
+  }
+
+  function setActiveLinks(sectionId){
+    document.querySelectorAll('.admin-tabs a, .admin-side-menu a').forEach(function(link){
+      const section = closestSectionFromHash(link.getAttribute('href'));
+      link.classList.toggle('is-active', !!section && section.id === sectionId);
+    });
+  }
+
+  function toggleAdminSection(section, forceOpen){
+    if(!section) return;
+    const body = section.querySelector(':scope > .admin-collapsible-body');
+    const toggle = section.querySelector(':scope > .section-head .admin-section-toggle');
+    const willOpen = typeof forceOpen === 'boolean' ? forceOpen : section.classList.contains('is-collapsed');
+    section.classList.toggle('is-collapsed', !willOpen);
+    if(body) body.hidden = !willOpen;
+    if(toggle){
+      toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      const text = toggle.querySelector('.admin-section-toggle-text');
+      if(text) text.textContent = willOpen ? 'Hide' : 'Show';
+    }
+    if(willOpen) setActiveLinks(section.id);
+  }
+
+  function makeSectionCollapsible(section, index){
+    if(!section || section.dataset.adminCollapsibleReady === 'true') return;
+    const head = section.querySelector(':scope > .section-head');
+    if(!head) return;
+    section.dataset.adminCollapsibleReady = 'true';
+    section.classList.add('admin-collapsible');
+
+    let body = section.querySelector(':scope > .admin-collapsible-body');
+    if(!body){
+      body = document.createElement('div');
+      body.className = 'admin-collapsible-body';
+      const nodes = [];
+      let node = head.nextSibling;
+      while(node){ nodes.push(node); node = node.nextSibling; }
+      nodes.forEach(function(item){ body.appendChild(item); });
+      section.appendChild(body);
+    }
+
+    let toggle = head.querySelector('.admin-section-toggle');
+    if(!toggle){
+      toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'btn btn-small admin-section-toggle';
+      toggle.innerHTML = '<span class="admin-section-toggle-text">Show</span><span class="admin-section-chevron" aria-hidden="true"></span>';
+      head.appendChild(toggle);
+    }
+    toggle.setAttribute('aria-controls', body.id || (section.id + 'Body'));
+    body.id = body.id || (section.id + 'Body');
+
+    toggle.addEventListener('click', function(ev){ ev.preventDefault(); ev.stopPropagation(); toggleAdminSection(section); });
+    head.addEventListener('click', function(ev){
+      if(ev.target.closest('a,button,input,select,textarea,label')) return;
+      toggleAdminSection(section);
+    });
+
+    const targetSection = closestSectionFromHash(window.location.hash);
+    const shouldOpen = targetSection ? targetSection.id === section.id : index === 0;
+    toggleAdminSection(section, shouldOpen);
+  }
+
+  function bindAdminNav(){
+    document.querySelectorAll('.admin-tabs a, .admin-side-menu a').forEach(function(link){
+      link.addEventListener('click', function(){
+        const section = closestSectionFromHash(link.getAttribute('href'));
+        if(section){
+          toggleAdminSection(section, true);
+          setTimeout(function(){ section.scrollIntoView({behavior:'smooth', block:'start'}); }, 0);
+        }
+      });
+    });
+  }
+
+  function initAdminCollapsibleSections(){
+    const stack = document.querySelector('.admin-stack');
+    if(!stack) return;
+    ADMIN_SECTION_ORDER.forEach(function(id){
+      const section = document.getElementById(id);
+      if(section) stack.appendChild(section);
+    });
+    ADMIN_SECTION_ORDER.forEach(function(id, index){ makeSectionCollapsible(document.getElementById(id), index); });
+    bindAdminNav();
+    const targetSection = closestSectionFromHash(window.location.hash);
+    setActiveLinks(targetSection ? targetSection.id : ADMIN_SECTION_ORDER[0]);
+    window.addEventListener('hashchange', function(){
+      const section = closestSectionFromHash(window.location.hash);
+      if(section) toggleAdminSection(section, true);
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initAdminCollapsibleSections);
+  }else{
+    initAdminCollapsibleSections();
+  }
+})();
+</script>
 </body>
 </html>

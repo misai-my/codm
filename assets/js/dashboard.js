@@ -291,15 +291,11 @@ function timelineDateTimeText(value) {
 function timelineDateText(row) {
  if (row?.display_date_text) return row.display_date_text;
 
- const startDate = dateLabel(row?.start_at);
- const endDate = dateLabel(row?.end_at);
-
+ // Always show the full date + time on both sides when an end time exists.
+ // This keeps multi-day timeline items clear and also avoids ambiguity for
+ // events that end late at night or run close to midnight.
  if (row?.start_at && row?.end_at) {
-  if (startDate && endDate && startDate !== endDate) {
-   return `${timelineDateTimeText(row.start_at)} – ${timelineDateTimeText(row.end_at)}`;
-  }
-
-  return `${startDate} · ${timeLabel(row.start_at)}–${timeLabel(row.end_at)}`;
+  return `${timelineDateTimeText(row.start_at)} – ${timelineDateTimeText(row.end_at)}`;
  }
 
  if (row?.start_at) {

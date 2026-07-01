@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8"/>
+ <meta name="viewport" content="width=device-width, initial-scale=1"/>
+ <title>Admin Randomizer · CODM Tournament OS</title>
+ <link rel="stylesheet" href="assets/css/style.css?v=randomizer-admin-v1"/>
+ <link rel="icon" href="favicon.ico" sizes="any">
+ <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
+ <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=favicon-yellow-v1">
+ <style>
+  .randomizer-shell{display:grid;grid-template-columns:minmax(300px,0.95fr) minmax(360px,1.05fr);gap:18px;align-items:start;}
+  .randomizer-panel{min-height:100%;}
+  .randomizer-textarea{min-height:360px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;line-height:1.45;resize:vertical;}
+  .randomizer-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px;}
+  .randomizer-result-box{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden;}
+  .randomizer-result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.1);}
+  .randomizer-output{width:100%;min-height:260px;padding:16px;border:0;background:transparent;color:rgba(255,255,255,.9);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:13px;line-height:1.5;resize:vertical;outline:none;white-space:pre;}
+  .group-preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:14px;}
+  .group-preview-card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px;}
+  .group-preview-card h3{margin:0 0 10px;font-size:14px;color:#ffd34d;letter-spacing:.04em;text-transform:uppercase;}
+  .group-preview-card ol{margin:0;padding-left:22px;color:rgba(255,255,255,.82);}
+  .group-preview-card li{padding:3px 0;}
+  .admin-randomizer-locked{max-width:720px;margin:0 auto;}
+  @media(max-width:920px){.randomizer-shell{grid-template-columns:1fr}.randomizer-textarea{min-height:280px}.randomizer-options{grid-template-columns:1fr}}
+ </style>
+</head>
+<body>
+<header class="nav admin-nav">
+ <div class="container nav-inner">
+  <a class="brand codm-premium-brand" href="admin.html">
+   <span class="brand-mark logo-image" style="width:44px;height:44px;min-width:44px;max-width:44px;min-height:44px;max-height:44px;flex:0 0 44px;overflow:hidden;display:grid;place-items:center;padding:6px;border-radius:14px;box-sizing:border-box;">
+    <img src="assets/img/codm-logo.png" width="32" height="32" alt="CODM Tournament OS logo" style="width:32px;height:32px;max-width:32px;max-height:32px;object-fit:contain;display:block;position:static;"/>
+   </span>
+   <span class="brand-title">CODM TOURNAMENT OS<small>ADMIN RANDOMIZER</small></span>
+  </a>
+  <nav class="nav-links admin-only-nav">
+   <a class="nav-link" href="admin.html">Admin Console</a>
+   <a class="nav-link" href="dashboard.html" data-tournament-link="dashboard.html" target="_blank" rel="noopener">View Public Site</a>
+   <button class="btn btn-danger btn-small hidden" id="randomizerSignOutBtn" data-signout>Sign Out</button>
+  </nav>
+  <div class="language-switcher">
+   <label for="languageSelect">Language</label>
+   <select id="languageSelect" data-language-select aria-label="Language">
+    <option value="en">EN</option>
+    <option value="ms">MS</option>
+    <option value="fil">FIL</option>
+    <option value="zh">ZH</option>
+   </select>
+  </div>
+ </div>
+</header>
+
+<main>
+ <section class="section">
+  <div class="container">
+   <section id="randomizerLoginCard" class="card admin-login-card hidden admin-randomizer-locked">
+    <div class="eyebrow">Admin Login</div>
+    <h1>Randomizer access is admin-only.</h1>
+    <p class="lead">Approved admins can sign in to split pasted player/team lists into sheet-ready groups.</p>
+    <form id="randomizerLoginForm" class="form" style="max-width:520px;">
+     <div class="field">
+      <label for="randomizerLoginEmail">Admin Email</label>
+      <input id="randomizerLoginEmail" type="email" placeholder="admin@email.com" autocomplete="username" required/>
+     </div>
+     <div class="field">
+      <label for="randomizerLoginPassword">Password</label>
+      <input id="randomizerLoginPassword" type="password" placeholder="Enter password" autocomplete="current-password" required/>
+     </div>
+     <button class="btn btn-primary" type="submit">Login to Randomizer</button>
+     <div id="randomizerLoginStatus" class="notice hidden"></div>
+    </form>
+    <div class="actions" style="margin-top:14px;">
+     <a class="btn" href="dashboard.html" data-tournament-link="dashboard.html">Back to Public Event Hub</a>
+    </div>
+   </section>
+
+   <section id="randomizerDenied" class="card hidden admin-randomizer-locked">
+    <div class="eyebrow">Admin Only</div>
+    <h1>Admin role required.</h1>
+    <p class="lead">This account is logged in, but it is not marked as an admin in Supabase profiles.</p>
+    <div class="notice notice-warning">Ask the site owner to add this account as an admin.</div>
+    <div class="actions" style="margin-top:14px;">
+     <button class="btn btn-danger" data-signout>Sign Out</button>
+     <a class="btn" href="dashboard.html" data-tournament-link="dashboard.html">View Public Site</a>
+    </div>
+   </section>
+
+   <div id="randomizerMain" class="hidden">
+    <section class="admin-hero card">
+     <div>
+      <div class="eyebrow">Admin Tool</div>
+      <h1>Group Randomizer</h1>
+      <p>Paste player or team names, choose the number of groups, and generate a Google Sheets-ready result.</p>
+     </div>
+     <div class="actions">
+      <a class="btn" href="admin.html">Back to Admin Console</a>
+     </div>
+    </section>
+
+    <section class="randomizer-shell">
+     <section class="card randomizer-panel">
+      <div class="section-head">
+       <div>
+        <div class="eyebrow">Input</div>
+        <h2>Names to split</h2>
+        <p>Paste one player/team per line. Blank lines are ignored. Duplicates are kept unless you enable duplicate removal.</p>
+       </div>
+      </div>
+
+      <form id="randomizerForm" class="form">
+       <div class="field">
+        <label for="randomizerInput">Player / Team Names</label>
+        <textarea id="randomizerInput" class="randomizer-textarea" placeholder="Team Alpha&#10;Team Bravo&#10;Team Charlie&#10;Team Delta"></textarea>
+       </div>
+
+       <div class="randomizer-options">
+        <div class="field">
+         <label for="randomizerGroupCount">Number of Groups</label>
+         <input id="randomizerGroupCount" type="number" min="1" step="1" value="4"/>
+        </div>
+        <div class="field">
+         <label for="randomizerGroupPrefix">Group Name Prefix</label>
+         <input id="randomizerGroupPrefix" type="text" value="Group" placeholder="Group"/>
+        </div>
+        <div class="field">
+         <label for="randomizerFormat">Sheet Output Format</label>
+         <select id="randomizerFormat">
+          <option value="long">Long Table: Group / Slot / Name</option>
+          <option value="wide">Wide Table: Group columns</option>
+         </select>
+        </div>
+        <div class="field">
+         <label for="randomizerDistribution">Distribution</label>
+         <select id="randomizerDistribution">
+          <option value="balanced">Balanced, top to bottom</option>
+          <option value="snake">Snake order</option>
+         </select>
+        </div>
+       </div>
+
+       <label class="check-row" style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+        <input id="randomizerRemoveDuplicates" type="checkbox"/>
+        <span>Remove exact duplicate names before randomizing</span>
+       </label>
+
+       <div class="actions" style="margin-top:16px;">
+        <button class="btn btn-primary" type="submit">Randomize Groups</button>
+        <button class="btn" type="button" id="randomizerClearBtn">Clear</button>
+       </div>
+      </form>
+     </section>
+
+     <section class="card randomizer-panel">
+      <div class="section-head">
+       <div>
+        <div class="eyebrow">Output</div>
+        <h2>Copy-ready result</h2>
+        <p>Copy the result and paste directly into Google Sheets.</p>
+       </div>
+      </div>
+
+      <div class="randomizer-result-box">
+       <div class="randomizer-result-head">
+        <strong id="randomizerSummary">No result yet</strong>
+        <button class="btn btn-small" type="button" id="randomizerCopyBtn">Copy Result</button>
+       </div>
+       <textarea id="randomizerOutput" class="randomizer-output" readonly placeholder="Your sheet-ready randomized output will appear here."></textarea>
+      </div>
+
+      <div id="randomizerPreview" class="group-preview-grid"></div>
+     </section>
+    </section>
+   </div>
+  </div>
+ </section>
+</main>
+
+<div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js?v=randomizer-admin-v1"></script>
+<script src="assets/js/app.js?v=randomizer-admin-v1"></script>
+<script src="assets/js/i18n.js?v=randomizer-admin-v1"></script>
+<script src="assets/js/randomizer.js?v=randomizer-admin-v1"></script>
+</body>
+</html>

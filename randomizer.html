@@ -4,7 +4,7 @@
  <meta charset="utf-8"/>
  <meta name="viewport" content="width=device-width, initial-scale=1"/>
  <title>Admin Randomizer · CODM Tournament OS</title>
- <link rel="stylesheet" href="assets/css/style.css?v=randomizer-admin-v1"/>
+ <link rel="stylesheet" href="assets/css/style.css?v=randomizer-log-v1"/>
  <link rel="icon" href="favicon.ico" sizes="any">
  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png?v=favicon-yellow-v1">
  <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png?v=favicon-yellow-v1">
@@ -22,6 +22,11 @@
   .group-preview-card ol{margin:0;padding-left:22px;color:rgba(255,255,255,.82);}
   .group-preview-card li{padding:3px 0;}
   .admin-randomizer-locked{max-width:720px;margin:0 auto;}
+
+  .randomizer-system-log-card{margin-top:18px;}
+  .randomizer-system-log-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .randomizer-system-log{width:100%;min-height:280px;padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(0,0,0,.34);color:#9df7c8;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:12px;line-height:1.55;resize:vertical;outline:none;white-space:pre;box-shadow:inset 0 0 28px rgba(0,0,0,.22);}
+  .randomizer-log-note{margin-top:10px;color:rgba(255,255,255,.58);font-size:12px;}
   @media(max-width:920px){.randomizer-shell{grid-template-columns:1fr}.randomizer-textarea{min-height:280px}.randomizer-options{grid-template-columns:1fr}}
  </style>
 </head>
@@ -171,6 +176,21 @@
       <div id="randomizerPreview" class="group-preview-grid"></div>
      </section>
     </section>
+
+    <section class="card randomizer-system-log-card">
+     <div class="section-head">
+      <div>
+       <div class="eyebrow">System Audit</div>
+       <h2>Randomization System Log</h2>
+       <p>Technical trace of how the list was parsed, shuffled, distributed, and assigned.</p>
+      </div>
+      <div class="randomizer-system-log-actions">
+       <button class="btn btn-small" type="button" id="randomizerCopyLogBtn">Copy Log</button>
+      </div>
+     </div>
+     <textarea id="randomizerSystemLog" class="randomizer-system-log" readonly placeholder="System log will appear here after randomizing."></textarea>
+     <p class="randomizer-log-note">This log is generated locally in the admin browser for transparency. It can be copied and saved with the official group draw record.</p>
+    </section>
    </div>
   </div>
  </section>
@@ -178,9 +198,9 @@
 
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/config.js?v=randomizer-admin-v1"></script>
-<script src="assets/js/app.js?v=randomizer-admin-v1"></script>
-<script src="assets/js/i18n.js?v=randomizer-admin-v1"></script>
-<script src="assets/js/randomizer.js?v=randomizer-admin-v1"></script>
+<script src="assets/js/config.js?v=randomizer-log-v1"></script>
+<script src="assets/js/app.js?v=randomizer-log-v1"></script>
+<script src="assets/js/i18n.js?v=randomizer-log-v1"></script>
+<script src="assets/js/randomizer.js?v=randomizer-log-v1"></script>
 </body>
 </html>
